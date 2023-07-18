@@ -9,3 +9,4 @@ backend_python/venv
 backend_python/venv/Lib
 Solver/__pycache__
 backend_python/__pycache__
+frontend/node_modules
