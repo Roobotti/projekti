@@ -44,7 +44,7 @@ def generate_basic_puzzle(pattern, height):
     stacked "height" times
     """
     # generate base, populate from list of indices
-    base = np.zeros((4, 4))
+    base = np.zeros((5, 5))
     for i, j in pattern:
         base[i, j] = 1
 
@@ -278,7 +278,7 @@ def plot_combo(target_pieces):
 
 def find_good_combination(target_puzzle, combos=4):
     h = 2
-    puzzle_size = get_puzzle_size(generate_basic_puzzle(target_puzzle, h))
+    puzzle_size = get_puzzle_size(generate_basic_puzzle(target_puzzle, 2))
 
     for piece_count in range(1, 5):
         print("looking at combinations of ", piece_count, "pieces")
@@ -297,7 +297,7 @@ def find_good_combination(target_puzzle, combos=4):
                 if size == puzzle_size:
                     try:
                         solution_count, puzzle_solution = solve_puzzle(
-                            generate_basic_puzzle(target_puzzle, h),
+                            generate_basic_puzzle(target_puzzle, 2),
                             target_pieces,
                         )
                         if solution_count > 0 and solution_count <= combos:
@@ -307,3 +307,8 @@ def find_good_combination(target_puzzle, combos=4):
                     except:
                         print("error")
         print("redy")
+
+
+rotated_pieces = {}
+for code, coordinate in piece_coordinates.items():
+    rotated_pieces[code] = piece_variations(generate_piece(coordinate))

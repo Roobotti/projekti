@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, Request
+from flask import Flask, jsonify, request
 
 from pymongo_get_database import get_database
 from pandas import DataFrame
@@ -13,7 +13,6 @@ dbname = get_database()
 collection_name = dbname["boards"]
 item_details = collection_name.find()
 collection_length = collection_name.count_documents({})
-random_int = random.randint(0, collection_length - 1)
 
 
 class NumpyArrayEncoder(JSONEncoder):
@@ -33,6 +32,7 @@ def hello():
 
 @app.route("/board", methods=["GET"])
 def board():
+    random_int = random.randint(0, collection_length - 1)
     print("board endpoint reached...")
     coordinates = list(item_details[random_int].values())[1]
     base = {"base": generate_base(coordinates), "coordinates": coordinates}
@@ -42,11 +42,13 @@ def board():
 
 
 @app.route("/blocks", methods=["GET"])
-def blocks(request: Request):
+def blocks():
     print("blocks endpoint reached...")
     query_param = request.args.get("param")
-    combination, solution = find_good_combination(query_param)
+    query_param = json.loads(query_param)
 
+    print("param", query_param)
+    combination, solution = find_good_combination(([(c[0], c[1]) for c in query_param]))
     return jsonify(combination)
 
 

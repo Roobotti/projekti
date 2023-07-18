@@ -1,7 +1,10 @@
 from pymongo_get_database import get_database
 from pandas import DataFrame
 from solver import generate_base
+
 import requests
+import json
+
 
 dbname = get_database()
 collection_name = dbname["boards"]
@@ -15,23 +18,22 @@ url2 = "http://localhost:6969/board"
 
 # Define the query parameter
 query_param = [
-    (0, 0),
-    (1, 0),
-    (2, 0),
-    (3, 0),
-    (1, 1),
-    (2, 1),
-    (3, 1),
-    (4, 1),
-    (1, 2),
-    (2, 2),
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [3, 0],
+    [1, 1],
+    [2, 1],
+    [3, 1],
+    [4, 1],
+    [1, 2],
+    [2, 2],
 ]
 
+serialized_param = json.dumps(query_param)
+
 # Send a GET request to the server with the query parameter
-res = requests.get(url2).json()
-coordinates = [(c[0], c[1]) for c in res["coordinates"]]
-print(coordinates)
-response = requests.get(url, params={"param": coordinates})
+response = requests.get(url, params={"param": serialized_param})
 
 # Check the response status code
 if response.status_code == 200:
