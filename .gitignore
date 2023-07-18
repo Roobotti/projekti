@@ -1,0 +1,11 @@
+.env
+./venv
+*.log
+backend_python/.env
+.vscode/settings.json
+./__pycache__
+./Lib
+backend_python/venv
+backend_python/venv/Lib
+Solver/__pycache__
+backend_python/__pycache__
