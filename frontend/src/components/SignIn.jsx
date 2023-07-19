@@ -6,7 +6,6 @@ import Text from './Text';
 import theme from '../theme';
 import * as yup from 'yup'
 
-import { useSignIn } from '../hooks/useSignIn';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username is required'),
@@ -60,7 +59,7 @@ export const SignInContainer = ({onSubmit}) => {
   )}
 
 const SignIn = () => {
-  const [ signIn, result ] = useSignIn();
+  const [ signIn, result ] = useContext();
   const onSubmit = async (values) => {
     console.log("values", values)
     try {

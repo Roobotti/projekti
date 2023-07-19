@@ -3,4 +3,4 @@ import os
 
 load_dotenv(".env")
 
-CONNECTION_STRING = os.getenv("CONNECTION_STRING")
+ATLAS_URI = os.getenv("ATLAS_URI")

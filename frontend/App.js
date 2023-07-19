@@ -1,26 +1,25 @@
 import { NativeRouter } from "react-router-native";
-import { ApolloProvider } from "@apollo/client";
 import Constants from "expo-constants";
 
 import Main from "./src/components/Main";
-import createApolloClient from "./src/utils/apolloClient";
-import AuthStorage from "./src/utils/authStorage";
 import AuthStorageContext from "./src/contexts/AuthStorageContext";
-
-const authStorage = new AuthStorage();
-const apolloClient = createApolloClient(authStorage);
+import AuthStorage from "./src/utils/authStorage";
+import { BoardContextProvider } from "./src/contexts/BoardContext";
+import { BlocksContextProvider } from "./src/contexts/BlockContext";
 
 const App = () => {
-  console.log(Constants.manifest.extra);
+  console.log("app", Constants.manifest.extra);
 
   return (
-    <NativeRouter>
-      <ApolloProvider client={apolloClient}>
-        <AuthStorageContext.Provider value={authStorage}>
-          <Main />
-        </AuthStorageContext.Provider>
-      </ApolloProvider>
-    </NativeRouter>
+    <BoardContextProvider>
+      <BlocksContextProvider>
+        <NativeRouter>
+          <AuthStorageContext.Provider value={AuthStorage}>
+            <Main />
+          </AuthStorageContext.Provider>
+        </NativeRouter>
+      </BlocksContextProvider>
+    </BoardContextProvider>
   );
 };
 
