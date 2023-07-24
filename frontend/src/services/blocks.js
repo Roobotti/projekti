@@ -1,9 +1,10 @@
 import Constants from "expo-constants";
 const baseUrl = `${Constants.manifest.extra.uri}/api/blocks`;
 
-export const getBlocks = async (data) => {
+export const getBlocks = async (data, signal) => {
   console.log(data.coordinates);
   const response = await fetch(baseUrl, {
+    signal: signal,
     method: "POST",
     headers: {
       "Content-Type": "application/json",

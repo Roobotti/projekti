@@ -314,23 +314,38 @@ def find_good_combination(target_puzzle, combos=4):
         print("redy")
 
 
+def load_block(target_pieces):
+    for i, piece in enumerate(target_pieces):
+        fig = plt.figure(figsize=(7, 7))
+        ax = fig.add_subplot(1, 1, 1, projection="3d")
+        ax.axis("off")
+        block = generate_block(piece_coordinates[piece])
+
+        ax.set_xlim(0, block.shape[0])
+        ax.set_ylim(0, block.shape[1])
+        ax.set_zlim(0, block.shape[2])  # Set the maximum height for the plot
+
+        ax.voxels(
+            block,
+            facecolors=piece_colors[piece],
+            edgecolor="gray",
+        )
+
+        plt.axis("off")
+        plt.savefig(f"{piece}.png", transparent=True)
+        plt.close(fig)
+
+
 rotated_pieces = {}
 for code, coordinate in piece_coordinates.items():
     rotated_pieces[code] = piece_variations(generate_piece(coordinate))
 
-target_puzzle = "tester"
+target_puzzle = [[0, 0], [0, 2], [1, 0], [1, 1], [1, 2], [2, 1], [2, 2], [3, 2]]
+target_blocks = ["b4", "r4", "r3", "r1"]
 
-print(generate_base(puzzle_coordinates[target_puzzle]))
+count, solution = solve_puzzle(
+    generate_basic_puzzle(target_puzzle, PUZZLE_HEIGHT),
+    target_blocks,
+)
 
-if False:
-    target_pieces, solution = find_good_combination(target_puzzle, 4)
-
-    plot_combo(target_pieces)
-
-    solution_count, puzzle_solution = solve_puzzle(
-        generate_basic_puzzle(puzzle_coordinates[target_puzzle], PUZZLE_HEIGHT),
-        target_pieces,
-        3,
-    )
-
-    plot_solutions(target_pieces, puzzle_solution, 1)
+plot_solutions(target_blocks, solution, count)

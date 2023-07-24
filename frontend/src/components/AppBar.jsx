@@ -1,4 +1,5 @@
-import { ScrollView, View, StyleSheet } from 'react-native';
+import { ScrollView, View, StyleSheet, Button } from 'react-native';
+import { useContext } from 'react';
 import { Link } from 'react-router-native';
 import Text from './Text';
 import Constants from 'expo-constants';
@@ -14,10 +15,13 @@ const styles = StyleSheet.create({
     // ...
   },
   tab: {
+
     justifyContent: 'space-around',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    paddingHorizontal: 20
   },
   scroll: {
+    gap: 40,
     flexDirection: 'row'
   }
 });

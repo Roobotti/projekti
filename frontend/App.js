@@ -6,6 +6,7 @@ import AuthStorageContext from "./src/contexts/AuthStorageContext";
 import AuthStorage from "./src/utils/authStorage";
 import { BoardContextProvider } from "./src/contexts/BoardContext";
 import { BlocksContextProvider } from "./src/contexts/BlockContext";
+import { ScreenContextProvider } from "./src/contexts/SceenContext";
 
 const App = () => {
   console.log("app", Constants.manifest.extra);
@@ -13,11 +14,13 @@ const App = () => {
   return (
     <BoardContextProvider>
       <BlocksContextProvider>
-        <NativeRouter>
-          <AuthStorageContext.Provider value={AuthStorage}>
-            <Main />
-          </AuthStorageContext.Provider>
-        </NativeRouter>
+        <ScreenContextProvider>
+          <NativeRouter>
+            <AuthStorageContext.Provider value={AuthStorage}>
+              <Main />
+            </AuthStorageContext.Provider>
+          </NativeRouter>
+        </ScreenContextProvider>
       </BlocksContextProvider>
     </BoardContextProvider>
   );
