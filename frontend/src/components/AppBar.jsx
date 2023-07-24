@@ -40,7 +40,7 @@ const AppBar = () => {
     <View style={styles.container}>
       <ScrollView horizontal style={styles.scroll}>
         <View style={styles.tab}>
-          <Tab to="/" text="Repositories"/>
+          <Tab to="/" text="Menu"/>
         </View>
       </ScrollView>
     </View>
