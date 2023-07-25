@@ -30,6 +30,10 @@ class TokenData(BaseModel):
 
 class User(BaseModel):
     username: str
+    friends: list[str]
+    requests: list[str]
+    wins: list[str]
+    lobby: str
     disabled: bool | None = None
 
 

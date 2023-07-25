@@ -24,6 +24,9 @@ const Sign = () => {
 const Logout = () => {
   return (
     <>
+      <Link to="/multiPlayer" style={styles.option}>
+        <Text style={styles.optionText}>Multiplayer</Text>
+      </Link>
       <Link to="/SignOut" style={styles.option}>
         <Text style={styles.optionText}>Sign out</Text>
       </Link>
@@ -40,15 +43,8 @@ const Menu = () => {
       <Link to="/singlePlayer" style={styles.option}>
         <Text style={styles.optionText}>Single Player</Text>
       </Link>
-      <Link to="/multiplayer" style={styles.option}>
-        <Text style={styles.optionText}>Multiplayer</Text>
-      </Link>
 
       {!user ? <Sign /> : <Logout />}
-      
-
-      
-
       
     </ScrollView>
   );

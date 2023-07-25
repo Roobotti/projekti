@@ -22,24 +22,20 @@ export const signIn = async ({ username, password }) => {
   }
 };
 
-export const signUp = async (username, password) => {
+export const signUp = async ({ username, password }) => {
   try {
     const formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
 
-    const response = await fetch(`${baseUrl}/token`, {
+    const response = await fetch(`${baseUrl}/signup`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+      body: formData,
     });
 
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error signing up:", error);
-    return null;
   }
 };
 

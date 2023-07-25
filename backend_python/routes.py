@@ -48,11 +48,37 @@ async def read_users_me(
     return current_user
 
 
+@router.get("/users/me/lobby", response_model=User)
+async def read_users_me(
+    current_user: Annotated[User, Depends(get_current_active_user)]
+):
+    return current_user
+
+
+@router.put("/users/me/lobby", response_model=User)
+async def update_user_lobby(
+    lobby: str, current_user: User = Depends(get_current_active_user)
+):
+    current_user.lobby = lobby
+    await users.update_one(
+        {"username": current_user.username},
+        {"$set": {"lobby": lobby}},
+    )
+    return current_user
+
+
 @router.post("/signup")
-def sign_up(username: str, password: str):
-    hashed_password = get_password_hash(password)
-    user_data = {"username": username, "hashed_password": hashed_password}
-    existing_user = users.find_one({"username": username})
+def sign_up(form_data: OAuth2PasswordRequestForm = Depends()):
+    hashed_password = get_password_hash(form_data.password)
+    user_data = {
+        "username": form_data.username,
+        "hashed_password": hashed_password,
+        "friends": [],
+        "requests": [],
+        "wins": [],
+        "lobby": "",
+    }
+    existing_user = users.find_one({"username": form_data.username})
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
 

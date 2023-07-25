@@ -93,6 +93,7 @@ export const SignIn = () => {
 
 export const SignUp = () => {
   const navigate = useNavigate();
+  
   const onSubmit = async (values) => {
     try {
       await signUp(values);
