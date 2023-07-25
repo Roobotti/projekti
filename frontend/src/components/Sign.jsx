@@ -7,11 +7,14 @@ import { Formik } from 'formik';
 import FormikTextInput from './FormikTextInput';
 
 
-import { signIn, signUp } from '../services/users';
+import { signIn, signUp, signOut } from '../services/users';
 import Text from './Text';
 import theme from '../theme';
 import * as yup from 'yup'
 import { useAuthStorage } from '../hooks/useStorageContext';
+import { UserContext } from "../contexts/UserContext";
+import { readUsersMe } from '../services/users';
+import { useContext } from 'react';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username is required'),
@@ -65,12 +68,15 @@ const SignContainer = ({onSubmit, mode}) => {
 
 export const SignIn = () => {
   const navigate = useNavigate();
-  const authStorage = useAuthStorage()
+  const authStorage = useAuthStorage();
+  const userContext = useContext(UserContext);
+
   const onSubmit = async (values) => {
     try {
       const result = await signIn(values);
       const json = await result.json()
       await authStorage.setAccessToken(json["access_token"])
+      await userContext.login( json )
       console.log("hei", json["access_token"])
       navigate("/", { replace: true });
       console.log('Token saved to AsyncStorage');
@@ -99,5 +105,21 @@ export const SignUp = () => {
       <SignContainer onSubmit={onSubmit} mode="sign up" />
     </View>
   )
+};
+
+export const SignOut = () => {
+  const authStorage = useAuthStorage();
+  const userContext = useContext(UserContext);
+  const navigate = useNavigate();
+  const s = async (values) => {
+    try {
+      await signOut(values);
+      await authStorage.removeAccessToken()
+      await userContext.logout()
+      navigate("/", { replace: true });
+    } catch (error) { console.log(error) }
+  };
+
+  s()
 };
 

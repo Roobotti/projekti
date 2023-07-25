@@ -1,12 +1,39 @@
 
+
 import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Link } from 'react-router-native';
-import { readUsersMe } from '../services/users';
 
+
+import { useState, useEffect, useContext  } from 'react';
+import { UserContext } from '../contexts/UserContext';
+
+
+const Sign = () => {
+  return (
+    <>
+      <Link to="/SignIn" style={styles.option}>
+        <Text style={styles.optionText}>Sign in</Text>
+      </Link>
+      <Link to="/SignUp" style={styles.option}>
+        <Text style={styles.optionText}>Sign up</Text>
+      </Link>
+    </>
+  )
+}
+
+const Logout = () => {
+  return (
+    <>
+      <Link to="/SignOut" style={styles.option}>
+        <Text style={styles.optionText}>Sign out</Text>
+      </Link>
+    </>
+  )
+}
 
 const Menu = () => {
-  const user = readUsersMe()
-
+  const { user } = useContext(UserContext);
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       
@@ -17,13 +44,10 @@ const Menu = () => {
         <Text style={styles.optionText}>Multiplayer</Text>
       </Link>
 
+      {!user ? <Sign /> : <Logout />}
       
-      <Link to="/SignIn" style={styles.option}>
-        <Text style={styles.optionText}>Sign in</Text>
-      </Link>
-      <Link to="/SignUp" style={styles.option}>
-        <Text style={styles.optionText}>Sign up</Text>
-      </Link>
+
+      
 
       
     </ScrollView>

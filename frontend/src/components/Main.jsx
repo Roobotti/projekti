@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Route, Routes, Navigate } from 'react-router-native';
 import AppBar from './AppBar';
-import { SignUp, SignIn } from './Sign';
+import { SignUp, SignIn, SignOut } from './Sign';
 import Board from './GameView';
 import Menu from './Menu';
 
@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
 });
 
 const Main = () => {
+
    return (
     <View style={styles.container}>
       <AppBar />
@@ -21,6 +22,7 @@ const Main = () => {
         <Route path="/singlePlayer" element={<Board />} exact />
         <Route path="/SignIn" element={<SignIn />} exact />
         <Route path="/SignUp" element={<SignUp />} exact />
+        <Route path="/SignOut" element={<SignOut />} exact />
         {//<Route path="/SignIn" element={<SignIn />} exact />
 }
         <Route path="*" element={<Navigate to="/" replace />} />

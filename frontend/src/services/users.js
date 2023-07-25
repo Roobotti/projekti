@@ -1,7 +1,5 @@
 import Constants from "expo-constants";
 import { useAuthStorage } from "../hooks/useStorageContext";
-import AuthStorage from "../utils/authStorage";
-import axios from "axios";
 
 const baseUrl = `${Constants.manifest.extra.uri}/api`;
 
@@ -45,10 +43,17 @@ export const signUp = async (username, password) => {
   }
 };
 
-export const readUsersMe = async () => {
+export const signOut = async () => {
   try {
     const authStorage = useAuthStorage();
-    const token = await authStorage.getAccessToken();
+    await authStorage.removeAccessToken();
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+  }
+};
+
+export const readUsersMe = async (token) => {
+  try {
     const response = await fetch(`${baseUrl}/users/me/`, {
       method: "GET",
       headers: {
@@ -62,9 +67,8 @@ export const readUsersMe = async () => {
     }
 
     const data = await response.json();
-    console.log("User data:", data);
     return data;
   } catch (error) {
-    console.error("Error fetching user data:", error);
+    console.error("Error fetching the user data:", error);
   }
 };
