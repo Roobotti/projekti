@@ -24,7 +24,7 @@ const Sign = () => {
 const Logout = () => {
   return (
     <>
-      <Link to="/multiPlayer" style={styles.option}>
+      <Link to="/Lobby" style={styles.option}>
         <Text style={styles.optionText}>Multiplayer</Text>
       </Link>
       <Link to="/SignOut" style={styles.option}>

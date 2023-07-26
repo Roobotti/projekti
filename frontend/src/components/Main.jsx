@@ -5,6 +5,7 @@ import { SignUp, SignIn, SignOut } from './Sign';
 import Lobby from './Lobby';
 import Board from './GameView';
 import Menu from './Menu';
+import MultiPlayer from './MultiPlayer';
 
 const styles = StyleSheet.create({
   container: {
@@ -21,7 +22,8 @@ const Main = () => {
       <Routes>
         <Route path="/" element={<Menu />} exact />
         <Route path="/singlePlayer" element={<Board />} exact />
-        <Route path="/multiPlayer" element={<Lobby />} exact />
+        <Route path="/MultiPlayer/:host" render={(props) => <MultiPlayer {...props} />} exact/>
+        <Route path="/Lobby" element={<Lobby />} exact />
         <Route path="/SignIn" element={<SignIn />} exact />
         <Route path="/SignUp" element={<SignUp />} exact />
         <Route path="/SignOut" element={<SignOut />} exact />

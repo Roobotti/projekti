@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
+import { history } from 'react-router-native';
 import  Constants from "expo-constants";
-
-const baseUrl = `${Constants.manifest.extra.ws}`;
+import { io } from "socket.io-client";
 
 import { UserContext } from '../contexts/UserContext';
 
@@ -13,64 +13,55 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import MultiPlayer from './MultiPlayer';
+
+const baseUrl = `${Constants.manifest.extra.ws}`;
+const socket = io.connect(baseUrl, {
+			path: '/ws/socket.io',
+		})
+
+console.log(baseUrl)
+// client-side
 
 const Lobby = () => {
   const { user, friends, requests } = useContext(UserContext);
   const [invites, setInvites] = useState([])
   const [newFriend, setNewFriend] = useState("");
-  const [ws, setWs] = useState(null);
+  const [game, setGame] = useState(null)
+  console.log(invites)
 
- useEffect(() => {
-    // Establish WebSocket connection when the component mounts
-    const socket = new WebSocket(`${baseUrl}/ws`);
-    setWs(socket);
-    socket.on("open", () => {
-      console.log("WebSocket connection established.");
-    });
+  useEffect( () => {
+    socket.on("connect", () => {
+    console.log("connected");
+    socket.emit("connection")
+  });
 
+    socket.on("disconnect", () => {
+    console.log("disconnected"); // undefined
+  });
 
-    socket.onmessage((event) => {
-      const data = JSON.parse(event.data);
-      console.log("Received data:", data);
+  socket.on(user, (data) => {
+  console.log("sender",data.user)
+  if (data.type === "invite") { 
+    setInvites(...invites, data.user)
+    console.log("invited")
+  }
+  });
 
-      if (data.type === "invite") {
-        // Handle friend invite
-        setInvites((prevInvites) => [...prevInvites, data.sender]);
-      } else if (data.type === "join_response") {
-        // Handle join response
-        // Display a message indicating whether the join request was accepted or rejected
-        console.log(`${data.sender} ${data.accepted ? "joined" : "could not join"} your lobby.`);
-      }
-    });
-
-    return () => {
-      // Clean up the WebSocket connection when the component unmounts
-      if (ws) {
-        ws.close();
-      }
-    };
-  }, [user]);
+  }, [user])
 
   const handleInvite = (friend) => {
-    // Send WebSocket message to invite the friend
-    const inviteData = {
-      type: "invite",
-      sender: user,
-      recipient: friend,
-    };
-    ws.send(JSON.stringify(inviteData));
+    console.log("invite", friend)
+    socket.emit('invite', {"user":user, "friend":friend});
+    setGame(<MultiPlayer host={true} user={user} friend={friend}/>)
   };
 
   const handleJoin = (friend) => {
-    // Send WebSocket message to join the friend's lobby
-    const joinData = {
-      type: "join",
-      sender: user,
-      recipient: friend,
-    };
-    ws.send(JSON.stringify(joinData));
+    console.log("join")
+    setGame(<MultiPlayer host={false} user={user} friend={friend}/>)
   };
 
+  if (game) return game
 
   return (
     <View style={styles.container}>
@@ -95,27 +86,16 @@ const Lobby = () => {
               <TouchableOpacity style={styles.friendItem}>
                 <Text>{friend}</Text>
               </TouchableOpacity>
-              <TouchableOpacity  style={styles.joinItem} onPress={() => handleJoin(friend)}>
-                <Text>Join</Text>
-              </TouchableOpacity>
+              {
+                invites && invites.includes(friend) ? (
+                <TouchableOpacity  style={styles.joinItem} onPress={() => handleJoin(friend)}>
+                  <Text>join</Text>
+                </TouchableOpacity>) :(
+                <TouchableOpacity  style={styles.joinItem} onPress={() => handleInvite(friend)}>
+                  <Text>invite</Text>
+                </TouchableOpacity>)
+              }
           </View>
-        ))}
-      </ScrollView>
-
-      {/* Horizontal scroll view of friend requests */}
-      <ScrollView
-        horizontal
-        style={styles.requestsScrollView}
-        contentContainerStyle={styles.requestsScrollViewContent}
-      >
-        {invites && invites.map((invite) => (
-          <TouchableOpacity
-            key={invite}
-            style={styles.requestItem}
-            onPress={() => handleInvite(invite)}
-          >
-            <Text>{invite}</Text>
-          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>

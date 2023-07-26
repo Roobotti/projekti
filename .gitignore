@@ -6,7 +6,9 @@ backend_python/.env
 ./__pycache__
 ./Lib
 backend_python/venv
-backend_python/venv/Lib
+
 Solver/__pycache__
 backend_python/__pycache__
 frontend/node_modules
+backend_python/node_modules
+
