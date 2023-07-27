@@ -23,7 +23,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT"],
     allow_headers=["*"],
 )
 
@@ -68,7 +68,25 @@ async def handle_ubongo(sid, args):
 @app.sio.on("invite")
 async def handle_join(sid, args):
     print("invite", args)
-    await app.sio.emit(args["friend"], {"type": "invite", "user": args["user"]})
+    await app.sio.emit(
+        args["friend"], {"type": "invite", "user": args["user"]}, skip_sid=sid
+    )
+
+
+@app.sio.on("accept")
+async def handle_accept(sid, args):
+    print("accept", args)
+    await app.sio.emit(
+        args["friend"], {"type": "accept", "user": args["user"]}, skip_sid=sid
+    )
+
+
+@app.sio.on("request")
+async def handle_request(sid, args):
+    print("request", args)
+    await app.sio.emit(
+        args["friend"], {"type": "request", "user": args["user"]}, skip_sid=sid
+    )
 
 
 @app.on_event("startup")

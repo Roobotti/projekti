@@ -14,6 +14,7 @@ import {
   StyleSheet,
 } from "react-native";
 import MultiPlayer from './MultiPlayer';
+import { sendRequest } from '../services/users';
 
 const baseUrl = `${Constants.manifest.extra.ws}`;
 const socket = io.connect(baseUrl, {
@@ -24,7 +25,7 @@ console.log(baseUrl)
 // client-side
 
 const Lobby = () => {
-  const { user, friends, requests } = useContext(UserContext);
+  const { user, friends, requests, token, sentRequests, wins, setReFresh, setFriends, setRequests } = useContext(UserContext);
   const [invites, setInvites] = useState([])
   const [newFriend, setNewFriend] = useState("");
   const [game, setGame] = useState(null)
@@ -41,11 +42,24 @@ const Lobby = () => {
   });
 
   socket.on(user, (data) => {
-  console.log("sender",data.user)
-  if (data.type === "invite") { 
-    setInvites(...invites, data.user)
-    console.log("invited")
-  }
+    console.log("sender", data.user)
+    switch (data.type) {
+      case "invite":
+        setInvites(...invites, data.user);
+        console.log("invited");
+        break;
+      case "accept":
+        setFriends([...friends, data.user])
+        setRequests(requests.filter((f) => f !== data.user))
+        console.log("accept");
+        break;
+      case "request":
+        setRequests([...friends, data.user])
+        console.log("request");
+        break;
+
+    }
+
   });
 
   }, [user])
@@ -61,6 +75,19 @@ const Lobby = () => {
     setGame(<MultiPlayer host={false} user={user} friend={friend}/>)
   };
 
+  const handleAccept = (friend) => {
+    console.log("Accept")
+    setFriends([...friends, friend])
+    setRequests(requests.filter((f) => f !== friend))
+    socket.emit('accept', {"user":user, "friend":friend});
+    sendRequest(token, friend)
+  };
+
+  const handleAddFriend = () => {
+    console.log("tok:", token)
+    if (sendRequest(token, newFriend)) socket.emit('request', {"user":user, "friend":newFriend});
+  };
+
   if (game) return game
 
   return (
@@ -71,8 +98,10 @@ const Lobby = () => {
         value={newFriend}
         onChangeText={(text) => setNewFriend(text)}
         placeholder="Add new friend"
+        returnKeyType="done" 
         onSubmitEditing={() => handleAddFriend()}
       />
+
 
       {/* Horizontal scroll view of the user's friends */}
       <ScrollView
@@ -98,14 +127,47 @@ const Lobby = () => {
           </View>
         ))}
       </ScrollView>
+      
+      {/* Horizontal scroll view of the user's requests */}
+      <ScrollView
+        horizontal
+        style={styles.friendsScrollView}
+        contentContainerStyle={styles.friendsScrollViewContent}
+      >
+        <Text style={styles.label}>Friend requests</Text>
+        {requests && requests.map((friend) => (
+          <View key={friend} style={styles.friendItemContainer}>
+              <TouchableOpacity style={styles.friendItem}  onPress={() => handleAccept(friend)}>
+                <Text>{friend}</Text>
+              </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Horizontal scroll view of the user's sent requests */}
+      <ScrollView
+        horizontal
+        style={styles.friendsScrollView}
+        contentContainerStyle={styles.friendsScrollViewContent}
+      >
+        <Text style={styles.label}>Sent requests</Text>
+        {sentRequests && sentRequests.map((friend) => (
+          <View key={friend} style={styles.friendItemContainer}>
+              <TouchableOpacity style={styles.friendItem}>
+                <Text>{friend}</Text>
+              </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
+      
+      <View style={styles.friendItemContainer}>
+        <TouchableOpacity style={styles.friendItem} onPress={() => setReFresh(Math.random()) }>
+          <Text>reFresh</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
         }
-
-  // Function to handle adding a new friend
-  const handleAddFriend = () => {
-    console.log(newFriend)
-  };
 
 
 const styles = StyleSheet.create({

@@ -65,6 +65,48 @@ export const readUsersMe = async (token) => {
     const data = await response.json();
     return data;
   } catch (error) {
+    //console.error("Error fetching the user data:", error);
+  }
+};
+
+export const newWin = async (token, win) => {
+  try {
+    const response = await fetch(`${baseUrl}/users/me/wins/${win}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user data");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
     console.error("Error fetching the user data:", error);
+  }
+};
+
+export const sendRequest = async (token, friend) => {
+  try {
+    const response = await fetch(`${baseUrl}/users/me/sentRequests/${friend}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch put request");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching the PUT sentRequests:", error);
   }
 };
