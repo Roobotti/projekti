@@ -56,7 +56,13 @@ async def handle_board(sid, args):
 @app.sio.on("blocks")
 async def handle_blocks(sid, args):
     room = args["room"]
-    await app.sio.emit("blocks", {"blocks": args["blocks"]}, room=room, skip_sid=sid)
+    await app.sio.emit("blocks", {"blocks": args["blocks"]}, room=room)
+
+
+@app.sio.on("loading")
+async def handle_loading(sid, args):
+    room = args["room"]
+    await app.sio.emit("loading", {}, room=room)
 
 
 @app.sio.on("ubongo")
