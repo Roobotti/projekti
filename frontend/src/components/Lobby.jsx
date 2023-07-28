@@ -1,7 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { history } from 'react-router-native';
-import  Constants from "expo-constants";
-import { io } from "socket.io-client";
+
 
 import { UserContext } from '../contexts/UserContext';
 
@@ -16,38 +15,37 @@ import {
 import MultiPlayer from './MultiPlayer';
 import { sendRequest } from '../services/users';
 
-const baseUrl = `${Constants.manifest.extra.ws}`;
-const socket = io.connect(baseUrl, {
-			path: '/ws/socket.io',
-		})
+import { socket } from '../services/socket';
 
-console.log(baseUrl)
 // client-side
 
 const Lobby = () => {
-  const { user, friends, requests, token, sentRequests, wins, setReFresh, setFriends, setRequests } = useContext(UserContext);
-  const [invites, setInvites] = useState([])
+  const { user, friends, requests, token, sentRequests, wins, invites, setSentInvite, setReFresh, setFriends, setRequests, setInvites } = useContext(UserContext);
   const [newFriend, setNewFriend] = useState("");
   const [game, setGame] = useState(null)
   console.log(invites)
 
   useEffect( () => {
+    socket.emit('active', {user})
     socket.on("connect", () => {
     console.log("connected");
     socket.emit("connection")
   });
-
     socket.on("disconnect", () => {
     console.log("disconnected"); // undefined
   });
 
-  socket.on(user, (data) => {
+  socket.on(`${user}/post`, (data) => {
     console.log("sender", data.user)
     switch (data.type) {
       case "invite":
         setInvites(...invites, data.user);
         console.log("invited");
         break;
+      case "cancel_invite":
+          setInvites(invites.filter((i) => i !== data.user));
+          console.log("invite_removed");
+          break;
       case "accept":
         setFriends([...friends, data.user])
         setRequests(requests.filter((f) => f !== data.user))
@@ -67,12 +65,13 @@ const Lobby = () => {
   const handleInvite = (friend) => {
     console.log("invite", friend)
     socket.emit('invite', {"user":user, "friend":friend});
-    setGame(<MultiPlayer host={true} user={user} friend={friend}/>)
+    setSentInvite(friend)
+    setGame(<MultiPlayer host={true} user={user} friend={friend} />)
   };
 
   const handleJoin = (friend) => {
     console.log("join")
-    setGame(<MultiPlayer host={false} user={user} friend={friend}/>)
+    setGame(<MultiPlayer host={false} user={user} friend={friend} />)
   };
 
   const handleAccept = (friend) => {
@@ -85,6 +84,8 @@ const Lobby = () => {
 
   const handleAddFriend = () => {
     console.log("tok:", token)
+    if (newFriend in friends || newFriend in sentRequests || newFriend === user) return null
+    if (newFriend in requests) return handleAccept(newFriend)
     if (sendRequest(token, newFriend)) socket.emit('request', {"user":user, "friend":newFriend});
   };
 
@@ -104,12 +105,12 @@ const Lobby = () => {
 
 
       {/* Horizontal scroll view of the user's friends */}
+      <Text style={styles.label}>Friends</Text>
       <ScrollView
         horizontal
         style={styles.friendsScrollView}
         contentContainerStyle={styles.friendsScrollViewContent}
       >
-        <Text style={styles.label}>Friends</Text>
         {friends && friends.map((friend) => (
           <View key={friend} style={styles.friendItemContainer}>
               <TouchableOpacity style={styles.friendItem}>
@@ -129,12 +130,12 @@ const Lobby = () => {
       </ScrollView>
       
       {/* Horizontal scroll view of the user's requests */}
+      <Text style={styles.label}>Friend requests</Text>
       <ScrollView
         horizontal
         style={styles.friendsScrollView}
         contentContainerStyle={styles.friendsScrollViewContent}
       >
-        <Text style={styles.label}>Friend requests</Text>
         {requests && requests.map((friend) => (
           <View key={friend} style={styles.friendItemContainer}>
               <TouchableOpacity style={styles.friendItem}  onPress={() => handleAccept(friend)}>
@@ -145,12 +146,12 @@ const Lobby = () => {
       </ScrollView>
 
       {/* Horizontal scroll view of the user's sent requests */}
+      <Text style={styles.label}>Sent requests</Text>
       <ScrollView
         horizontal
         style={styles.friendsScrollView}
         contentContainerStyle={styles.friendsScrollViewContent}
       >
-        <Text style={styles.label}>Sent requests</Text>
         {sentRequests && sentRequests.map((friend) => (
           <View key={friend} style={styles.friendItemContainer}>
               <TouchableOpacity style={styles.friendItem}>

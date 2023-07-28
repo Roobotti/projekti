@@ -9,16 +9,12 @@ import Matrix from './Matrix';
 import BlockRenderer from './Blocks';
 import { Loading } from './Loading';
 
-import  Constants from "expo-constants";
-import { io } from "socket.io-client";
-
-
-const baseUrl = `${Constants.manifest.extra.ws}`;
-const socket = io.connect(baseUrl, {
-			path: '/ws/socket.io',
-		})
+import { socket } from '../services/socket';
+import { UserContext } from '../contexts/UserContext';
 
 const MultiPlayer = ({host, user, friend}) => {
+  const {room, setRoom} = useContext(UserContext)
+
   const { data, setData } = useContext(BoardContext);
   const { blocks, setBlocks } = useContext(BlocksContext)
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +22,14 @@ const MultiPlayer = ({host, user, friend}) => {
   const [abortController, setAbortController] = useState(null);
   const [userReady, setUserReady] = useState(false);
   const [friendReady, setFriendReady] = useState(false);
-  const [room, setRoom] = useState(null)
   const [gameOver, setGameOver] = useState(false)
   const [win, setWin] = useState(false)
 
 
+  // send roomname / hostName 
+  // send roomname / playerName
+
+  // main -> if logged in socket on...
   useEffect( () => {
     socket.on("connect", () => {
       console.log("connected");
@@ -42,8 +41,6 @@ const MultiPlayer = ({host, user, friend}) => {
     socket.on("redy", () => { setFriendReady(true) } )
     socket.on("board", ({board}) => { 
       setData(board) 
-      setBlocks([])
-      setLoaded(false)
     } )
     socket.on("loading", () => { setIsLoading(true) } )
     socket.on("blocks", ({blocks}) => { 
@@ -53,46 +50,51 @@ const MultiPlayer = ({host, user, friend}) => {
     })
     socket.on("ubongo", () => { setGameOver(true) } )
 
+    if (host) socket.on("hostGiveData", () => {
+      if (data) socket.emit('board', {"room":room, "board":data});
+      if (loaded) socket.emit('blocks', {"room":room, "blocks":blocks});
+      else socket.emit("loading", {"room": room})
+    }) 
+
+    if (host) newGame()
+    if (!host && !isLoading && !loaded) socket.emit('giveData', {"room":room});
+
   }, [])
 
-  const newGame = () => {
-    setData(null)
-    setBlocks(null)
-    setIsLoading(!host)
+  const newGame = async() => {
+    setData([])
+    setBlocks([])
     setUserReady(false)
     setFriendReady(false)
     setGameOver(false)
-    setWin(false)    
+    setWin(false)
+    setIsLoading(false)
     setLoaded(false)
+    if (host){
+      response = await getBoard()
+      await getBlock(await response)
+    }
   }
 
   const getBoard = async () => {
     try {
-      setBlocks([])
-      setLoaded(false)
-      setIsLoading(false)
-      if (abortController) {
-        console.log("abort")
-        abortController.abort(); // Abort the previous fetch request
-      }
       const response = await getOne()
       const parsedResponse = JSON.parse(response)
       socket.emit('board', {"room":room, "board":parsedResponse});
       await setData(parsedResponse)
-
+      return parsedResponse
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
-  const getBlock = async () => {
+  const getBlock = async (board) => {
     try {
       socket.emit('loading', {"room":room, "blocks":response});
       const controller = new AbortController();
       setAbortController(controller);
       const signal = controller.signal
-
-      const response = await getBlocks(data, signal)
+      const response = await getBlocks(board, signal)
       console.log("block", response)
       socket.emit('blocks', {"room":room, "blocks":response});
       await setBlocks(response)
@@ -119,43 +121,35 @@ const MultiPlayer = ({host, user, friend}) => {
         <Text>!!UBONGO!!</Text>
         <Text> {win ? user : friend} won </Text>
         <Button title="new game?" onPress={newGame} />
-
       </View>
     )
   }
 
-  if (!userReady) {
-    return (
+  const WhoReady = () => {
+    return(
       <View>
-        <Button title="Redy" onPress={sentRedy} />
-      </View>
-    )
-  }
+        { !userReady 
 
-  if (!friendReady) {
-    return (
-      <View>
-        <Text>waiting for {friend}</Text>
+          ? (<Button title="Redy" onPress={sentRedy}/>)
+          : ( !friendReady && <Text>waiting for {friend}</Text> )
+        }
       </View>
     )
   }
 
   return (
     <View>
-      {host && <Button title="new board" onPress={getBoard} />}
-      {data && <Matrix matrix={data.base}/>}
-      {host && data && <Button title="get blocks" onPress={getBlock} />}
+      {loaded && blocks && <BlockRenderer blocks={blocks} /> }
       {isLoading 
         ? ( <Loading /> )
-        : ( 
-          loaded && (
-          <View>
-            <BlockRenderer blocks={blocks} /> 
-            <Button title="UBONGO" onPress={sentUbongo} />
-          </View>
-          )
-          )
+        : ( loaded && <WhoReady /> )
       }
+      {friendReady && userReady && (
+        <View> 
+          <Matrix matrix={data.base}/>
+          <Button title="UBONGO" onPress={sentUbongo} />
+        </View>
+      )}
     </View>
   );
 };

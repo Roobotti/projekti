@@ -89,6 +89,55 @@ async def update_user_requests(
 async def update_user_sentRequests(
     request: str, current_user: User = Depends(get_current_active_user)
 ):
+    ## check if reques should be sent
+    if request in [*current_user.sentRequests, *current_user.friends]:
+        return False
+
+    found = True
+    try:
+        index = current_user.requests.index(request)
+        newFriend = current_user.requests[index]
+    except:
+        found = False
+
+    if found:
+        users.update_one(
+            {"username": current_user.username},
+            {
+                "$pull": {"sentRequests": newFriend, "requests": newFriend},
+                "$push": {"friends": newFriend},
+            },
+        )
+        users.update_one(
+            {"username": newFriend},
+            {
+                "$pull": {
+                    "sentRequests": current_user.username,
+                    "requests": current_user.username,
+                },
+                "$push": {"friends": current_user.username},
+            },
+        )
+        return False
+
+    users.update_one(
+        {"username": current_user.username},
+        {"$push": {"sentRequests": request}},
+    )
+    print(request)
+    print(current_user.username)
+    users.update_one(
+        {"username": request},
+        {"$push": {"requests": current_user.username}},
+    )
+    return True
+
+
+@router.put("/users/me/sentInvite/{request}", response_model=bool)
+async def update_user_sentRequests(
+    request: str, current_user: User = Depends(get_current_active_user)
+):
+    ## check if reques should be sent
     if request in [*current_user.sentRequests, *current_user.friends]:
         return False
 

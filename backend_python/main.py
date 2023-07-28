@@ -41,6 +41,12 @@ async def handle_join(sid, args):
     await app.sio.emit("lobby", {"room": room}, room=room)
 
 
+@app.sio.on("leave")
+async def handle_leave(sid, args):
+    app.sio.leave_room(sid, args["room"])
+    await app.sio.emit("left", {"user": args["user"]}, room=args["room"])
+
+
 @app.sio.on("redy")
 async def handle_redy(sid, args):
     room = args["room"]
@@ -65,6 +71,13 @@ async def handle_loading(sid, args):
     await app.sio.emit("loading", {}, room=room)
 
 
+@app.sio.on("giveData")
+async def handle_giveData(sid, args):
+    room = args["room"]
+    print("give data")
+    await app.sio.emit("hostGiveData", {}, room=room, skip_sid=sid)
+
+
 @app.sio.on("ubongo")
 async def handle_ubongo(sid, args):
     room = args["room"]
@@ -72,10 +85,20 @@ async def handle_ubongo(sid, args):
 
 
 @app.sio.on("invite")
-async def handle_join(sid, args):
+async def handle_invite(sid, args):
     print("invite", args)
     await app.sio.emit(
-        args["friend"], {"type": "invite", "user": args["user"]}, skip_sid=sid
+        f"{args['friend']}/post", {"type": "invite", "user": args["user"]}, skip_sid=sid
+    )
+
+
+@app.sio.on("cancel_invites")
+async def handle_cancel_invites(sid, args):
+    print("cancel invites")
+    await app.sio.emit(
+        f"{args['friend']}/post",
+        {"type": "cancel_invite", "user": args["user"]},
+        skip_sid=sid,
     )
 
 
@@ -83,7 +106,7 @@ async def handle_join(sid, args):
 async def handle_accept(sid, args):
     print("accept", args)
     await app.sio.emit(
-        args["friend"], {"type": "accept", "user": args["user"]}, skip_sid=sid
+        f"{args['friend']}/post", {"type": "accept", "user": args["user"]}, skip_sid=sid
     )
 
 
@@ -91,7 +114,9 @@ async def handle_accept(sid, args):
 async def handle_request(sid, args):
     print("request", args)
     await app.sio.emit(
-        args["friend"], {"type": "request", "user": args["user"]}, skip_sid=sid
+        f"{args['friend']}/post",
+        {"type": "request", "user": args["user"]},
+        skip_sid=sid,
     )
 
 

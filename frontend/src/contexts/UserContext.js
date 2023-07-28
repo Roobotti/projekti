@@ -11,8 +11,10 @@ export const UserContextProvider = ({ children }) => {
   const [requests, setRequests] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
   const [wins, setWins] = useState([]);
-  const [lobby, setLobby] = useState(null);
+  const [room, setRoom] = useState(null);
   const [token, setToken] = useState(null);
+  const [invites, setInvites] = useState([]);
+  const [sentInvite, setSentInvite] = useState(null);
   const [reFresh, setReFresh] = useState(false);
 
   useEffect(() => {
@@ -66,14 +68,19 @@ export const UserContextProvider = ({ children }) => {
         requests,
         sentRequests,
         wins,
-        lobby,
+        room,
         token,
+        invites,
+        sentInvite,
         login,
         logout,
         setSentRequests,
         setRequests,
         setReFresh,
         setFriends,
+        setInvites,
+        setSentInvite,
+        setRoom,
       }}
     >
       {children}
