@@ -47,6 +47,7 @@ def generate_basic_puzzle(pattern, height):
     """
     # generate base, populate from list of indices
     base = np.zeros((6, 6))
+    print("pat", pattern)
     for i, j in pattern:
         base[i, j] = 1
 
@@ -121,38 +122,27 @@ def piece_variations(piece):
 
 
 def piece_fits_puzzle(puzzle, pieces, piece_id):
-    """
-    checks if the list of rotated "piece" can still fit the puzzle
-    """
     solutions = []
-    piece_counter = 0
-    verbose = False
     for piece in pieces:
         size_diff = [
             max(0, puzzle.shape[0] - piece.shape[0]) + 1,
             max(0, puzzle.shape[1] - piece.shape[1]) + 1,
             max(0, puzzle.shape[2] - piece.shape[2]) + 1,
         ]
-        # piece still fits the available parts of the puzzle
-        still_fits = True
         for shift_x in range(size_diff[0]):
             for shift_y in range(size_diff[1]):
                 for shift_z in range(size_diff[2]):
                     still_fits = True
                     for i, j, k in np.ndindex(piece.shape):
-                        if still_fits:
-                            # if there is an empty part of the puzzle piece with these coordinates
-                            if piece[i, j, k] == 1:
-                                try:
-                                    if (
-                                        puzzle[i + shift_x, j + shift_y, k + shift_z]
-                                        != 1
-                                    ):
-                                        still_fits = False
-                                except:
+                        if piece[i, j, k] == 1:
+                            try:
+                                if puzzle[i + shift_x, j + shift_y, k + shift_z] != 1:
                                     still_fits = False
+                                    break
+                            except IndexError:
+                                still_fits = False
+                                break
                     if still_fits:
-                        # found piece location, adding it to an instance of the puzzle
                         puzzle_instance = puzzle.copy()
                         for i, j, k in np.ndindex(piece.shape):
                             if piece[i, j, k] == 1:
@@ -272,34 +262,30 @@ def plot_combo(target_pieces):
 
 
 def find_good_combination(target_puzzle, piece_count=4):
-    basic_puzzle = generate_basic_puzzle(
-        puzzle_coordinates[target_puzzle], PUZZLE_HEIGHT
-    )
+    basic_puzzle = generate_basic_puzzle(target_puzzle, 2)
     puzzle_size = get_puzzle_size(basic_puzzle)
-    piece_combinations = [
-        list(i) for i in permutations(piece_coordinates.keys(), piece_count)
-    ]
+    piece_combinations = permutations(piece_coordinates.keys(), piece_count)
 
     def is_combination_valid(combination, target_size, piece_sizes):
         return sum(piece_sizes[piece] for piece in combination) == target_size
 
-    valid_combinations = list(
-        filter(
-            lambda c: is_combination_valid(c, puzzle_size, piece_sizes),
-            piece_combinations,
-        )
-    )
-    random.shuffle(valid_combinations)
+    valid_combinations = [
+        list(combination)
+        for combination in piece_combinations
+        if is_combination_valid(combination, puzzle_size, piece_sizes)
+    ]
 
+    random.shuffle(valid_combinations)
     print("looking at combinations of ", piece_count, "pieces")
 
     for combination in valid_combinations:
         try:
             solution_count, solution = solve_puzzle(basic_puzzle, combination)
-            if solution_count > 0 and solution_count <= 5:
-                return (solution_count, combination)
-        except:
+            if 0 < solution_count <= 5:
+                return solution_count, combination
+        except Exception as e:
             pass
+
     return 0, []
 
 
@@ -329,12 +315,92 @@ rotated_pieces = {}
 for code, coordinate in piece_coordinates.items():
     rotated_pieces[code] = piece_variations(generate_piece(coordinate))
 
-target_puzzle = [[0, 0], [0, 2], [1, 0], [1, 1], [1, 2], [2, 1], [2, 2], [3, 2]]
+li = [
+    [[1, 1], [2, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]],
+    [[0, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [4, 2], [1, 3], [2, 3]],
+    [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [1, 3]],
+    [[2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [3, 3]],
+    [[1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [0, 3], [2, 3], [3, 3]],
+    [[0, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3], [3, 3]],
+    [[0, 0], [0, 1], [1, 1], [2, 1], [1, 2], [2, 2], [1, 3], [2, 3], [3, 3]],
+    [[3, 1], [4, 1], [1, 2], [2, 2], [3, 2], [4, 2], [0, 3], [1, 3], [2, 3]],
+    [[0, 1], [1, 1], [2, 1], [1, 2], [2, 2], [3, 2], [4, 2], [1, 3], [2, 3], [3, 3]],
+    [[0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3]],
+    [[3, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3]],
+    [[1, 1], [2, 1], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3], [3, 3]],
+    [[1, 2], [2, 2], [3, 2], [4, 2], [0, 3], [1, 3], [2, 3], [3, 3]],
+    [[1, 1], [2, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3]],
+    [[1, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3], [4, 3]],
+    [[2, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3], [4, 3]],
+    [[3, 1], [1, 2], [2, 2], [3, 2], [4, 2], [0, 3], [1, 3], [2, 3], [3, 3]],
+    [[2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [4, 2], [0, 3], [1, 3], [2, 3]],
+    [[0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [3, 2], [2, 3], [3, 3]],
+    [[2, 1], [3, 1], [4, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3]],
+    [[1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [0, 3], [1, 3], [2, 3]],
+    [[0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [2, 3], [3, 3]],
+    [[0, 1], [1, 1], [2, 1], [1, 2], [2, 2], [1, 3], [2, 3], [3, 3]],
+    [[2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [1, 3]],
+    [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [2, 2]],
+    [[3, 0], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3]],
+    [[4, 1], [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [1, 3], [2, 3], [3, 3]],
+    [[0, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [0, 3]],
+    [[1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2]],
+    [[0, 0], [1, 0], [2, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2]],
+    [[1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [3, 2]],
+    [[1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [2, 3]],
+    [[0, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2]],
+    [[1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [1, 2]],
+    [[1, 0], [2, 0], [3, 0], [4, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2]],
+    [[2, 0], [3, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [2, 3]],
+    [[0, 0], [1, 0], [2, 0], [3, 0], [1, 1], [2, 1], [3, 1], [4, 1], [2, 2]],
+    [[1, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [0, 3], [2, 3]],
+    [[0, 0], [1, 0], [2, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2]],
+    [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [0, 1], [1, 1], [2, 1], [3, 1]],
+    [[1, 0], [1, 1], [2, 1], [3, 1], [4, 1], [0, 2], [1, 2], [2, 2], [3, 2]],
+    [[1, 0], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3]],
+    [[1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [2, 2]],
+    [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [0, 2], [2, 2]],
+    [[3, 0], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [1, 3], [2, 3]],
+    [[3, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2], [1, 3]],
+    [[2, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2]],
+    [[1, 0], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [3, 2], [3, 3]],
+    [[1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [0, 2], [2, 2]],
+    [[0, 0], [1, 0], [2, 0], [3, 0], [1, 1], [2, 1], [1, 2], [2, 2], [3, 2]],
+    [[1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2]],
+    [[1, 0], [0, 1], [1, 1], [2, 1], [1, 2], [2, 2], [3, 2], [3, 3]],
+    [[1, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2]],
+    [[3, 0], [4, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2]],
+    [[0, 0], [2, 0], [0, 1], [1, 2]],
+    [[3, 0], [4, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2]],
+    [[0, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [2, 3]],
+    [[3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [0, 3]],
+    [[0, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2]],
+    [[1, 0], [2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [2, 2], [3, 2]],
+    [[2, 0], [3, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [3, 2]],
+    [[1, 0], [0, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [2, 3]],
+    [[0, 0], [1, 0], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [3, 2]],
+    [[1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [3, 2]],
+    [[2, 0], [3, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2]],
+    [[1, 0], [0, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [2, 3]],
+    [[1, 0], [3, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [3, 2]],
+    [[2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [3, 2], [2, 3]],
+    [[1, 0], [1, 1], [2, 1], [0, 2], [1, 2], [2, 2], [3, 2], [0, 3], [2, 3]],
+    [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [2, 2], [0, 3]],
+    [[0, 0], [1, 0], [2, 0], [3, 0], [1, 1], [2, 1], [3, 1], [1, 2]],
+    [[0, 0], [0, 1], [1, 1], [2, 1], [1, 2], [2, 2], [3, 2], [2, 3], [3, 3]],
+]
+
+lis = [[(j[0], j[1]) for j in i] for i in li]
+
+print({repr(n): seq for (n, seq) in enumerate(lis)})
+
+
+target_puzzle = [[2, 1], [3, 1], [4, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3]]
 target_blocks = ["b4", "r4", "r3", "r1"]
 
 print("start")
 tic = time.perf_counter()
-count, solution = find_good_combination("tester", 4)
+count, solution = find_good_combination(target_puzzle, 4)
 print(count)
 print(solution)
 toc = time.perf_counter()

@@ -43,6 +43,9 @@ const Menu = () => {
       <Link to="/singlePlayer" style={styles.option}>
         <Text style={styles.optionText}>Single Player</Text>
       </Link>
+      <Link to="/boardWrite" style={styles.option}>
+        <Text style={styles.optionText}>boardWrite</Text>
+      </Link>
 
       {!user ? <Sign /> : <Logout />}
       

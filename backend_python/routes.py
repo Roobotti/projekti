@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 dbname = get_database()
-boards = dbname["boards"]
+boards = dbname["own_boards"]
 users = dbname["users"]
 
 item_details = boards.find()

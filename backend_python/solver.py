@@ -119,38 +119,27 @@ def piece_variations(piece):
 
 
 def piece_fits_puzzle(puzzle, pieces, piece_id):
-    """
-    checks if the list of rotated "piece" can still fit the puzzle
-    """
     solutions = []
-    piece_counter = 0
-    verbose = False
     for piece in pieces:
         size_diff = [
             max(0, puzzle.shape[0] - piece.shape[0]) + 1,
             max(0, puzzle.shape[1] - piece.shape[1]) + 1,
             max(0, puzzle.shape[2] - piece.shape[2]) + 1,
         ]
-        # piece still fits the available parts of the puzzle
-        still_fits = True
         for shift_x in range(size_diff[0]):
             for shift_y in range(size_diff[1]):
                 for shift_z in range(size_diff[2]):
                     still_fits = True
                     for i, j, k in np.ndindex(piece.shape):
-                        if still_fits:
-                            # if there is an empty part of the puzzle piece with these coordinates
-                            if piece[i, j, k] == 1:
-                                try:
-                                    if (
-                                        puzzle[i + shift_x, j + shift_y, k + shift_z]
-                                        != 1
-                                    ):
-                                        still_fits = False
-                                except:
+                        if piece[i, j, k] == 1:
+                            try:
+                                if puzzle[i + shift_x, j + shift_y, k + shift_z] != 1:
                                     still_fits = False
+                                    break
+                            except IndexError:
+                                still_fits = False
+                                break
                     if still_fits:
-                        # found piece location, adding it to an instance of the puzzle
                         puzzle_instance = puzzle.copy()
                         for i, j, k in np.ndindex(piece.shape):
                             if piece[i, j, k] == 1:
@@ -165,19 +154,11 @@ def get_puzzle_size(puzzle):
     return (puzzle == 1).sum()
 
 
-def solve_puzzle(puzzle, target_pieces, combos=5):
+def solve_puzzle(puzzle, target_pieces):
     """
     Takes a puzzle and a set of target pieces,
     returning all solutions with the solution count.
     """
-
-    puzzle_size = get_puzzle_size(puzzle)
-    piece_size = 0
-    for piece in target_pieces:
-        piece_size += piece_sizes[piece]
-
-    if puzzle_size != piece_size:
-        return 0, _
 
     i = 0
 
@@ -198,7 +179,7 @@ def solve_puzzle(puzzle, target_pieces, combos=5):
             if len(partial_solutions[i - 1]) > 0:
                 _temp = []
                 for partial_solution in partial_solutions[i - 1]:
-                    _temp = _temp + piece_fits_puzzle(
+                    _temp += piece_fits_puzzle(
                         partial_solution,
                         rotated_pieces[piece],
                         piece_color_codes[piece],
@@ -213,6 +194,7 @@ def solve_puzzle(puzzle, target_pieces, combos=5):
 
     if (i == target_count) & (len(partial_solutions[i - 1]) > 0):
         solution_count = len(partial_solutions[i - 1])
+        print(solution_count)
         return (solution_count, partial_solutions[i - 1])
     else:
         return (solution_count, _)
@@ -276,37 +258,33 @@ def plot_combo(target_pieces):
     plt.show()
 
 
-def find_good_combination(target_puzzle, combos=4):
-    h = 2
-    puzzle_size = get_puzzle_size(generate_basic_puzzle(target_puzzle, 2))
+def find_good_combination(target_puzzle, piece_count=4):
+    basic_puzzle = generate_basic_puzzle(target_puzzle, 2)
+    puzzle_size = get_puzzle_size(basic_puzzle)
+    piece_combinations = [
+        list(i) for i in permutations(piece_coordinates.keys(), piece_count)
+    ]
 
-    for piece_count in range(1, 5):
-        print("looking at combinations of ", piece_count, "pieces")
-        piece_combinations = permutations(piece_coordinates.keys(), piece_count)
-        piece_combinations = list(piece_combinations)
-        random.shuffle(piece_combinations)
+    def is_combination_valid(combination, target_size, piece_sizes):
+        return sum(piece_sizes[piece] for piece in combination) == target_size
 
-        for combination in piece_combinations:
-            size = 0
-            target_pieces = []
-            for piece in enumerate(combination):
-                size = size + piece_sizes[piece[1]]
-                target_pieces.append(piece[1])
+    valid_combinations = list(
+        filter(
+            lambda c: is_combination_valid(c, puzzle_size, piece_sizes),
+            piece_combinations,
+        )
+    )
+    random.shuffle(valid_combinations)
 
-            if sorted(target_pieces) == target_pieces:
-                if size == puzzle_size:
-                    try:
-                        solution_count, puzzle_solution = solve_puzzle(
-                            generate_basic_puzzle(target_puzzle, 2),
-                            target_pieces,
-                        )
-                        if solution_count > 0 and solution_count <= combos:
-                            print("found good combo:", target_pieces, solution_count)
-                            return target_pieces, puzzle_solution
+    print("looking at combinations of ", piece_count, "pieces")
 
-                    except:
-                        print("error")
-        print("redy")
+    for combination in valid_combinations:
+        try:
+            solution_count, solution = solve_puzzle(basic_puzzle, combination)
+            if solution_count > 0 and solution_count <= 5:
+                return combination, solution
+        except:
+            pass
 
 
 rotated_pieces = {}

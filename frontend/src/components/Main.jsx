@@ -6,6 +6,7 @@ import Lobby from './Lobby';
 import Board from './GameView';
 import Menu from './Menu';
 import MultiPlayer from './MultiPlayer';
+import BoardWrite from "./BoardWrite"
 
 const styles = StyleSheet.create({
   container: {
@@ -27,8 +28,7 @@ const Main = () => {
         <Route path="/SignIn" element={<SignIn />} exact />
         <Route path="/SignUp" element={<SignUp />} exact />
         <Route path="/SignOut" element={<SignOut />} exact />
-        {//<Route path="/SignIn" element={<SignIn />} exact />
-}
+        <Route path="/boardWrite" element={<BoardWrite />} exact />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </View>
