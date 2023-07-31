@@ -23,11 +23,30 @@ const blockImageMapping = {
   y4: require('../block_images/y4.png'),
 }
 
+export const BlockRendererVert = ({ blocks }) => {
+  console.log("jejj", blocks)
+  const rows = Math.ceil(blocks.length / 2); // Calculate the number of rows needed
+  return (
+      <ScrollView >
+        {[...Array(rows)].map((_, rowIndex) => (
+          <View key={rowIndex} style={styles.row}>
+            {blocks.slice(rowIndex * 2, rowIndex * 2 + 2).map((block, index) => (
+              <Image
+                key={index}
+                source={blockImageMapping[block]}
+                style={styles.blockImage}
+              />
+            ))}
+          </View>
+        ))}
+        </ScrollView>
+
+  );
+};
+
 const BlockRenderer = ({ blocks }) => {
   console.log("jejj", blocks)
-
   const rows = Math.ceil(blocks.length / 2); // Calculate the number of rows needed
-
   return (
       <ScrollView horizontal >
         {[...Array(rows)].map((_, rowIndex) => (

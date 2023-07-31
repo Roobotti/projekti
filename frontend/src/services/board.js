@@ -10,6 +10,14 @@ export const getOne = async () => {
   return json;
 };
 
+export const getSelected = async (board) => {
+  console.log(baseUrl);
+  const response = await fetch(`${baseUrl}s/${board}`);
+  const json = await response.json();
+
+  return json;
+};
+
 const deleteOne = async (object) => {
   await axios.delete(`${baseUrl}/${object}`, { headers });
 };

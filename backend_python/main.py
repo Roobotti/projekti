@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from routes import router as board_router
 from socket_services import *
 
+from initalData import board_solutions
 
 import json
 import random
@@ -98,7 +99,7 @@ async def handle_blocks(sid, args):
 async def handle_loading(sid, args):
     room = args["room"]
     current_rooms[room]["loading"] = True
-    await app.sio.emit("loading", {}, room=room)
+    await app.sio.emit("loading", {}, room=room, skip_sid=sid)
 
 
 @app.sio.on("giveData")

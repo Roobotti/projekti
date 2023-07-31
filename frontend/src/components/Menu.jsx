@@ -68,6 +68,9 @@ const Menu = () => {
       <Link to="/boardWrite" style={styles.option}>
         <Text style={styles.optionText}>boardWrite</Text>
       </Link>
+      <Link to="/solutionsWrite" style={styles.option}>
+        <Text style={styles.optionText}>solutionsWrite</Text>
+      </Link>
 
       {!user ? <Sign /> : <Logout />}
       

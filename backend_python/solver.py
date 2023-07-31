@@ -287,6 +287,39 @@ def find_good_combination(target_puzzle, piece_count=4):
             pass
 
 
+def find_good_combinations(target_puzzle, piece_count=4):
+    basic_puzzle = generate_basic_puzzle(target_puzzle, 2)
+    puzzle_size = get_puzzle_size(basic_puzzle)
+    piece_combinations = [
+        list(i) for i in permutations(piece_coordinates.keys(), piece_count)
+    ]
+
+    combos = []
+
+    def is_combination_valid(combination, target_size, piece_sizes):
+        return sum(piece_sizes[piece] for piece in combination) == target_size
+
+    valid_combinations = list(
+        filter(
+            lambda c: is_combination_valid(c, puzzle_size, piece_sizes),
+            piece_combinations,
+        )
+    )
+    random.shuffle(valid_combinations)
+
+    for combination in valid_combinations:
+        try:
+            solution_count, solution = solve_puzzle(basic_puzzle, combination)
+            if solution_count > 0 and solution_count <= 5:
+                combos.append(combination)
+                print("solver combos:", combos)
+                if len(combos) >= 2:
+                    return combos
+        except:
+            pass
+    return combos
+
+
 rotated_pieces = {}
 for code, coordinate in piece_coordinates.items():
     rotated_pieces[code] = piece_variations(generate_piece(coordinate))

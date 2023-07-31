@@ -18,10 +18,33 @@ router = APIRouter()
 
 dbname = get_database()
 boards = dbname["own_boards"]
+solutions = dbname["own_solutions"]
 users = dbname["users"]
 
 item_details = boards.find()
+solutions_details = solutions.find()
 boards_length = boards.count_documents({})
+solutions_length = solutions.count_documents({})
+
+test = True
+
+
+@router.get("/boards/{index}", response_description="get board")
+def board_selected(index: int):
+    coordinates = list(item_details[min(index, 71)].values())[1]
+    base = {"base": generate_base(coordinates), "coordinates": coordinates}
+    encodedNumpyBase = json.dumps(base, default=lambda x: x.tolist())
+    print(base)
+    return encodedNumpyBase
+
+
+@router.get("/solutions/{index}", response_description="get solution")
+def solution_selected(index: int):
+    coordinates = list(item_details[min(index, 71)].values())[1]
+    base = {"base": generate_base(coordinates), "coordinates": coordinates}
+    encodedNumpyBase = json.dumps(base, default=lambda x: x.tolist())
+    print(base)
+    return encodedNumpyBase
 
 
 @router.get("/board", response_description="get board")
@@ -33,6 +56,25 @@ def board():
     encodedNumpyBase = json.dumps(base, default=lambda x: x.tolist())
     print(base)
     return encodedNumpyBase
+
+
+@router.get("/blocks&board", response_description="get blocks and board")
+def blocks_and_board():
+    while True:
+        try:
+            random_int = random.randint(0, solutions_length - 1)
+            print("board and blocks endpoint reached...")
+            data = list(solutions_details[random_int].values())[1]
+
+            coordinates = data["board"]
+            blocks = random.choice(data["solutions"])
+            print("data:", data)
+            base = {"base": generate_base(coordinates), "coordinates": coordinates}
+            encodedNumpyBase = json.dumps(base, default=lambda x: x.tolist())
+            print(base)
+            return {"board": encodedNumpyBase, "blocks": blocks}
+        except:
+            print("no solutions")
 
 
 @router.post("/blocks", response_description="get blocks", response_model=List)
