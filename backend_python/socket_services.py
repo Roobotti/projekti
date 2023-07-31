@@ -21,7 +21,7 @@ class Board:
 
 
 def make_room_id(user: Player, friend: Player):
-    return "".join([user, friend].sort())
+    return "".join(sorted([user, friend]))
 
 
 # Promise function to make sure room id is unique

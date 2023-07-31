@@ -17,7 +17,6 @@ import { sendRequest } from '../services/users';
 
 import { socket } from '../services/socket';
 
-// client-side
 
 const Lobby = () => {
   const { user, friends, requests, token, sentRequests, wins, invites, setSentInvite, setReFresh, setFriends, setRequests, setInvites } = useContext(UserContext);
@@ -66,12 +65,12 @@ const Lobby = () => {
     console.log("invite", friend)
     socket.emit('invite', {"user":user, "friend":friend});
     setSentInvite(friend)
-    setGame(<MultiPlayer host={true} user={user} friend={friend} />)
+    setGame(<MultiPlayer user={user} friend={friend} />)
   };
 
   const handleJoin = (friend) => {
     console.log("join")
-    setGame(<MultiPlayer host={false} user={user} friend={friend} />)
+    setGame(<MultiPlayer user={user} friend={friend} />)
   };
 
   const handleAccept = (friend) => {

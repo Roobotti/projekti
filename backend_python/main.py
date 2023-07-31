@@ -27,6 +27,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+current_rooms = {}
+empty_room = {"host": [], "board": [], "blocks": [], "loading": False}
+
 
 @app.sio.on("connection")
 async def handle_connection(self):
@@ -36,9 +39,26 @@ async def handle_connection(self):
 @app.sio.on("join")
 async def handle_join(sid, args):
     room = make_room_id(args["user"], args["friend"])
+
     print(room)
+    current_rooms[room] = current_rooms.get(room, empty_room)
+    if not (current_rooms[room]["host"]):
+        current_rooms[room]["host"] = args["user"]
+
+    print(current_rooms[room])
+
     app.sio.enter_room(sid, room)
-    await app.sio.emit("lobby", {"room": room}, room=room)
+    await app.sio.emit(
+        "room",
+        {
+            "room": room,
+            "host": current_rooms[room]["host"],
+            "board": current_rooms[room]["board"],
+            "blocks": current_rooms[room]["blocks"],
+            "loading": current_rooms[room]["loading"],
+        },
+        room=sid,
+    )
 
 
 @app.sio.on("leave")
@@ -56,18 +76,28 @@ async def handle_redy(sid, args):
 @app.sio.on("board")
 async def handle_board(sid, args):
     room = args["room"]
+    current_rooms[room]["board"] = args["board"]
+    current_rooms[room]["blocks"] = []
     await app.sio.emit("board", {"board": args["board"]}, room=room, skip_sid=sid)
 
 
 @app.sio.on("blocks")
 async def handle_blocks(sid, args):
     room = args["room"]
-    await app.sio.emit("blocks", {"blocks": args["blocks"]}, room=room)
+    current_rooms[room]["blocks"] = args["blocks"]
+    current_rooms[room]["loading"] = False
+    await app.sio.emit(
+        "blocks",
+        {"blocks": args["blocks"], "board": current_rooms[room]["board"]},
+        room=room,
+        skip_sid=sid,
+    )
 
 
 @app.sio.on("loading")
 async def handle_loading(sid, args):
     room = args["room"]
+    current_rooms[room]["loading"] = True
     await app.sio.emit("loading", {}, room=room)
 
 

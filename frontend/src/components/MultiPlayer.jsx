@@ -12,7 +12,7 @@ import { Loading } from './Loading';
 import { socket } from '../services/socket';
 import { UserContext } from '../contexts/UserContext';
 
-const MultiPlayer = ({host, user, friend}) => {
+const MultiPlayer = ({user, friend}) => {
   const {room, setRoom} = useContext(UserContext)
 
   const { data, setData } = useContext(BoardContext);
@@ -24,6 +24,7 @@ const MultiPlayer = ({host, user, friend}) => {
   const [friendReady, setFriendReady] = useState(false);
   const [gameOver, setGameOver] = useState(false)
   const [win, setWin] = useState(false)
+  const [host, setHost] = useState(false)
 
 
   // send roomname / hostName 
@@ -31,35 +32,39 @@ const MultiPlayer = ({host, user, friend}) => {
 
   // main -> if logged in socket on...
   useEffect( () => {
-    socket.on("connect", () => {
-      console.log("connected");
-      socket.emit("connection")
-      socket.emit('join', {"user":user, "friend":friend});
-    });
-    socket.on("lobby", ({room}) => {setRoom(room)})
+    socket.emit('join', {"user":user, "friend":friend});
+
+    socket.on("room", ({room, host, blocks, board, loading}) => {
+      setRoom(room)
+      setHost(host === user)
+      setBlocks(blocks)
+      setData(board)
+      setIsLoading(loading)
+      console.log("join")
+    })
+
     socket.on("disconnect", () => {console.log("disconnected") });
     socket.on("redy", () => { setFriendReady(true) } )
     socket.on("board", ({board}) => { 
       setData(board) 
     } )
     socket.on("loading", () => { setIsLoading(true) } )
-    socket.on("blocks", ({blocks}) => { 
+    socket.on("blocks", ({blocks, board}) => { 
+      setData(board)
       setBlocks(blocks) 
       setIsLoading(false)
       setLoaded(true)
     })
     socket.on("ubongo", () => { setGameOver(true) } )
 
-    if (host) socket.on("hostGiveData", () => {
-      if (data) socket.emit('board', {"room":room, "board":data});
-      if (loaded) socket.emit('blocks', {"room":room, "blocks":blocks});
-      else socket.emit("loading", {"room": room})
-    }) 
-
-    if (host) newGame()
-    if (!host && !isLoading && !loaded) socket.emit('giveData', {"room":room});
-
   }, [])
+
+  useEffect( () => {
+    if (host) {
+      console.log("newGame")
+      newGame()}
+
+  }, [host])
 
   const newGame = async() => {
     setData([])
@@ -68,8 +73,10 @@ const MultiPlayer = ({host, user, friend}) => {
     setFriendReady(false)
     setGameOver(false)
     setWin(false)
-    setIsLoading(false)
     setLoaded(false)
+
+    setIsLoading(true)
+
     if (host){
       response = await getBoard()
       await getBlock(await response)
@@ -79,7 +86,7 @@ const MultiPlayer = ({host, user, friend}) => {
   const getBoard = async () => {
     try {
       const response = await getOne()
-      const parsedResponse = JSON.parse(response)
+      const parsedResponse = await JSON.parse(response)
       socket.emit('board', {"room":room, "board":parsedResponse});
       await setData(parsedResponse)
       return parsedResponse
@@ -99,6 +106,7 @@ const MultiPlayer = ({host, user, friend}) => {
       socket.emit('blocks', {"room":room, "blocks":response});
       await setBlocks(response)
       setIsLoading(false)
+      setLoaded(true)
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -128,7 +136,7 @@ const MultiPlayer = ({host, user, friend}) => {
   const WhoReady = () => {
     return(
       <View>
-        { !userReady 
+        { (!userReady && data && blocks) 
 
           ? (<Button title="Redy" onPress={sentRedy}/>)
           : ( !friendReady && <Text>waiting for {friend}</Text> )
