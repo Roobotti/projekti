@@ -12,6 +12,8 @@ import { Loading } from './Loading';
 import { socket } from '../services/socket';
 import { UserContext } from '../contexts/UserContext';
 
+const InitialcountDown = 5
+
 const MultiPlayer = ({user, friend}) => {
   const {room, setRoom} = useContext(UserContext)
 
@@ -22,6 +24,7 @@ const MultiPlayer = ({user, friend}) => {
   const [abortController, setAbortController] = useState(null);
   const [userReady, setUserReady] = useState(false);
   const [friendReady, setFriendReady] = useState(false);
+  const [countdown, setCountdown] = useState(InitialcountDown)
   const [gameOver, setGameOver] = useState(false)
   const [win, setWin] = useState(false)
   const [host, setHost] = useState(false)
@@ -37,13 +40,13 @@ const MultiPlayer = ({user, friend}) => {
     socket.on("room", ({room, host, blocks, board, loading}) => {
       setRoom(room)
       setHost(host === user)
-      setBlocks(blocks)
       setData(board)
+      setBlocks(blocks)
       setIsLoading(loading)
+      setLoaded(loading)
       console.log("join")
     })
 
-    socket.on("disconnect", () => {console.log("disconnected") });
     socket.on("redy", () => { setFriendReady(true) } )
     socket.on("board", ({board}) => { 
       setData(board) 
@@ -58,6 +61,19 @@ const MultiPlayer = ({user, friend}) => {
     socket.on("ubongo", () => { setGameOver(true) } )
 
   }, [])
+
+  //count down
+  useEffect( () => {
+    const interval = setInterval(() => {
+      setCountdown(countdown - 1);
+    }, 1000);
+    if (counter < 0 ) {
+      clearInterval(interval);
+      console.log('Countdown ended!');
+    }
+
+
+  }, [userReady, friendReady])
 
   useEffect( () => {
     if (host) {
@@ -81,6 +97,7 @@ const MultiPlayer = ({user, friend}) => {
       response = await getBoard()
       await getBlock(await response)
     }
+    else (socket.emit('join', {"user":user, "friend":friend}))
   }
 
   const getBoard = async () => {
@@ -145,6 +162,7 @@ const MultiPlayer = ({user, friend}) => {
     )
   }
 
+
   return (
     <View>
       {loaded && blocks && <BlockRenderer blocks={blocks} /> }
@@ -153,9 +171,17 @@ const MultiPlayer = ({user, friend}) => {
         : ( loaded && <WhoReady /> )
       }
       {friendReady && userReady && (
-        <View> 
-          <Matrix matrix={data.base}/>
-          <Button title="UBONGO" onPress={sentUbongo} />
+        <View>
+          {(countdown === InitialcountDown) 
+            ? (<WhoReady />)
+            : (<Text> starts in: {countdown} s</Text>)
+          }
+          {(countdown < 0) && (
+            <View> 
+              <Matrix matrix={data.base}/>
+              <Button title="UBONGO" onPress={sentUbongo} />
+            </View>
+          )}
         </View>
       )}
     </View>
