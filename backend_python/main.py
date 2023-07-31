@@ -29,7 +29,7 @@ app.add_middleware(
 )
 
 current_rooms = {}
-empty_room = {"host": [], "board": [], "blocks": [], "loading": False}
+empty_room = {"host": [], "board": [], "blocks": [], "redy": False}
 
 
 @app.sio.on("connection")
@@ -56,7 +56,6 @@ async def handle_join(sid, args):
             "host": current_rooms[room]["host"],
             "board": current_rooms[room]["board"],
             "blocks": current_rooms[room]["blocks"],
-            "loading": current_rooms[room]["loading"],
         },
         room=sid,
     )
@@ -71,28 +70,21 @@ async def handle_leave(sid, args):
 @app.sio.on("redy")
 async def handle_redy(sid, args):
     room = args["room"]
-    await app.sio.emit("redy", {}, room=room, skip_sid=sid)
+
+    if current_rooms[room]["redy"]:
+        await app.sio.emit("redy", {}, room=room)
+    else:
+        current_rooms[room]["redy"] = True
 
 
-@app.sio.on("board")
-async def handle_board(sid, args):
+@app.sio.on("data")
+async def handle_data(sid, args):
     room = args["room"]
-    current_rooms[room]["board"] = args["board"]
-    current_rooms[room]["blocks"] = []
-    await app.sio.emit("board", {"board": args["board"]}, room=room, skip_sid=sid)
-
-
-@app.sio.on("blocks")
-async def handle_blocks(sid, args):
-    room = args["room"]
-    current_rooms[room]["blocks"] = args["blocks"]
-    current_rooms[room]["loading"] = False
-    await app.sio.emit(
-        "blocks",
-        {"blocks": args["blocks"], "board": current_rooms[room]["board"]},
-        room=room,
-        skip_sid=sid,
-    )
+    board = args["board"]
+    blocks = args["blocks"]
+    current_rooms[room]["board"] = board
+    current_rooms[room]["blocks"] = blocks
+    await app.sio.emit("game_data", {"board": board, "blocks": blocks}, room=room)
 
 
 @app.sio.on("loading")
@@ -102,17 +94,14 @@ async def handle_loading(sid, args):
     await app.sio.emit("loading", {}, room=room, skip_sid=sid)
 
 
-@app.sio.on("giveData")
-async def handle_giveData(sid, args):
-    room = args["room"]
-    print("give data")
-    await app.sio.emit("hostGiveData", {}, room=room, skip_sid=sid)
-
-
 @app.sio.on("ubongo")
 async def handle_ubongo(sid, args):
     room = args["room"]
+    current_rooms[room]["redy"] = False
+    current_rooms[room]["board"] = []
+    current_rooms[room]["blocks"] = []
     await app.sio.emit("ubongo", {}, room=room, skip_sid=sid)
+    await app.sio.emit("game_data", {"board": [], "blocks": []}, room=room)
 
 
 @app.sio.on("invite")

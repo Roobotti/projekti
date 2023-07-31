@@ -1,8 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { View, Button } from 'react-native';
 import { BoardContext } from '../contexts/BoardContext';
-import { getOne } from '../services/board'
-import { getBlocks } from '../services/blocks';
+import { getSolutions } from '../services/blocks';
 import Text from './Text';
 import { BlocksContext } from '../contexts/BlockContext';
 import Matrix from './Matrix';
@@ -37,43 +36,36 @@ const MultiPlayer = ({user, friend}) => {
   useEffect( () => {
     socket.emit('join', {"user":user, "friend":friend});
 
-    socket.on("room", ({room, host, blocks, board, loading}) => {
+    socket.on("room", ({room, host, blocks, board}) => {
       setRoom(room)
       setHost(host === user)
       setData(board)
       setBlocks(blocks)
-      setIsLoading(loading)
-      setLoaded(loading)
       console.log("join")
     })
 
     socket.on("redy", () => { setFriendReady(true) } )
-    socket.on("board", ({board}) => { 
-      setData(board) 
-    } )
-    socket.on("loading", () => { setIsLoading(true) } )
-    socket.on("blocks", ({blocks, board}) => { 
+    socket.on("game_data", ({board, blocks}) => { 
       setData(board)
-      setBlocks(blocks) 
+      setBlocks(blocks)
       setIsLoading(false)
-      setLoaded(true)
-    })
+    } )
     socket.on("ubongo", () => { setGameOver(true) } )
 
   }, [])
 
   //count down
   useEffect( () => {
-    const interval = setInterval(() => {
-      setCountdown(countdown - 1);
-    }, 1000);
-    if (counter < 0 ) {
-      clearInterval(interval);
-      console.log('Countdown ended!');
-    }
+    if (friendReady && countdown > 0) {
+      const interval = setInterval( () => {
+        setCountdown( c => c - 1)
+      }, 1000);
+      return () => {
+        clearInterval(interval);
+      };
+  }
 
-
-  }, [userReady, friendReady])
+  }, [friendReady, countdown])
 
   useEffect( () => {
     if (host) {
@@ -83,52 +75,25 @@ const MultiPlayer = ({user, friend}) => {
   }, [host])
 
   const newGame = async() => {
-    setData([])
-    setBlocks([])
     setUserReady(false)
     setFriendReady(false)
     setGameOver(false)
+    setCountdown(InitialcountDown)
     setWin(false)
-    setLoaded(false)
 
-    setIsLoading(true)
-
-    if (host){
-      response = await getBoard()
-      await getBlock(await response)
-    }
-    else (socket.emit('join', {"user":user, "friend":friend}))
+    if (host){getData()}
   }
 
-  const getBoard = async () => {
-    try {
-      const response = await getOne()
-      const parsedResponse = await JSON.parse(response)
-      socket.emit('board', {"room":room, "board":parsedResponse});
-      await setData(parsedResponse)
-      return parsedResponse
+  const getData = async () => {
+    try {      
+      const response = await getSolutions()
+      const parsedBoard = JSON.parse(response.board)
+      socket.emit('data', {"room":room, "blocks":response.blocks, "board":parsedBoard});
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  };
+  }
 
-  const getBlock = async (board) => {
-    try {
-      socket.emit('loading', {"room":room, "blocks":response});
-      const controller = new AbortController();
-      setAbortController(controller);
-      const signal = controller.signal
-      const response = await getBlocks(board, signal)
-      console.log("block", response)
-      socket.emit('blocks', {"room":room, "blocks":response});
-      await setBlocks(response)
-      setIsLoading(false)
-      setLoaded(true)
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
 
   const sentRedy = () => {
     socket.emit('redy', {"room":room});
@@ -165,10 +130,10 @@ const MultiPlayer = ({user, friend}) => {
 
   return (
     <View>
-      {loaded && blocks && <BlockRenderer blocks={blocks} /> }
+      { blocks && <BlockRenderer blocks={blocks} /> }
       {isLoading 
         ? ( <Loading /> )
-        : ( loaded && <WhoReady /> )
+        : ( <WhoReady /> )
       }
       {friendReady && userReady && (
         <View>
@@ -176,7 +141,7 @@ const MultiPlayer = ({user, friend}) => {
             ? (<WhoReady />)
             : (<Text> starts in: {countdown} s</Text>)
           }
-          {(countdown < 0) && (
+          {(countdown === 0) && (
             <View> 
               <Matrix matrix={data.base}/>
               <Button title="UBONGO" onPress={sentUbongo} />

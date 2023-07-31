@@ -26,8 +26,6 @@ solutions_details = solutions.find()
 boards_length = boards.count_documents({})
 solutions_length = solutions.count_documents({})
 
-test = True
-
 
 @router.get("/boards/{index}", response_description="get board")
 def board_selected(index: int):
