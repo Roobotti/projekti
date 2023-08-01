@@ -69,6 +69,39 @@ export const readUsersMe = async (token) => {
   }
 };
 
+export const uploadAvatar = async (token, avatar) => {
+  const response = await fetch(`${baseUrl}/users/me/avatar`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(avatar),
+  });
+  console.log("Success:");
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch uploadAvatar");
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+export const loadFriend = async (friend) => {
+  const response = await fetch(`${baseUrl}/friend/${friend}`, {
+    method: "GET",
+  });
+  console.log("Success:");
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch uploadAvatar");
+  }
+
+  const data = await response.json();
+  return data;
+};
+
 export const newWin = async (token, win) => {
   try {
     const response = await fetch(`${baseUrl}/users/me/wins/${win}`, {

@@ -28,6 +28,15 @@ class TokenData(BaseModel):
     username: str | None = None
 
 
+class Avatar(BaseModel):
+    image_data: str
+
+
+class Friend(BaseModel):
+    avatar: str
+    wins: list[str]
+
+
 class User(BaseModel):
     username: str
     friends: list[str]
@@ -35,6 +44,7 @@ class User(BaseModel):
     sentRequests: list[str]
     wins: list[str]
     lobby: str
+    avatar: str
     disabled: bool | None = None
 
 

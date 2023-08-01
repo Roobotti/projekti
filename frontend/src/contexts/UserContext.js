@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { readUsersMe } from "../services/users";
+import { loadAvatar, readUsersMe } from "../services/users";
 import { useAuthStorage } from "../hooks/useStorageContext";
 
 export const UserContext = createContext();
@@ -15,6 +15,7 @@ export const UserContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [invites, setInvites] = useState([]);
   const [sentInvite, setSentInvite] = useState(null);
+  const [avatar, setAvatar] = useState(null);
   const [reFresh, setReFresh] = useState(false);
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export const UserContextProvider = ({ children }) => {
         const friends = (await result) ? result.friends : [];
         const requests = (await result) ? result.requests : [];
         const wins = (await result) ? result.wins : [];
+        const avatar = (await result) ? result.avatar : null;
         const sentRequests = (await result) ? result.sentRequests : [];
 
         console.log("user:", user);
@@ -43,6 +45,7 @@ export const UserContextProvider = ({ children }) => {
         setRequests(requests);
         setSentRequests(sentRequests);
         setWins(wins);
+        setAvatar(avatar);
       } catch (error) {
         console.error("Error fetching da user data:", error);
         setUser(null);
@@ -72,6 +75,7 @@ export const UserContextProvider = ({ children }) => {
         token,
         invites,
         sentInvite,
+        avatar,
         login,
         logout,
         setSentRequests,
@@ -81,6 +85,7 @@ export const UserContextProvider = ({ children }) => {
         setInvites,
         setSentInvite,
         setRoom,
+        setAvatar,
       }}
     >
       {children}

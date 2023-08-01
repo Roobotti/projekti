@@ -16,6 +16,7 @@ import MultiPlayer from './MultiPlayer';
 import { sendRequest } from '../services/users';
 
 import { socket } from '../services/socket';
+import FriendProfile from './Friend';
 
 
 const Lobby = () => {
@@ -73,6 +74,11 @@ const Lobby = () => {
     setGame(<MultiPlayer user={user} friend={friend} />)
   };
 
+  const handleProfile = (friend) => {
+    console.log("to friend profile", friend)
+    setGame(<FriendProfile friend={friend} />)
+  }
+
   const handleAccept = (friend) => {
     console.log("Accept")
     setFriends([...friends, friend])
@@ -112,7 +118,7 @@ const Lobby = () => {
       >
         {friends && friends.map((friend) => (
           <View key={friend} style={styles.friendItemContainer}>
-              <TouchableOpacity style={styles.friendItem}>
+              <TouchableOpacity style={styles.friendItem} onPress={() => handleProfile(friend)}>
                 <Text>{friend}</Text>
               </TouchableOpacity>
               {

@@ -1,8 +1,8 @@
 import jwt
 
-from fastapi import APIRouter, Depends, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, Request, HTTPException, Body, UploadFile
+
+
 from services import *
 from config import ACCESS_TOKEN_EXPIRE_MINUTES
 from typing import Optional
@@ -12,9 +12,11 @@ from solver import generate_base, find_good_combination
 import random
 import json
 import numpy as np
+import base64
+from io import BytesIO
+from PIL import Image
 
 router = APIRouter()
-
 
 dbname = get_database()
 boards = dbname["own_boards"]
@@ -90,6 +92,27 @@ async def read_users_me(
     return current_user
 
 
+@router.put("/users/me/avatar", response_model=User)
+async def upload_avatar(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    body: str = Body(...),
+):
+    print("data_fdound")
+
+    users.update_one(
+        {"username": current_user.username},
+        {"$set": {"avatar": body}},
+    )
+    print("len", len(body))
+    return current_user
+
+
+@router.get("/friend/{friend}", response_model=Friend)
+async def upload_avatar(friend: str):
+    friend = users.find_one({"username": friend})
+    return friend
+
+
 @router.get("/users/me/lobby", response_model=User)
 async def read_users_me(
     current_user: Annotated[User, Depends(get_current_active_user)]
@@ -102,8 +125,7 @@ async def update_user_wins(
     win: str, current_user: User = Depends(get_current_active_user)
 ):
     await users.update_one(
-        {"username": current_user.username},
-        {"$push": {"wins": win}},
+        {"username": current_user.username}, {"$push": {"wins": win}}
     )
     return current_user
 
