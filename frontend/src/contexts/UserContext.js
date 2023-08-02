@@ -11,6 +11,7 @@ export const UserContextProvider = ({ children }) => {
   const [requests, setRequests] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
   const [wins, setWins] = useState([]);
+  const [loses, setLoses] = useState([]);
   const [room, setRoom] = useState(null);
   const [token, setToken] = useState(null);
   const [invites, setInvites] = useState([]);
@@ -36,6 +37,7 @@ export const UserContextProvider = ({ children }) => {
         const friends = (await result) ? result.friends : [];
         const requests = (await result) ? result.requests : [];
         const wins = (await result) ? result.wins : [];
+        const loses = (await result) ? result.loses : [];
         const avatar = (await result) ? result.avatar : null;
         const sentRequests = (await result) ? result.sentRequests : [];
 
@@ -45,6 +47,7 @@ export const UserContextProvider = ({ children }) => {
         setRequests(requests);
         setSentRequests(sentRequests);
         setWins(wins);
+        setLoses(loses);
         setAvatar(avatar);
       } catch (error) {
         console.error("Error fetching da user data:", error);
@@ -71,6 +74,7 @@ export const UserContextProvider = ({ children }) => {
         requests,
         sentRequests,
         wins,
+        loses,
         room,
         token,
         invites,

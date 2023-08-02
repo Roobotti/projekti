@@ -1,16 +1,41 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { loadFriend } from '../services/users';
+import { UserContext } from '../contexts/UserContext';
 
+const VsText = ({wins, loses}) => {
+  const textStyles = [
+    styles.text,
+    wins > loses ? styles.losing : styles.winning,
+    wins===loses && styles.tied
+  ];
+
+  return <Text style={textStyles}>{loses} - {wins}</Text>;
+};
+
+const VsStatus = (wins, loses) => {
+  if (wins===loses) return 'tied'
+  return wins > loses ? 'losing' : 'winning'
+}
 
 const FriendProfile = ({ friend, onDelete }) => {
   const [friendData, setFriendData] = useState(null);
+  const {user, wins} = useContext(UserContext)
+  const [friendWins, setFriendWins] = useState(0)
+  const [friendLoses, setFriendLoses] = useState(0)
 
   useEffect(() => {
     console.log("sjsjs", friend)
     loadFriendData();
   }, []);
+
+  useEffect(() => {
+    if (friendData) {
+      setFriendWins(friendData.wins ? friendData.wins.filter(w => w === user).length : 0)
+      setFriendLoses(friendData.loses ? friendData.loses.filter(w => w === user).length : 0)
+    }
+  }, [friendData])
 
   const loadFriendData = async () => {
     try {
@@ -21,13 +46,18 @@ const FriendProfile = ({ friend, onDelete }) => {
     }
   };
 
-  if (!friendData) return <View><Text>voi vittu</Text></View>
+  if (!friendData) return <View><Text>loading</Text></View>
+
   return (
     <View style={styles.container}>
       {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
 
       <Text style={styles.name}>{friend}</Text>
-      <Text style={styles.wins}>{`Wins: ${friendData.wins ? friendData.wins.length : 0}`}</Text>
+      <Text style={styles.wins}>{`Total wins: ${friendData.wins ? friendData.wins.length : 0}`}</Text>
+
+      <Text style={styles.wins}>You're {VsStatus(friendWins, friendLoses)}</Text>
+      <VsText wins={friendWins} loses={friendLoses} />
+
       <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
         <Text style={styles.deleteButtonText}>Delete Friend</Text>
       </TouchableOpacity>
@@ -53,6 +83,18 @@ const styles = StyleSheet.create({
   wins: {
     fontSize: 18,
     marginTop: 5,
+  },
+  text: {
+    fontSize: 18,
+  },
+  winning: {
+    color: 'green',
+  },
+  losing: {
+    color: 'red',
+  },
+  tied: {
+    color: 'black',
   },
   deleteButton: {
     backgroundColor: 'red',

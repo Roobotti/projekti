@@ -120,13 +120,14 @@ async def read_users_me(
     return current_user
 
 
-@router.put("/users/me/wins/{win}", response_model=User)
+@router.put("/users/me/wins/{friend}", response_model=User)
 async def update_user_wins(
-    win: str, current_user: User = Depends(get_current_active_user)
+    friend: str, current_user: User = Depends(get_current_active_user)
 ):
     await users.update_one(
-        {"username": current_user.username}, {"$push": {"wins": win}}
+        {"username": current_user.username}, {"$push": {"wins": friend}}
     )
+    await users.update_one({"username": friend}, {"$push": {"loses": friend}})
     return current_user
 
 

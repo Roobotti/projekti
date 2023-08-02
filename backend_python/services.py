@@ -43,6 +43,7 @@ class User(BaseModel):
     requests: list[str]
     sentRequests: list[str]
     wins: list[str]
+    loses: list[str]
     lobby: str
     avatar: str
     disabled: bool | None = None
