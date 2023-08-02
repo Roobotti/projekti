@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, ImageBackground } from 'react-native';
 
 const blockImageMapping = {
   g1: require('../block_images/g1.png'),
@@ -23,7 +23,7 @@ const blockImageMapping = {
   y4: require('../block_images/y4.png'),
 }
 
-export const BlockRendererVert = ({ blocks }) => {
+export const BlockRendererLarge = ({ blocks }) => {
   console.log("jejj", blocks)
   const rows = Math.ceil(blocks.length / 2); // Calculate the number of rows needed
   return (
@@ -34,7 +34,7 @@ export const BlockRendererVert = ({ blocks }) => {
               <Image
                 key={index}
                 source={blockImageMapping[block]}
-                style={styles.blockImage}
+                style={styles.blockImageLarge}
               />
             ))}
           </View>
@@ -44,21 +44,17 @@ export const BlockRendererVert = ({ blocks }) => {
   );
 };
 
+
 const BlockRenderer = ({ blocks }) => {
   console.log("jejj", blocks)
-  const rows = Math.ceil(blocks.length / 2); // Calculate the number of rows needed
   return (
       <ScrollView horizontal >
-        {[...Array(rows)].map((_, rowIndex) => (
-          <View key={rowIndex} style={styles.row}>
-            {blocks.slice(rowIndex * 2, rowIndex * 2 + 2).map((block, index) => (
+            {blocks.map((block) => (
               <Image
-                key={index}
+                key={block}
                 source={blockImageMapping[block]}
                 style={styles.blockImage}
               />
-            ))}
-          </View>
         ))}
         </ScrollView>
 
@@ -67,20 +63,23 @@ const BlockRenderer = ({ blocks }) => {
 
 const styles = StyleSheet.create({
   container: {
-
-
   },
-
   row: {
     flexDirection: 'row',
-    alignContent: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'center',
+    padding: 20
+  },
+  blockImageLarge: {
+    flex: 1,
+    width: 150,
+    height: 150,
+    resizeMode: 'center'
   },
   blockImage: {
-    width: 200,
-    height: 200,
-    marginTop: -20,
-    marginHorizontal: -45
+    width: 100,
+    height: 100,
+    resizeMode: 'center'
   },
 });
 

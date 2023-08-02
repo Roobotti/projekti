@@ -1,21 +1,20 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { View, Button } from 'react-native';
+import { View, Button, StyleSheet, Image, Text } from 'react-native';
 import { BoardContext } from '../contexts/BoardContext';
 import { getSolutions } from '../services/blocks';
-import Text from './Text';
 import { BlocksContext } from '../contexts/BlockContext';
 import Matrix from './Matrix';
-import BlockRenderer from './Blocks';
+import BlockRenderer, { BlockRendererLarge } from './Blocks';
 import { Loading } from './Loading';
 
 import { socket } from '../services/socket';
 import { UserContext } from '../contexts/UserContext';
+import { loadFriend, newWin } from '../services/users';
 
 const InitialcountDown = 5
 
 const MultiPlayer = ({user, friend}) => {
-  const {room, setRoom} = useContext(UserContext)
-
+  const {room, token, avatar, setRoom} = useContext(UserContext)
   const { data, setData } = useContext(BoardContext);
   const { blocks, setBlocks } = useContext(BlocksContext)
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +26,7 @@ const MultiPlayer = ({user, friend}) => {
   const [gameOver, setGameOver] = useState(false)
   const [win, setWin] = useState(false)
   const [host, setHost] = useState(false)
-
+  const [friendData, setFriendData] = useState(null)
 
   // send roomname / hostName 
   // send roomname / playerName
@@ -52,6 +51,17 @@ const MultiPlayer = ({user, friend}) => {
     } )
     socket.on("ubongo", () => { setGameOver(true) } )
 
+    socket.on("left", () => {console.log("player left")})
+
+    socket.on(`${user}/post`, (data) => {
+      switch (data.type) {
+        case "cancel_invite":
+          setInvites(invites.filter((i) => i !== data.user));
+          console.log("invite_removed");
+          break;
+      }
+    })
+
   }, [])
 
   //count down
@@ -68,6 +78,11 @@ const MultiPlayer = ({user, friend}) => {
   }, [friendReady, countdown])
 
   useEffect( () => {
+    const getFriend = async () => {
+      const data = await loadFriend(friend)
+      setFriendData(data)
+    }
+    getFriend()
     if (host) {
       console.log("newGame")
       newGame()}
@@ -102,14 +117,30 @@ const MultiPlayer = ({user, friend}) => {
 
   const sentUbongo = () => {
     socket.emit('ubongo', {"room":room});
+    newWin(token, friend)
+    setWin(true)
     setGameOver(true)
   };
 
   if (gameOver) {
     return( 
-      <View>
-        <Text>!!UBONGO!!</Text>
-        <Text> {win ? user : friend} won </Text>
+      <View style={styles.winner_container}>
+        <Text style={styles.text}>!!UBONGO!!</Text>
+
+        {win 
+          ? (
+            <View>
+              {<Image source={{ uri: `data:image/jpeg;base64,${avatar}` }} style={styles.avatar} />}
+              <Text style={styles.text} > You won </Text>
+            </View>)
+          : (
+            <View>
+              {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
+              <Text style={styles.text} > {friend} won </Text>
+            </View>
+            )
+          }
+        
         <Button title="new game?" onPress={newGame} />
       </View>
     )
@@ -119,18 +150,16 @@ const MultiPlayer = ({user, friend}) => {
     return(
       <View>
         { (!userReady && data && blocks) 
-
           ? (<Button title="Redy" onPress={sentRedy}/>)
-          : ( !friendReady && <Text>waiting for {friend}</Text> )
+          : ( !friendReady && <Text style={styles.text} >waiting for {friend}</Text> )
         }
       </View>
     )
   }
 
-
   return (
     <View>
-      { blocks && <BlockRenderer blocks={blocks} /> }
+      { blocks && <BlockRendererLarge blocks={blocks} /> }
       {isLoading 
         ? ( <Loading /> )
         : ( <WhoReady /> )
@@ -153,4 +182,26 @@ const MultiPlayer = ({user, friend}) => {
   );
 };
 
+const styles = StyleSheet.create({
+  winner_container: {
+    alignItems: 'center',
+    margin: 40,
+  },
+  text: {
+    fontSize: 23,
+    marginBottom: 20,
+    fontWeight: 'bold',
+    alignSelf: 'center',
+
+  },
+  avatar: {
+    width: 150,
+    height: 150,
+    borderRadius: 150,
+    marginBottom: 20,
+
+  },
+});
+
 export default MultiPlayer;
+

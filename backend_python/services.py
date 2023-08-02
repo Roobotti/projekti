@@ -35,6 +35,7 @@ class Avatar(BaseModel):
 class Friend(BaseModel):
     avatar: str
     wins: list[str]
+    loses: list[str]
 
 
 class User(BaseModel):

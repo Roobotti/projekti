@@ -21,26 +21,21 @@ const VsStatus = (wins, loses) => {
 
 const FriendProfile = ({ friend, onDelete }) => {
   const [friendData, setFriendData] = useState(null);
-  const {user, wins} = useContext(UserContext)
+  const {user} = useContext(UserContext)
   const [friendWins, setFriendWins] = useState(0)
   const [friendLoses, setFriendLoses] = useState(0)
 
   useEffect(() => {
-    console.log("sjsjs", friend)
     loadFriendData();
   }, []);
-
-  useEffect(() => {
-    if (friendData) {
-      setFriendWins(friendData.wins ? friendData.wins.filter(w => w === user).length : 0)
-      setFriendLoses(friendData.loses ? friendData.loses.filter(w => w === user).length : 0)
-    }
-  }, [friendData])
 
   const loadFriendData = async () => {
     try {
       const data = await loadFriend(friend);
-      setFriendData(await data);
+      setFriendData(data);
+      setFriendWins(data.wins ? data.wins.filter(w => w === user).length : 0)
+      setFriendLoses(data.loses ? data.loses.filter(w => w === user).length : 0)
+      console.log("ss", data.loses.filter(w => w === user).length)
     } catch (error) {
       console.error('Error loading friend data:', error);
     }

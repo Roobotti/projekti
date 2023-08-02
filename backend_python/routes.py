@@ -124,10 +124,8 @@ async def read_users_me(
 async def update_user_wins(
     friend: str, current_user: User = Depends(get_current_active_user)
 ):
-    await users.update_one(
-        {"username": current_user.username}, {"$push": {"wins": friend}}
-    )
-    await users.update_one({"username": friend}, {"$push": {"loses": friend}})
+    users.update_one({"username": current_user.username}, {"$push": {"wins": friend}})
+    users.update_one({"username": friend}, {"$push": {"loses": current_user.username}})
     return current_user
 
 

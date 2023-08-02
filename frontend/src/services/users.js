@@ -102,9 +102,9 @@ export const loadFriend = async (friend) => {
   return data;
 };
 
-export const newWin = async (token, win) => {
+export const newWin = async (token, friend) => {
   try {
-    const response = await fetch(`${baseUrl}/users/me/wins/${win}`, {
+    const response = await fetch(`${baseUrl}/users/me/wins/${friend}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,

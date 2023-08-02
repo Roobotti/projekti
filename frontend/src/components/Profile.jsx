@@ -35,7 +35,11 @@ const UserAvatar = ({source, onChange}) => {
 }
 
 export const Profile = () => {
-  const {avatar, token, user, friends, wins, loses, setAvatar} = useContext(UserContext)
+  const {avatar, token, user, friends, wins, loses, setAvatar, setReFresh} = useContext(UserContext)
+
+  useEffect( () => {
+    setReFresh(Math.random())
+  }, [])
 
   const onAvatarChange = async (image) => {
     setAvatar(image)

@@ -44,6 +44,7 @@ const Menu = () => {
       setSentInvite(null)
     }
     if (room) socket.emit("leave", {"user":user, "room":room})
+    
     socket.on(`${user}/post`, (data) => {
       console.log("sender", data.user)
       switch (data.type) {
