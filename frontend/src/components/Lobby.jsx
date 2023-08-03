@@ -1,29 +1,32 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { history } from 'react-router-native';
-
-
+import Collapsible from 'react-native-collapsible';
 import { UserContext } from '../contexts/UserContext';
-
+import Text from './Text';
 import {
   View,
   TextInput,
   ScrollView,
-  Text,
   TouchableOpacity,
   StyleSheet,
+  RefreshControl,
 } from "react-native";
 import MultiPlayer from './MultiPlayer';
-import { sendRequest } from '../services/users';
+import { sendDeleteFriend, sendDeleteRequest, sendDeleteSentRequest, sendRequest } from '../services/users';
 
 import { socket } from '../services/socket';
 import FriendProfile from './Friend';
 
 
 const Lobby = () => {
-  const { user, friends, requests, token, sentRequests, wins, invites, setSentInvite, setReFresh, setFriends, setRequests, setInvites } = useContext(UserContext);
+  const { user, friends, requests, token, sentRequests, wins, invites, setSentInvite, setReFresh, setFriends, setRequests, setInvites, setSentRequests } = useContext(UserContext);
   const [newFriend, setNewFriend] = useState("");
   const [game, setGame] = useState(null)
+  const [refreshing, setRefreshing] = useState(false);
+  const [requestsCollaps, setRequestsCollaps] = useState(null)
+  const [sentRequestsCollaps, setSentRequestsCollaps] = useState(Object.fromEntries(sentRequests.map(r => [r, false])))
   console.log(invites)
+  console.log(requestsCollaps)
 
   useEffect( () => {
     socket.emit('active', {user})
@@ -62,6 +65,15 @@ const Lobby = () => {
 
   }, [user])
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setReFresh(Math.random())
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
+
+
   const handleInvite = (friend) => {
     console.log("invite", friend)
     socket.emit('invite', {"user":user, "friend":friend});
@@ -72,15 +84,17 @@ const Lobby = () => {
   const handleJoin = (friend) => {
     console.log("join")
     setGame(<MultiPlayer user={user} friend={friend} />)
+
   };
 
   const handleProfile = (friend) => {
     console.log("to friend profile", friend)
-    setGame(<FriendProfile friend={friend} />)
+    setGame(<FriendProfile friend={friend} onDelete={handleDeleteFriend} />)
   }
 
   const handleAccept = (friend) => {
     console.log("Accept")
+    setRequestsCollaps(null)
     setFriends([...friends, friend])
     setRequests(requests.filter((f) => f !== friend))
     socket.emit('accept', {"user":user, "friend":friend});
@@ -91,13 +105,42 @@ const Lobby = () => {
     console.log("tok:", token)
     if (newFriend in friends || newFriend in sentRequests || newFriend === user) return null
     if (newFriend in requests) return handleAccept(newFriend)
-    if (sendRequest(token, newFriend)) socket.emit('request', {"user":user, "friend":newFriend});
+    if (!sentRequests.includes(newFriend) && sendRequest(token, newFriend)) {
+      socket.emit('request', {"user":user, "friend":newFriend})
+      setSentRequests([...sentRequests, newFriend])
+    }
   };
 
+  const handleDeleteFriend = (friend) => {
+    console.log("Deleted")
+    setRequestsCollaps(null)
+    setFriends(friends.filter((f) => f !== friend))
+    sendDeleteFriend(token, friend)
+  }
+
+  const handleDeleteSentRequest = (friend) => {
+    console.log("Deleted")
+    setSentRequests(sentRequests.filter((f) => f !== friend))
+    setRequestsCollaps(null)
+    sendDeleteSentRequest(token, friend)
+  }
+
+  const handleDeleteRequest = (friend) => {
+    console.log("Deleted")
+    setRequests(requests.filter((f) => f !== friend))
+    setRequestsCollaps(null)
+    sendDeleteRequest(token, friend)
+  }
+
+  const handleRequestCollab = (friend) => {
+    setRequestsCollaps(requestsCollaps === friend ? null : friend)
+  }
   if (game) return game
 
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      contentContainerStyle={styles.container}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
       {/* Input box for adding new friends */}
       <TextInput
         style={styles.input}
@@ -127,7 +170,7 @@ const Lobby = () => {
                   <Text>join</Text>
                 </TouchableOpacity>) :(
                 <TouchableOpacity  style={styles.joinItem} onPress={() => handleInvite(friend)}>
-                  <Text>invite</Text>
+                  <Text>Host</Text>
                 </TouchableOpacity>)
               }
           </View>
@@ -139,11 +182,12 @@ const Lobby = () => {
       <ScrollView
         horizontal
         style={styles.friendsScrollView}
-        contentContainerStyle={styles.friendsScrollViewContent}
+        contentContainerStyle={styles.requestsScrollViewContent}
       >
         {requests && requests.map((friend) => (
+          
           <View key={friend} style={styles.friendItemContainer}>
-              <TouchableOpacity style={styles.friendItem}  onPress={() => handleAccept(friend)}>
+              <TouchableOpacity style={styles.friendItem} onPress={() => handleRequestCollab(friend)}>
                 <Text>{friend}</Text>
               </TouchableOpacity>
           </View>
@@ -154,50 +198,103 @@ const Lobby = () => {
       <Text style={styles.label}>Sent requests</Text>
       <ScrollView
         horizontal
-        style={styles.friendsScrollView}
-        contentContainerStyle={styles.friendsScrollViewContent}
+        contentContainerStyle={styles.requestsScrollViewContent}
       >
         {sentRequests && sentRequests.map((friend) => (
           <View key={friend} style={styles.friendItemContainer}>
-              <TouchableOpacity style={styles.friendItem}>
+              <TouchableOpacity style={styles.friendItem} onPress={() => handleRequestCollab(friend)}>
                 <Text>{friend}</Text>
               </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
+
+      {/*Collapsible for handling requests*/}
+      <Collapsible style={styles.friendItem} collapsed={!requestsCollaps}>
+
+        {requests.includes(requestsCollaps) 
+        ? (
+          <View>
+            <Text>Friend request of {requestsCollaps}</Text>
+            <View style={styles.addDelete}>
+              <TouchableOpacity style={styles.addItem} onPress={() => handleAccept(requestsCollaps)}>
+                <Text>Add</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.deleteItem} onPress={() => handleDeleteRequest(requestsCollaps)}>
+                <Text>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )
+        : (
+          <View>
+            <Text>Friend Request for {requestsCollaps}</Text>
+            <View style={styles.addDelete}>
+              <TouchableOpacity style={styles.addItem} onPress={() => setRequestsCollaps(null)}>
+                <Text>OK</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.deleteItem} onPress={() => handleDeleteSentRequest(requestsCollaps)}>
+                <Text>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )
+        }
+      </Collapsible>
       
-      <View style={styles.friendItemContainer}>
-        <TouchableOpacity style={styles.friendItem} onPress={() => setReFresh(Math.random()) }>
-          <Text>reFresh</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+
+    </ScrollView>
   );
         }
 
 
 const styles = StyleSheet.create({
+
   container: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'stretch',
     padding: 20,
+  },
+  addDelete: {
+    flexDirection: 'row',
+    padding: 20,
+    marginBottom: 20,
+    justifyContent: 'space-around'
   },
   input: {
     borderWidth: 1,
     borderColor: "gray",
     borderRadius: 5,
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   friendsScrollView: {
     height: 50,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   friendsScrollViewContent: {
+    alignItems: "center",
+  },
+  requestsScrollViewContent: {
     alignItems: "center",
   },
   friendItemContainer: {
     flexDirection: "row", // Set the flexDirection to row
     alignItems: "center", // Align children vertically in the center
     marginRight: 10, // Add some margin between friend items
+  },
+  addItem: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "green",
+    borderRadius: 10,
+  },
+  deleteItem: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "red",
+    borderRadius: 10,
   },
   friendItem: {
     paddingHorizontal: 20,
@@ -214,14 +311,19 @@ const styles = StyleSheet.create({
     marginLeft: 0,
   },
   label: {
+    flex: 1,
+    alignItems: 'flex-end',
+    alignContent: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 30,
     paddingVertical: 10,
     backgroundColor: "#ffccfc",
-    borderRadius: 5,
-    marginHorizontal: 5,
+    borderRadius: 10,
+    marginVertical: 10,
   },
   requestsScrollView: {
     height: 50,
+    marginBottom: 5,
   },
   requestsScrollViewContent: {
     alignItems: "center",

@@ -143,3 +143,72 @@ export const sendRequest = async (token, friend) => {
     console.error("Error fetching the PUT sentRequests:", error);
   }
 };
+
+export const sendDeleteFriend = async (token, friend) => {
+  try {
+    const response = await fetch(`${baseUrl}/users/me/deleteFriend/${friend}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delte friend");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+export const sendDeleteSentRequest = async (token, friend) => {
+  try {
+    const response = await fetch(
+      `${baseUrl}/users/me/deleteSentRequest/${friend}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delte sent request");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+export const sendDeleteRequest = async (token, friend) => {
+  try {
+    const response = await fetch(
+      `${baseUrl}/users/me/deleteRequest/${friend}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delte request");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};

@@ -30,6 +30,7 @@ export const UserContextProvider = ({ children }) => {
 
   useEffect(() => {
     const fetcher = async () => {
+      if (reFresh) return null;
       try {
         //get the user data from db
         const result = await readUsersMe(await authStorage.getAccessToken());

@@ -242,6 +242,53 @@ async def update_user_sentRequests(
     return True
 
 
+@router.put("/users/me/deleteFriend/{friend}", response_model=bool)
+async def delete_friend(
+    friend: str, current_user: User = Depends(get_current_active_user)
+):
+    users.update_one(
+        {"username": current_user.username},
+        {"$pull": {"friends": friend}},
+    )
+
+    users.update_one(
+        {"username": friend},
+        {"$pull": {"friends": current_user.username}},
+    )
+    return True
+
+
+@router.put("/users/me/deleteSentRequest/{friend}", response_model=bool)
+async def delete_sent_request(
+    friend: str, current_user: User = Depends(get_current_active_user)
+):
+    users.update_one(
+        {"username": current_user.username},
+        {"$pull": {"sentRequests": friend}},
+    )
+
+    users.update_one(
+        {"username": friend},
+        {"$pull": {"requests": current_user.username}},
+    )
+    return True
+
+
+@router.put("/users/me/deleteRequest/{friend}", response_model=bool)
+async def delete_friend(
+    friend: str, current_user: User = Depends(get_current_active_user)
+):
+    users.update_one(
+        {"username": friend},
+        {"$pull": {"sentRequests": current_user.username}},
+    )
+    users.update_one(
+        {"username": current_user.username},
+        {"$pull": {"requests": friend}},
+    )
+    return True
+
+
 @router.post("/signup")
 def sign_up(form_data: OAuth2PasswordRequestForm = Depends()):
     hashed_password = get_password_hash(form_data.password)
@@ -253,7 +300,11 @@ def sign_up(form_data: OAuth2PasswordRequestForm = Depends()):
         "sentRequests": [],
         "wins": [],
         "lobby": "",
+        "loses": [],
+        "lobby": "",
+        "avatar": "",
     }
+
     existing_user = users.find_one({"username": form_data.username})
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
