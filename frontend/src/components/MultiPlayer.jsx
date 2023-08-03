@@ -111,7 +111,7 @@ const MultiPlayer = ({user, friend}) => {
 
 
   const sentRedy = () => {
-    socket.emit('redy', {"room":room});
+    socket.emit('redy', {"room":room, "user":user});
     setUserReady(true)
   };
 
@@ -157,9 +157,15 @@ const MultiPlayer = ({user, friend}) => {
     )
   }
 
+  const choseBlockRender = () => {
+    return (
+      friendReady && userReady ? <BlockRenderer blocks={blocks} /> : <BlockRendererLarge blocks={blocks} />
+    )
+  }
+
   return (
     <View>
-      { blocks && <BlockRendererLarge blocks={blocks} /> }
+      { blocks && choseBlockRender() }
       {isLoading 
         ? ( <Loading /> )
         : ( <WhoReady /> )

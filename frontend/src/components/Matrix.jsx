@@ -9,10 +9,11 @@ const Matrix = ({matrix}) => {
 
   const boxHeightInPixels = windowWidth * 0.21; // Adjust the scale factor for desired size
 
-
   return (
     <View style={styles.container}>
-      {matrix.map((row, rowIndex) => (
+      {matrix
+        .filter((row) => row.includes(1))
+        .map((row, rowIndex) => (
         <View key={rowIndex} style={styles.row}>
           {row.map((value, colIndex) => (
             <View

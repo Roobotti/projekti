@@ -29,7 +29,7 @@ app.add_middleware(
 )
 
 current_rooms = {}
-empty_room = {"host": [], "board": [], "blocks": [], "redy": False}
+empty_room = {"host": [], "board": [], "blocks": [], "redy": {}}
 
 
 @app.sio.on("connection")
@@ -43,6 +43,9 @@ async def handle_join(sid, args):
 
     print(room)
     current_rooms[room] = current_rooms.get(room, empty_room)
+
+    current_rooms[room]["redy"][args["user"]] = False
+
     if not (current_rooms[room]["host"]):
         current_rooms[room]["host"] = args["user"]
 
@@ -70,11 +73,10 @@ async def handle_leave(sid, args):
 @app.sio.on("redy")
 async def handle_redy(sid, args):
     room = args["room"]
+    current_rooms[room]["redy"][args["user"]] = True
 
-    if current_rooms[room]["redy"]:
+    if all(current_rooms[room]["redy"].values()):
         await app.sio.emit("redy", {}, room=room)
-    else:
-        current_rooms[room]["redy"] = True
 
 
 @app.sio.on("data")
