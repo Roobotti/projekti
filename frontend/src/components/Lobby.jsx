@@ -312,6 +312,8 @@ const styles = StyleSheet.create({
   },
   label: {
     flex: 1,
+    textAlign: 'center',
+    textAlignVertical: 'center',
     alignItems: 'flex-end',
     alignContent: 'center',
     justifyContent: 'center',
