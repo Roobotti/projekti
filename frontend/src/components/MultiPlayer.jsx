@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useCallback } from 'react';
 import { View, Button, StyleSheet, Image, Text } from 'react-native';
 import { BoardContext } from '../contexts/BoardContext';
 import { getSolutions } from '../services/blocks';
@@ -25,11 +25,19 @@ const MultiPlayer = ({user, friend}) => {
   const [countdown, setCountdown] = useState(InitialcountDown)
   const [gameOver, setGameOver] = useState(false)
   const [win, setWin] = useState(false)
+  const [left, setLeft] = useState(null)
   const [host, setHost] = useState(false)
   const [friendData, setFriendData] = useState(null)
 
   // send roomname / hostName 
   // send roomname / playerName
+
+  const handleLeft = useCallback( () => {
+      socket.emit('host', {"user":user, "friend":friend, "userReady":userReady})
+      setLeft(friend)
+      setHost(true)
+      console.log(friend, "left");
+  })
 
   // main -> if logged in socket on...
   useEffect( () => {
@@ -51,7 +59,7 @@ const MultiPlayer = ({user, friend}) => {
     } )
     socket.on("ubongo", () => { setGameOver(true) } )
 
-    socket.on("left", () => {console.log("player left")})
+    socket.on("left", handleLeft)
 
     socket.on(`${user}/post`, (data) => {
       switch (data.type) {
@@ -78,14 +86,17 @@ const MultiPlayer = ({user, friend}) => {
   }, [friendReady, countdown])
 
   useEffect( () => {
+    if  (left) {setLeft(null)}
+    else {
     const getFriend = async () => {
-      const data = await loadFriend(friend)
-      setFriendData(data)
+        const data = await loadFriend(friend)
+        setFriendData(data)
+      }
+      getFriend()
+      if (host) {
+        console.log("newGame")
+        newGame()}
     }
-    getFriend()
-    if (host) {
-      console.log("newGame")
-      newGame()}
 
   }, [host])
 
@@ -111,7 +122,7 @@ const MultiPlayer = ({user, friend}) => {
 
 
   const sentRedy = () => {
-    socket.emit('redy', {"room":room, "user":user});
+    socket.emit('userRedy', {"room":room, "user":user});
     setUserReady(true)
   };
 
