@@ -33,21 +33,28 @@ class Avatar(BaseModel):
 
 
 class Friend(BaseModel):
+    username: str
     avatar: str
     wins: list[str]
     loses: list[str]
 
+    def to_dict(self):
+        return self.dict()
+
 
 class User(BaseModel):
     username: str
-    friends: list[str]
-    requests: list[str]
-    sentRequests: list[str]
+    friends: list[Friend]
+    requests: list[Friend]
+    sentRequests: list[Friend]
     wins: list[str]
     loses: list[str]
     lobby: str
     avatar: str
     disabled: bool | None = None
+
+    def json(self, *args, **kwargs):
+        return super().json(*args, **kwargs, exclude_none=True, by_alias=True)
 
 
 class UserInDB(User):
@@ -57,6 +64,13 @@ class UserInDB(User):
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
+
+
+def convert_user_to_friend(user: User) -> Friend:
+    friend = Friend(
+        username=user.username, avatar=user.avatar, wins=user.wins, loses=user.loses
+    )
+    return friend
 
 
 def verify_password(plain_password, hashed_password):

@@ -1,6 +1,8 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, Component } from 'react';
 import { history } from 'react-router-native';
 import Collapsible from 'react-native-collapsible';
+import Accordion from 'react-native-collapsible/Accordion'
+
 import { UserContext } from '../contexts/UserContext';
 import Text from './Text';
 import {
@@ -25,6 +27,7 @@ const Lobby = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [requestsCollaps, setRequestsCollaps] = useState(null)
   const [sentRequestsCollaps, setSentRequestsCollaps] = useState(Object.fromEntries(sentRequests.map(r => [r, false])))
+  const activeSections = useState([0])
   console.log(invites)
   console.log(requestsCollaps)
 
@@ -151,101 +154,100 @@ const Lobby = () => {
         onSubmitEditing={() => handleAddFriend()}
       />
 
-
-      {/* Horizontal scroll view of the user's friends */}
-      <Text style={styles.label}>Friends</Text>
-      <ScrollView
-        horizontal
-        style={styles.friendsScrollView}
-        contentContainerStyle={styles.friendsScrollViewContent}
-      >
-        {friends && friends.map((friend) => (
-          <View key={friend} style={styles.friendItemContainer}>
-              <TouchableOpacity style={styles.friendItem} onPress={() => handleProfile(friend)}>
-                <Text>{friend}</Text>
-              </TouchableOpacity>
-              {
-                invites && invites.includes(friend) ? (
-                <TouchableOpacity  style={styles.joinItem} onPress={() => handleJoin(friend)}>
-                  <Text>join</Text>
-                </TouchableOpacity>) :(
-                <TouchableOpacity  style={styles.joinItem} onPress={() => handleInvite(friend)}>
-                  <Text>Host</Text>
-                </TouchableOpacity>)
-              }
-          </View>
-        ))}
-      </ScrollView>
-      
-      {/* Horizontal scroll view of the user's requests */}
-      <Text style={styles.label}>Friend requests</Text>
-      <ScrollView
-        horizontal
-        style={styles.friendsScrollView}
-        contentContainerStyle={styles.requestsScrollViewContent}
-      >
-        {requests && requests.map((friend) => (
-          
-          <View key={friend} style={styles.friendItemContainer}>
-              <TouchableOpacity style={styles.friendItem} onPress={() => handleRequestCollab(friend)}>
-                <Text>{friend}</Text>
-              </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
-
-      {/* Horizontal scroll view of the user's sent requests */}
-      <Text style={styles.label}>Sent requests</Text>
-      <ScrollView
-        horizontal
-        contentContainerStyle={styles.requestsScrollViewContent}
-      >
-        {sentRequests && sentRequests.map((friend) => (
-          <View key={friend} style={styles.friendItemContainer}>
-              <TouchableOpacity style={styles.friendItem} onPress={() => handleRequestCollab(friend)}>
-                <Text>{friend}</Text>
-              </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
-
-      {/*Collapsible for handling requests*/}
-      <Collapsible style={styles.friendItem} collapsed={!requestsCollaps}>
-
-        {requests.includes(requestsCollaps) 
-        ? (
-          <View>
-            <Text>Friend request of {requestsCollaps}</Text>
-            <View style={styles.addDelete}>
-              <TouchableOpacity style={styles.addItem} onPress={() => handleAccept(requestsCollaps)}>
-                <Text>Add</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteItem} onPress={() => handleDeleteRequest(requestsCollaps)}>
-                <Text>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )
-        : (
-          <View>
-            <Text>Friend Request for {requestsCollaps}</Text>
-            <View style={styles.addDelete}>
-              <TouchableOpacity style={styles.addItem} onPress={() => setRequestsCollaps(null)}>
-                <Text>OK</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteItem} onPress={() => handleDeleteSentRequest(requestsCollaps)}>
-                <Text>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )
-        }
-      </Collapsible>
-      
-
+    {/* Horizontal scroll view of the user's friends */}
+    <Text style={styles.label}>Friends</Text>
+    <ScrollView
+      horizontal
+      style={styles.friendsScrollView}
+      contentContainerStyle={styles.friendsScrollViewContent}
+    >
+      {friends && friends.map((friend) => (
+        <View key={friend} style={styles.friendItemContainer}>
+            <TouchableOpacity style={styles.friendItem} onPress={() => handleProfile(friend)}>
+              <Text>{friend}</Text>
+            </TouchableOpacity>
+            {
+              invites && invites.includes(friend) ? (
+              <TouchableOpacity  style={styles.joinItem} onPress={() => handleJoin(friend)}>
+                <Text>join</Text>
+              </TouchableOpacity>) :(
+              <TouchableOpacity  style={styles.joinItem} onPress={() => handleInvite(friend)}>
+                <Text>Host</Text>
+              </TouchableOpacity>)
+            }
+        </View>
+      ))}
     </ScrollView>
+    
+    {/* Horizontal scroll view of the user's requests */}
+    <Text style={styles.label}>Friend requests</Text>
+    <ScrollView
+      horizontal
+      style={styles.friendsScrollView}
+      contentContainerStyle={styles.requestsScrollViewContent}
+    >
+      {requests && requests.map((friend) => (
+        
+        <View key={friend} style={styles.friendItemContainer}>
+            <TouchableOpacity style={styles.friendItem} onPress={() => handleRequestCollab(friend)}>
+              <Text>{friend}</Text>
+            </TouchableOpacity>
+        </View>
+      ))}
+    </ScrollView>
+
+    {/* Horizontal scroll view of the user's sent requests */}
+    <Text style={styles.label}>Sent requests</Text>
+    <ScrollView
+      horizontal
+      contentContainerStyle={styles.requestsScrollViewContent}
+    >
+      {sentRequests && sentRequests.map((friend) => (
+        <View key={friend} style={styles.friendItemContainer}>
+            <TouchableOpacity style={styles.friendItem} onPress={() => handleRequestCollab(friend)}>
+              <Text>{friend}</Text>
+            </TouchableOpacity>
+        </View>
+      ))}
+    </ScrollView>
+
+    {/*Collapsible for handling requests*/}
+    <Collapsible style={styles.friendItem} collapsed={!requestsCollaps}>
+
+      {requests.includes(requestsCollaps) 
+      ? (
+        <View>
+          <Text>Friend request of {requestsCollaps}</Text>
+          <View style={styles.addDelete}>
+            <TouchableOpacity style={styles.addItem} onPress={() => handleAccept(requestsCollaps)}>
+              <Text>Add</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.deleteItem} onPress={() => handleDeleteRequest(requestsCollaps)}>
+              <Text>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+      : (
+        <View>
+          <Text>Friend Request for {requestsCollaps}</Text>
+          <View style={styles.addDelete}>
+            <TouchableOpacity style={styles.addItem} onPress={() => setRequestsCollaps(null)}>
+              <Text>OK</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.deleteItem} onPress={() => handleDeleteSentRequest(requestsCollaps)}>
+              <Text>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+      }
+    </Collapsible>
+    
+
+  </ScrollView>
   );
-        }
+  }
 
 
 const styles = StyleSheet.create({

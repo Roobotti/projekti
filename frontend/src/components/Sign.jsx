@@ -14,7 +14,8 @@ import * as yup from 'yup'
 import { useAuthStorage } from '../hooks/useStorageContext';
 import { UserContext } from "../contexts/UserContext";
 import { readUsersMe } from '../services/users';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
+import { Loading } from './Loading';
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username is required'),
@@ -69,24 +70,31 @@ const SignContainer = ({onSubmit, mode}) => {
 export const SignIn = () => {
   const navigate = useNavigate();
   const authStorage = useAuthStorage();
-  const userContext = useContext(UserContext);
+  const {login, user} = useContext(UserContext);
+  const [loading, setLoading] = useState(false)
 
   const onSubmit = async (values) => {
     try {
+      setLoading(true)
       const result = await signIn(values);
       const json = await result.json()
       await authStorage.setAccessToken(json["access_token"])
-      await userContext.login( json )
-      console.log("hei", json["access_token"])
+      await login(json["access_token"])
       navigate("/", { replace: true });
       console.log('Token saved to AsyncStorage');
+      setLoading(false)
+    
 
-    } catch (error) { console.log(error) }
+    } catch (error) { 
+      console.log(error) 
+      setLoading(false)
+    }
   };
 
   return (
     <View style={styles.container}>
       <SignContainer onSubmit={onSubmit} mode="sign in" />
+      {loading && <Loading/>}
     </View>
   )
 };

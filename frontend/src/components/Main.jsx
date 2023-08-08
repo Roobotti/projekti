@@ -8,6 +8,7 @@ import Menu from './Menu';
 import MultiPlayer from './MultiPlayer';
 import BoardWrite from "./BoardWrite"
 import SolutionsWrite from './SolutionsWrite';
+import { LobbyCollap } from './LobbyCollapsible';
 import { Profile } from './Profile';
 
 const styles = StyleSheet.create({
@@ -18,7 +19,6 @@ const styles = StyleSheet.create({
 });
 
 const Main = () => {
-
    return (
     <View style={styles.container}>
       <AppBar />
@@ -26,7 +26,7 @@ const Main = () => {
         <Route path="/" element={<Menu />} exact />
         <Route path="/singlePlayer" element={<Board />} exact />
         <Route path="/MultiPlayer/:host" render={(props) => <MultiPlayer {...props} />} exact/>
-        <Route path="/Lobby" element={<Lobby />} exact />
+        <Route path="/Lobby" element={<LobbyCollap />} exact />
         <Route path="/SignIn" element={<SignIn />} exact />
         <Route path="/SignUp" element={<SignUp />} exact />
         <Route path="/SignOut" element={<SignOut />} exact />

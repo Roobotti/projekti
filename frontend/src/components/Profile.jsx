@@ -1,10 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {StatusBar, StyleSheet, View, TouchableOpacity, Image, ScrollView, Text} from 'react-native';
+import {StatusBar, StyleSheet, View, TouchableOpacity, Image, ScrollView} from 'react-native';
+import { Link } from 'react-router-native';
 import { UserContext } from '../contexts/UserContext';
 import * as ImagePicker from 'expo-image-picker';
-import { json } from 'react-router-native';
 import { uploadAvatar } from '../services/users';
 
+import Text from './Text';
+
+const Tab = ({ text, to, ...props }) => {
+  return (
+    <Link to={to} {...props}>
+      <Text fontSize="subheading" color="textSecondary" style={{padding: 20}}>{text}</Text>
+    </Link>
+  )
+}
 
 const UserAvatar = ({source, onChange}) => {
   const [image, setImage] = useState(source);
@@ -47,20 +56,28 @@ export const Profile = () => {
     // upload image to server here 
   };
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={{flex:1, justifyContent:'space-between'}}>
+      <ScrollView contentContainerStyle={styles.container}>
 
-      <Text style={styles.text} >{user}</Text>
+        <Text style={styles.text} >{user}</Text>
 
-      <UserAvatar
-        onChange={onAvatarChange}
-        source={avatar}
-      />
+        <UserAvatar
+          onChange={onAvatarChange}
+          source={avatar}
+        />
 
-      <Text style={styles.text} >Wins:{wins.length}</Text>
+        <Text style={styles.text} >Wins:{wins.length}</Text>
 
-      <Text style={styles.text} >Loses:{loses.length}</Text>
+        <Text style={styles.text} >Loses:{loses.length}</Text>
 
-    </ScrollView>
+  
+      </ScrollView>
+
+      <View style={styles.tab}>
+          <Tab to="/" text="X"/>
+      </View>
+      
+    </View>
   );
 };
 
@@ -88,4 +105,11 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignSelf: 'center',
   },
+  tab: {
+    alignSelf: 'center',
+    backgroundColor: 'red',
+    paddingHorizontal: 5,
+    marginBottom: 20,
+    borderRadius: 80
+  }
 });

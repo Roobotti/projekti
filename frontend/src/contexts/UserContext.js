@@ -1,5 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { loadAvatar, readUsersMe } from "../services/users";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { loadAvatar, loadFriend, readUsersMe } from "../services/users";
 import { useAuthStorage } from "../hooks/useStorageContext";
 
 export const UserContext = createContext();
@@ -17,6 +23,7 @@ export const UserContextProvider = ({ children }) => {
   const [invites, setInvites] = useState([]);
   const [sentInvite, setSentInvite] = useState(null);
   const [avatar, setAvatar] = useState(null);
+  const [avatars, setAvatars] = useState({});
   const [reFresh, setReFresh] = useState(false);
 
   useEffect(() => {
@@ -30,12 +37,13 @@ export const UserContextProvider = ({ children }) => {
 
   useEffect(() => {
     const fetcher = async () => {
-      if (reFresh) return null;
       try {
         //get the user data from db
-        const result = await readUsersMe(await authStorage.getAccessToken());
-        const user = (await result) ? result.username : null;
+        const result = await readUsersMe(
+          token || (await authStorage.getAccessToken())
+        );
         const friends = (await result) ? result.friends : [];
+        const user = (await result) ? result.username : null;
         const requests = (await result) ? result.requests : [];
         const wins = (await result) ? result.wins : [];
         const loses = (await result) ? result.loses : [];
@@ -44,7 +52,7 @@ export const UserContextProvider = ({ children }) => {
 
         console.log("user:", user);
         setUser(await user);
-        setFriends(friends);
+        setFriends(await friends);
         setRequests(requests);
         setSentRequests(sentRequests);
         setWins(wins);
@@ -59,12 +67,13 @@ export const UserContextProvider = ({ children }) => {
     fetcher();
   }, [token, reFresh]);
 
-  const login = (data) => {
-    setToken(data);
+  const login = (token) => {
+    setToken(token);
   };
 
   const logout = () => {
     setUser(null);
+    setToken(null);
   };
 
   return (

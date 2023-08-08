@@ -19,7 +19,7 @@ const VsStatus = (wins, loses) => {
   return wins > loses ? 'losing' : 'winning'
 }
 
-const FriendProfile = ({ friend, onDelete }) => {
+const FriendProfile = ({ friend, onDelete, onBack }) => {
   const [friendData, setFriendData] = useState(null);
   const {user} = useContext(UserContext)
   const [friendWins, setFriendWins] = useState(0)
@@ -44,17 +44,23 @@ const FriendProfile = ({ friend, onDelete }) => {
   if (!friendData) return <View><Text>loading</Text></View>
 
   return (
-    <View style={styles.container}>
-      {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
+    <View style={{flex:1, justifyContent:'space-between'}}>
+      <View style={styles.container}>
+        {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
 
-      <Text style={styles.name}>{friend}</Text>
-      <Text style={styles.wins}>{`Total wins: ${friendData.wins ? friendData.wins.length : 0}`}</Text>
+        <Text style={styles.name}>{friend}</Text>
+        <Text style={styles.wins}>{`Total wins: ${friendData.wins ? friendData.wins.length : 0}`}</Text>
 
-      <Text style={styles.wins}>You're {VsStatus(friendWins, friendLoses)}</Text>
-      <VsText wins={friendWins} loses={friendLoses} />
+        <Text style={styles.wins}>You're {VsStatus(friendWins, friendLoses)}</Text>
+        <VsText wins={friendWins} loses={friendLoses} />
 
-      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>Delete Friend</Text>
+        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+          <Text style={styles.deleteButtonText}>Delete Friend</Text>
+        </TouchableOpacity>
+
+      </View>
+      <TouchableOpacity onPress={() => onBack(null)}>
+          <Text style={styles.tab}> X </Text>
       </TouchableOpacity>
     </View>
   );
@@ -102,6 +108,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  tab: {
+    alignSelf: 'center',
+    backgroundColor: 'red',
+    padding: 5,
+    paddingHorizontal: 8,
+    marginBottom: 20,
+    borderRadius: 80,
+    fontSize: 20,
+  }
 });
 
 export default FriendProfile;

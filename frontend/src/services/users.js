@@ -89,17 +89,21 @@ export const uploadAvatar = async (token, avatar) => {
 };
 
 export const loadFriend = async (friend) => {
-  const response = await fetch(`${baseUrl}/friend/${friend}`, {
-    method: "GET",
-  });
-  console.log("Success:");
+  try {
+    const response = await fetch(`${baseUrl}/friend/${friend}`, {
+      method: "GET",
+    });
+    console.log("Success:");
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch uploadAvatar");
+    if (!response.ok) {
+      throw new Error("Failed to load friend");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
   }
-
-  const data = await response.json();
-  return data;
 };
 
 export const newWin = async (token, friend) => {
