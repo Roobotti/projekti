@@ -278,7 +278,7 @@ async def delete_friend(
 
 
 @router.post("/signup")
-def sign_up(form_data: OAuth2PasswordRequestForm = Depends()):
+async def sign_up(form_data: OAuth2PasswordRequestForm = Depends()):
     hashed_password = get_password_hash(form_data.password)
     user_data = {
         "username": form_data.username,

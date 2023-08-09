@@ -14,7 +14,7 @@ import * as yup from 'yup'
 import { useAuthStorage } from '../hooks/useStorageContext';
 import { UserContext } from "../contexts/UserContext";
 import { readUsersMe } from '../services/users';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Loading } from './Loading';
 
 const validationSchema = yup.object().shape({
@@ -26,23 +26,6 @@ const initialValues = {
   username: '',
   password: '',
 };
-
-const styles = StyleSheet.create({
-    container: {
-      display: 'flex'
-    },
-    form: {
-      padding: 20,
-    },
-    holder: {
-      padding: 20,
-      borderRadius: 10,
-      marginBottom: 20,
-      borderWidth: 1,
-      borderStyle: 'solid',
-      borderColor: '#f9c2ff'
-    }
-});
 
 const SignForm = ({onSubmit, mode}) => {
     return (
@@ -67,11 +50,17 @@ const SignContainer = ({onSubmit, mode}) => {
     </Formik>
   )}
 
+
 export const SignIn = () => {
   const navigate = useNavigate();
   const authStorage = useAuthStorage();
   const {login, user} = useContext(UserContext);
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState(null)
+
+  useEffect(() => {
+    if (message) { setTimeout( () => setMessage(null), 2000)}
+  }, [message])
 
   const onSubmit = async (values) => {
     try {
@@ -87,12 +76,14 @@ export const SignIn = () => {
 
     } catch (error) { 
       console.log(error) 
+      setMessage("Wrong credentials")
       setLoading(false)
     }
   };
 
   return (
     <View style={styles.container}>
+      {message && <Text style={styles.message}> {message} </Text>}
       <SignContainer onSubmit={onSubmit} mode="sign in" />
       {loading && <Loading/>}
     </View>
@@ -101,17 +92,37 @@ export const SignIn = () => {
 
 export const SignUp = () => {
   const navigate = useNavigate();
+  const authStorage = useAuthStorage();
+  const {login, user} = useContext(UserContext);
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState(null)
+
+  useEffect(() => {
+    if (message) { setTimeout( () => setMessage(null), 2000)}
+  }, [message])
   
   const onSubmit = async (values) => {
     try {
+      setLoading(true)
       await signUp(values);
+      const result = await signIn(values);
+      const json = await result.json()
+      await authStorage.setAccessToken(json["access_token"])
+      await login(json["access_token"])
       navigate("/", { replace: true });
-    } catch (error) { console.log(error) }
+      setLoading(false)
+    } catch (error) { 
+      console.log(error)
+      setMessage("Username is alredy taken")
+      setLoading(false)
+     }
   };
 
   return (
     <View style={styles.container}>
+      {message && <Text style={styles.message}> {message} </Text>}
       <SignContainer onSubmit={onSubmit} mode="sign up" />
+      {loading && <Loading/>}
     </View>
   )
 };
@@ -131,4 +142,31 @@ export const SignOut = () => {
 
   s()
 };
+
+
+
+const styles = StyleSheet.create({
+    container: {
+      display: 'flex'
+    },
+    form: {
+      padding: 20,
+    },
+    holder: {
+      padding: 20,
+      borderRadius: 10,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderStyle: 'solid',
+      borderColor: '#f9c2ff'
+    },
+    message: {
+      padding: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderStyle: 'solid',
+      borderColor: '#f9c2ff',
+      textAlign: 'center'
+    }
+});
 

@@ -1,11 +1,32 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {StatusBar, StyleSheet, View, TouchableOpacity, Image, ScrollView} from 'react-native';
-import { Link } from 'react-router-native';
+import {StatusBar, StyleSheet, View, TouchableOpacity, Image, ScrollView, Alert} from 'react-native';
+import { Link, useNavigate } from 'react-router-native';
 import { UserContext } from '../contexts/UserContext';
 import * as ImagePicker from 'expo-image-picker';
 import { uploadAvatar } from '../services/users';
 
 import Text from './Text';
+
+
+const showAlert = (navigate) =>
+  Alert.alert(
+    'Log out',
+    'Are you sure?',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Log out',
+        onPress: () => navigate("/SignOut", { replace: true }),
+        style: 'default'
+      }
+    ],
+    {
+      cancelable: true,
+    },
+  );
 
 const Tab = ({ text, to, ...props }) => {
   return (
@@ -45,6 +66,7 @@ const UserAvatar = ({source, onChange}) => {
 
 export const Profile = () => {
   const {avatar, token, user, friends, wins, loses, setAvatar, setReFresh} = useContext(UserContext)
+  const navigate = useNavigate();
 
   useEffect( () => {
     setReFresh(Math.random())
@@ -70,7 +92,10 @@ export const Profile = () => {
 
         <Text style={styles.text} >Loses:{loses.length}</Text>
 
-  
+        <TouchableOpacity onPress={() => showAlert(navigate)} style={styles.deleteButton}>
+          <Text style={styles.deleteButtonText}>Sign Out</Text>
+        </TouchableOpacity>
+
       </ScrollView>
 
       <View style={styles.tab}>
@@ -111,5 +136,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     marginBottom: 20,
     borderRadius: 80
-  }
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 8,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });

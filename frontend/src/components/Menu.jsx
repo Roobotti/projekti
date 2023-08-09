@@ -9,7 +9,7 @@ import { useState, useEffect, useContext  } from 'react';
 import { UserContext } from '../contexts/UserContext';
 
 
-const Sign = () => {
+const UnSigned = () => {
   return (
     <>
       <Link to="/SignIn" style={styles.option}>
@@ -22,14 +22,14 @@ const Sign = () => {
   )
 }
 
-const Logout = () => {
+const Signed = () => {
   return (
     <>
       <Link to="/Lobby" style={styles.option}>
         <Text style={styles.optionText}>Multiplayer</Text>
       </Link>
-      <Link to="/SignOut" style={styles.option}>
-        <Text style={styles.optionText}>Sign out</Text>
+      <Link to="/profile" style={styles.option}>
+        <Text style={styles.optionText}>profile</Text>
       </Link>
     </>
   )
@@ -66,14 +66,8 @@ const Menu = () => {
       <Link to="/singlePlayer" style={styles.option}>
         <Text style={styles.optionText}>Single Player</Text>
       </Link>
-      <Link to="/boardWrite" style={styles.option}>
-        <Text style={styles.optionText}>boardWrite</Text>
-      </Link>
-      <Link to="/profile" style={styles.option}>
-        <Text style={styles.optionText}>profile</Text>
-      </Link>
 
-      {!user ? <Sign /> : <Logout />}
+      {user ? <Signed /> : <UnSigned />}
       
     </ScrollView>
   );
