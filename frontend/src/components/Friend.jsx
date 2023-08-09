@@ -1,9 +1,29 @@
 
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { loadFriend } from '../services/users';
 import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';
+
+const showAlert = (onDelete) =>
+  Alert.alert(
+    'Delete friend',
+    'Are you sure?',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        onPress: () => onDelete(),
+        style: 'default'
+      }
+    ],
+    {
+      cancelable: true,
+    },
+  );
 
 const VsText = ({wins, loses}) => {
   const textStyles = [
@@ -56,7 +76,7 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
         <Text style={styles.wins}>You're {VsStatus(friendWins, friendLoses)}</Text>
         <VsText wins={friendWins} loses={friendLoses} />
 
-        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+        <TouchableOpacity onPress={() => showAlert(onDelete)} style={styles.deleteButton}>
           <Text style={styles.deleteButtonText}>Delete Friend</Text>
         </TouchableOpacity>
 
