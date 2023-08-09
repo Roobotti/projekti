@@ -48,10 +48,10 @@ async def handle_join(sid, args):
     room = make_room_id(args["user"], args["friend"])
 
     print(room)
-    current_rooms[room] = current_rooms.get(room, empty_room)
+    current_rooms[room] = current_rooms.get(room, empty_room.copy())
 
     if not (current_rooms[room]["host"]):
-        current_rooms[room] = empty_room
+        current_rooms[room] = empty_room.copy()
         current_rooms[room]["host"] = args["user"]
 
     print(current_rooms[room])

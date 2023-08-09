@@ -152,10 +152,10 @@ const MultiPlayer = ({user, friend}) => {
 
     const handleUbongoClick = () => {
       setClicks(clicks + 1)
-      if (clicks>=5) sentUbongo()
+      if (clicks>=3) sentUbongo()
     }
 
-    if (clicks>0) setUboText(6-clicks)
+    if (clicks>0) setUboText(3-clicks)
     else setUboText("UBONGO")
     return (
       <View>
@@ -165,7 +165,6 @@ const MultiPlayer = ({user, friend}) => {
       </View>
     )
   }
-
 
   if (gameOver) {
     return( 
