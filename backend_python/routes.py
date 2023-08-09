@@ -7,6 +7,7 @@ from services import *
 from config import ACCESS_TOKEN_EXPIRE_MINUTES
 from typing import Optional
 from pymongo_get_database import get_database
+from pymongo import UpdateOne, UpdateMany
 from typing import List
 from solver import generate_base, find_good_combination
 import random
@@ -99,10 +100,39 @@ async def upload_avatar(
 ):
     print("data_fdound")
 
+    # update self
     users.update_one(
         {"username": current_user.username},
         {"$set": {"avatar": body}},
     )
+
+    # update friends
+    users.update_many(
+        {
+            "username": {"$in": [f.username for f in current_user.friends]},
+            "friends.username": current_user.username,
+        },
+        {"$set": {"friends.$.avatar": body}},
+    )
+
+    # update requested friends
+    users.update_many(
+        {
+            "username": {"$in": [f.username for f in current_user.sentRequests]},
+            "requests.username": current_user.username,
+        },
+        {"$set": {"requests.$.avatar": body}},
+    )
+
+    # update users who have sent request
+    users.update_many(
+        {
+            "username": {"$in": [f.username for f in current_user.requests]},
+            "sentRequests.username": current_user.username,
+        },
+        {"$set": {"sentRequests.$.avatar": body}},
+    )
+
     print("len", len(body))
     return current_user
 

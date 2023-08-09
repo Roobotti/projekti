@@ -23,7 +23,6 @@ export const UserContextProvider = ({ children }) => {
   const [invites, setInvites] = useState([]);
   const [sentInvite, setSentInvite] = useState(null);
   const [avatar, setAvatar] = useState(null);
-  const [avatars, setAvatars] = useState({});
   const [reFresh, setReFresh] = useState(false);
 
   useEffect(() => {
