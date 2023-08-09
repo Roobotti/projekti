@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { loadFriend } from '../services/users';
 import { UserContext } from '../contexts/UserContext';
+import { Loading } from './Loading';
 
 const VsText = ({wins, loses}) => {
   const textStyles = [
@@ -32,16 +33,17 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
   const loadFriendData = async () => {
     try {
       const data = await loadFriend(friend);
-      setFriendData(data);
-      setFriendWins(data.wins ? data.wins.filter(w => w === user).length : 0)
-      setFriendLoses(data.loses ? data.loses.filter(w => w === user).length : 0)
-      console.log("ss", data.loses.filter(w => w === user).length)
+      const json = await data.json()
+      setFriendData(json);
+      setFriendWins(json.wins ? json.wins.filter(w => w === user).length : 0)
+      setFriendLoses(json.loses ? json.loses.filter(w => w === user).length : 0)
+      console.log("ss", json.loses.filter(w => w === user).length)
     } catch (error) {
       console.error('Error loading friend data:', error);
     }
   };
 
-  if (!friendData) return <View><Text>loading</Text></View>
+  if (!friendData) return <Loading/>
 
   return (
     <View style={{flex:1, justifyContent:'space-between'}}>

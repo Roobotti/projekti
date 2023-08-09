@@ -44,21 +44,7 @@ const Menu = () => {
       setSentInvite(null)
     }
     if (room) socket.emit("leave", {"user":user, "room":room})
-    
-    socket.on(`${user}/post`, (data) => {
-      console.log("sender", data.user)
-      switch (data.type) {
-        case "invite":
-          setInvites(...invites, data.user);
-          console.log("invited");
-          break;
-        case "cancel_invite":
-          setInvites(invites.filter((i) => i !== data.user));
-          console.log("invite_removed");
-          break;
-      }
-    })
-  }, [user])
+  })
   
   return (
     <ScrollView contentContainerStyle={styles.container}>

@@ -12,3 +12,4 @@ backend_python/__pycache__
 frontend/node_modules
 backend_python/node_modules
 
+frontend/%ProgramData%

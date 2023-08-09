@@ -104,7 +104,8 @@ const MultiPlayer = ({user, friend}) => {
     else {
     const getFriend = async () => {
         const data = await loadFriend(friend)
-        setFriendData(data)
+        const json = await data.json()
+        setFriendData(json)
       }
       getFriend()
       if (host) {

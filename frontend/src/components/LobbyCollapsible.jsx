@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useContext, useState, Component } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 
 import {
   SafeAreaView,
@@ -17,8 +17,6 @@ import {
 //import for the animation of Collapse and Expand
 import * as Animatable from 'react-native-animatable';
 
-//import for the collapsible/Expandable view
-import Collapsible from 'react-native-collapsible';
 
 //import for the Accordion view
 import Accordion from 'react-native-collapsible/Accordion';
@@ -28,10 +26,11 @@ import Text from './Text';
 
 
 import MultiPlayer from './MultiPlayer';
-import { loadFriend, sendDeleteFriend, sendDeleteRequest, sendDeleteSentRequest, sendRequest } from '../services/users';
+import { loadFriend, loadFriendData, sendDeleteFriend, sendDeleteRequest, sendDeleteSentRequest, sendRequest } from '../services/users';
 
 import { socket } from '../services/socket';
 import FriendProfile from './Friend';
+import { Loading } from './Loading';
 
 
 
@@ -45,6 +44,9 @@ export const LobbyCollap = () => {
   // Collapsed condition for the single collapsible
   const [collapsed, setCollapsed] = useState(true);
 
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState(null)
+
   useEffect( () => {
     socket.emit('active', {user})
     socket.on("connect", () => {
@@ -56,27 +58,28 @@ export const LobbyCollap = () => {
   });
 
   socket.on(`${user}/post`, async (data) => {
-    console.log("sender", data.user)
-    const friend =  await loadFriend(data.user)
+    console.log("sender", data.user, "user", user)
+    const friend =  await loadFriendData(data.user)
     switch (data.type) {
       case "invite":
-        setInvites([...invites, friend]);
-        console.log("invites:", friend.username);
-        break;
+        if (!invites.map((f) => f.username).includes(data.user)) {
+          await setInvites([...invites, await friend]);
+        }
+          break;
       case "cancel_invite":
-          setInvites(invites.filter((i) => i.username !== data.user));
+          await setInvites(invites.filter((i) => i.username !== data.user));
           console.log("invite_removed");
           break;
       case "accept":
         if (!friends.map((f) => f.username).includes(data.user)) {
-          setFriends([...friends, await friend])
+          await setFriends([...friends, await friend])
         }
-        setRequests(requests.filter((f) => f.username !== data.user))
+        await setRequests(requests.filter((f) => f.username !== data.user))
         console.log("accept");
         break;
       case "request":
         if (!requests.map((r) => r.username).includes(await friend.username)) {
-          setRequests([...requests, await friend])
+          await setRequests([...requests, await friend])
         }
         console.log("request");
         break;
@@ -86,6 +89,11 @@ export const LobbyCollap = () => {
   });
 
   }, [user])
+  
+  //message timeout
+  useEffect(() => {
+    if (message) { setTimeout( () => setMessage(null), 2000)}
+  }, [message])
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -96,13 +104,13 @@ export const LobbyCollap = () => {
   }, []);
 
   const CONTENT = [
-        {
+      {
       empty: invites.length,
       title: `Invites (${invites.length})`,
       content:
         <View  style={styles.map_container}>
             {invites && invites.map((i) => (
-              <View style={styles.user_container}>
+              <View key={i.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${i.avatar}` }} style={styles.avatar}/>
                 <Text>{i.username}</Text>
                 <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleJoin(i.username)} >
@@ -123,8 +131,8 @@ export const LobbyCollap = () => {
                 <TouchableOpacity style={{...styles.add, backgroundColor:'pink'}} onPress={() => handleProfile(friend.username)} >
                   <Text>{friend.username}</Text>
                 </TouchableOpacity>
-                {invites.map((i) => i.username).includes(friend.username) 
-                  ?(
+                {(invites && invites.map((i) => i.username).includes(friend.username))
+                  ? (
                     <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleJoin(friend.username)} >
                       <Text>Join</Text>
                     </TouchableOpacity>
@@ -179,9 +187,9 @@ export const LobbyCollap = () => {
     },
   ];
 
-  const handleInvite = (friend) => {
-    console.log("invite", friend)
-    socket.emit('invite', {"user":user, "friend":friend});
+  const handleInvite = async (friend) => {
+    console.log("invite", user, friend)
+    socket.emit("invite", {"user":user, "friend":friend});
     setSentInvite(friend)
     setGame(<MultiPlayer user={user} friend={friend} />)
   };
@@ -204,20 +212,35 @@ export const LobbyCollap = () => {
     sendRequest(token, friend)
     setRequests(requests.filter((f) => f.username !== friend))
     socket.emit('accept', {"user":user, "friend":friend});
-    const friendData = await loadFriend(friend)
+    const data = await loadFriend(friend)
+    const json = await data.json()
     console.log("Accept")
-    setFriends([...friends, await friendData])
+    setFriends([...friends, await json])
   };
 
   const handleAddFriend = async () => {
     console.log("tok:", token)
-    if (friends.map((f) => f.username).includes(newFriend) || sentRequests.map((f) => f.username).includes(newFriend) || newFriend === user) return null
+    setLoading(true)
+    if (friends.map((f) => f.username).includes(newFriend) || sentRequests.map((f) => f.username).includes(newFriend) || newFriend === user) {
+      setMessage(`You have alredy sent request to: "${newFriend}"`)
+      setLoading(false)
+      return null
+    }
     if (requests.map((f) => f.username).includes(newFriend)) return handleAccept(newFriend)
 
-    socket.emit('request', {"user":user, "friend": newFriend})
-    const friend = await loadFriend(newFriend)
-    await setSentRequests([...sentRequests, await friend])
-    await sendRequest(token, newFriend)
+    try {
+      socket.emit('request', {"user":user, "friend": newFriend})
+      const data = await loadFriend(newFriend)
+      const friend = data.json()
+      await setSentRequests([...sentRequests, await friend])
+      await sendRequest(token, newFriend)
+      setLoading(false)
+      
+    } catch (error) {
+      setMessage(`There is no user: "${newFriend}"`)
+      setLoading(false)
+    }
+
   }
 
   const handleDeleteFriend = (friend) => {
@@ -289,6 +312,8 @@ export const LobbyCollap = () => {
             returnKeyType="done" 
             onSubmitEditing={() => handleAddFriend()}
           />
+          {loading && <Loading/>}
+          {message && <Text style={styles.message}> {message} </Text>}
 
           {/*Code for Accordion/Expandable List starts here*/}
           <Accordion
@@ -415,5 +440,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     padding: 15,
     borderRadius: 20,
+  },
+  message: {
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#f9c2ff',
+    textAlign: 'center'
   }
 });
