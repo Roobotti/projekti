@@ -35,27 +35,15 @@ import FriendProfile from './Friend';
 
 
 
-//To make the selector (Something like tabs)
-const SELECTORS = [
-  { title: 'T&C', value: 0 },
-  { title: 'Privacy Policy', value: 1 },
-  { title: 'Return Policy', value: 2 },
-  { title: 'Reset all' },
-];
-
 export const LobbyCollap = () => {
   const { user, friends, requests, token, sentRequests, wins, invites, setSentInvite, setReFresh, setFriends, setRequests, setInvites, setSentRequests } = useContext(UserContext);
   const [newFriend, setNewFriend] = useState("");
   const [game, setGame] = useState(null)
   const [refreshing, setRefreshing] = useState(false);
-  const [requestsCollaps, setRequestsCollaps] = useState(null)
-  const [sentRequestsCollaps, setSentRequestsCollaps] = useState(Object.fromEntries(sentRequests.map(r => [r, false])))
     // Ddefault active selector
   const [activeSections, setActiveSections] = useState([]);
   // Collapsed condition for the single collapsible
   const [collapsed, setCollapsed] = useState(true);
-  console.log(invites)
-  console.log(requestsCollaps)
 
   useEffect( () => {
     socket.emit('active', {user})
@@ -72,20 +60,24 @@ export const LobbyCollap = () => {
     const friend =  await loadFriend(data.user)
     switch (data.type) {
       case "invite":
-        setInvites(...invites, await friend);
-        console.log("invited");
+        setInvites([...invites, friend]);
+        console.log("invites:", friend.username);
         break;
       case "cancel_invite":
           setInvites(invites.filter((i) => i.username !== data.user));
           console.log("invite_removed");
           break;
       case "accept":
-        setFriends([...friends, friend])
+        if (!friends.map((f) => f.username).includes(data.user)) {
+          setFriends([...friends, await friend])
+        }
         setRequests(requests.filter((f) => f.username !== data.user))
         console.log("accept");
         break;
       case "request":
-        setRequests([...friends, await friend])
+        if (!requests.map((r) => r.username).includes(await friend.username)) {
+          setRequests([...requests, await friend])
+        }
         console.log("request");
         break;
 
@@ -104,31 +96,58 @@ export const LobbyCollap = () => {
   }, []);
 
   const CONTENT = [
+        {
+      empty: invites.length,
+      title: `Invites (${invites.length})`,
+      content:
+        <View  style={styles.map_container}>
+            {invites && invites.map((i) => (
+              <View style={styles.user_container}>
+                <Image source={{ uri: `data:image/*;base64,${i.avatar}` }} style={styles.avatar}/>
+                <Text>{i.username}</Text>
+                <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleJoin(i.username)} >
+                  <Text>Join</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+        </View>
+    },
     {
+      empty: friends.length,
       title: `Friends (${friends.length})`,
       content:
-          <View>
+          <View  style={styles.map_container}>
           {friends && friends.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
                 <TouchableOpacity style={{...styles.add, backgroundColor:'pink'}} onPress={() => handleProfile(friend.username)} >
                   <Text>{friend.username}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleInvite(friend.username)} >
-                  <Text>Host</Text>
-                </TouchableOpacity>
+                {invites.map((i) => i.username).includes(friend.username) 
+                  ?(
+                    <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleJoin(friend.username)} >
+                      <Text>Join</Text>
+                    </TouchableOpacity>
+                  ) 
+                  :(
+                    <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleInvite(friend.username)} >
+                      <Text>Host</Text>
+                    </TouchableOpacity>
+                  )
+                }
             </View>
           ))}
         </View>
     },
     {
+      empty: requests.length,
       title: `Friend requests (${requests.length})`,
       content:(
-        <View>
+        <View  style={styles.map_container}>
           {requests && requests.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
-                <Text>{friend.username}</Text>
+                <Text style={{alignSelf:'center'}}>{friend.username}</Text>
                 <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleAccept(friend.username)} >
                   <Text>Add</Text>
                 </TouchableOpacity>
@@ -141,14 +160,15 @@ export const LobbyCollap = () => {
       )
     },
     {
+      empty: sentRequests.length,
       title: `Sent requests (${sentRequests.length})`,
       content:
         (
-        <View style={styles.c}>
+        <View style={styles.map_container}>
           {sentRequests && sentRequests.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
               <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
-              <Text>{friend.username}</Text>
+              <Text style={{alignSelf:'center'}}>{friend.username}</Text>
               <TouchableOpacity style={styles.delete} onPress={() => handleDeleteSentRequest(friend.username)} >
                 <Text>Delete</Text>
               </TouchableOpacity>
@@ -174,32 +194,34 @@ export const LobbyCollap = () => {
 
   const handleProfile = (friend) => {
     console.log("to friend profile", friend)
-    setGame(<FriendProfile friend={friend} onDelete={handleDeleteFriend} onBack={(v) => setGame(v)}/>)
+    setGame(<FriendProfile friend={friend} onDelete={() => { 
+      handleDeleteFriend(friend) 
+      setGame(null)
+    }} onBack={(v) => setGame(v)}/>)
   }
 
   const handleAccept = async (friend) => {
+    sendRequest(token, friend)
+    setRequests(requests.filter((f) => f.username !== friend))
+    socket.emit('accept', {"user":user, "friend":friend});
     const friendData = await loadFriend(friend)
     console.log("Accept")
     setFriends([...friends, await friendData])
-    setRequests(requests.filter((f) => f.username !== friend))
-    socket.emit('accept', {"user":user, "friend":friend});
-    sendRequest(token, friend)
   };
 
   const handleAddFriend = async () => {
     console.log("tok:", token)
-    if (newFriend in friends || newFriend in sentRequests || newFriend === user) return null
-    if (newFriend in requests) return handleAccept(newFriend)
-    if (!sentRequests.includes(newFriend)) {
-      const friend = await sendRequest(token, newFriend)
-      socket.emit('request', {"user":user, "friend": newFriend})
-      if (friend) setSentRequests([...sentRequests, await friend])
-    }
-  };
+    if (friends.map((f) => f.username).includes(newFriend) || sentRequests.map((f) => f.username).includes(newFriend) || newFriend === user) return null
+    if (requests.map((f) => f.username).includes(newFriend)) return handleAccept(newFriend)
+
+    socket.emit('request', {"user":user, "friend": newFriend})
+    const friend = await loadFriend(newFriend)
+    await setSentRequests([...sentRequests, await friend])
+    await sendRequest(token, newFriend)
+  }
 
   const handleDeleteFriend = (friend) => {
     console.log("Deleted")
-    setRequestsCollaps(null)
     setFriends(friends.filter((f) => f.username !== friend))
     sendDeleteFriend(token, friend)
   }
@@ -212,21 +234,12 @@ export const LobbyCollap = () => {
 
   const handleDeleteRequest = (friend) => {
     console.log("Deleted")
-    setRequests(requests.filter((f) => f !== friend))
-    setRequestsCollaps(null)
+    setRequests(requests.filter((f) => f.username !== friend))
     sendDeleteRequest(token, friend)
   }
 
-  const handleRequestCollab = (friend) => {
-    setRequestsCollaps(requestsCollaps === friend ? null : friend)
-  }
 
   if (game) return game
-
-  const toggleExpanded = () => {
-    //Toggling the state of single Collapsible
-    setCollapsed(!collapsed);
-  };
 
   const setSections = (sections) => {
     //setting up a active section state
@@ -235,6 +248,7 @@ export const LobbyCollap = () => {
 
   const renderHeader = (section, _, isActive) => {
     //Accordion Header view
+    if (!section.empty) return <></>
     return (
       <Animatable.View
         duration={400}
@@ -251,10 +265,10 @@ export const LobbyCollap = () => {
       <Animatable.View
         duration={400}
         style={[styles.content, isActive ? styles.active : styles.inactive]}
-        transition="backgroundColor">
+        transition='backgroundColor'>
         <Animatable.Text
           animation={isActive ? 'bounceIn' : undefined}
-          style={{ textAlign: 'center' }}>
+          style={{ flex: 1, alignSelf:'stretch', justifyContent: 'space-between', textAlign: 'center', display:'flex', }}>
           {section.content}
         </Animatable.Text>
       </Animatable.View>
@@ -276,20 +290,6 @@ export const LobbyCollap = () => {
             onSubmitEditing={() => handleAddFriend()}
           />
 
-          {/*Code for Single Collapsible Start*/}
-          <TouchableOpacity onPress={toggleExpanded}>
-            <View style={styles.header}>
-              <Text style={styles.headerText}>Invites ({invites.length})</Text>
-            </View>
-          </TouchableOpacity>
-          {/*Content of Single Collapsible*/}
-          <Collapsible collapsed={collapsed} align="center">
-            <View style={styles.content}>
-              <Text style={{ textAlign: 'center' }}>
-                
-              </Text>
-            </View>
-          </Collapsible>
           {/*Code for Accordion/Expandable List starts here*/}
           <Accordion
             activeSections={activeSections}
@@ -347,8 +347,6 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: 'center',
     backgroundColor: '#fff',
-    alignItems: 'flex-start',
-    alignSelf: 'stretch',
     borderColor: 'black',
     borderWidth: 2,
     borderRadius: 10,
@@ -378,16 +376,6 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: 'center',
   },
-  multipleToggle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 30,
-    alignItems: 'center',
-  },
-  multipleToggle__title: {
-    fontSize: 16,
-    marginRight: 8,
-  },
   input: {
     borderWidth: 1,
     borderColor: "gray",
@@ -401,18 +389,29 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   user_container: {
+    flex: 1,
+    width: 300,  /* Or whatever */
+    margin: 'auto', /* Magic! */
     flexDirection: 'row',
-    columnGap: 20,
-    alignContent: 'center',
-    alignItems: 'center'
+    alignSelf: 'flex-start',
+    justifyContent: 'space-between',
+    textAlignVertical: 'center',
+    
+  },
+  map_container: {
+    flex:1, 
+    rowGap:20, 
+    display:'flex'
   },
   delete: {
+    alignSelf: 'center',
     backgroundColor: 'red',
     padding: 15,
     borderRadius: 20,
     marginLeft: 40,
   },
   add: {
+    alignSelf: 'center',
     backgroundColor: 'red',
     padding: 15,
     borderRadius: 20,

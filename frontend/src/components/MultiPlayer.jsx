@@ -14,7 +14,7 @@ import { loadFriend, newWin } from '../services/users';
 const InitialcountDown = 5000
 
 const MultiPlayer = ({user, friend}) => {
-  const {room, token, avatar, setRoom} = useContext(UserContext)
+  const {room, token, avatar, invites, setRoom, setInvites} = useContext(UserContext)
   const { data, setData } = useContext(BoardContext);
   const { blocks, setBlocks } = useContext(BlocksContext)
   const [isLoading, setIsLoading] = useState(false);
