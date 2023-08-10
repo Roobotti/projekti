@@ -1,12 +1,13 @@
 
 
-import { View, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { Link } from 'react-router-native';
 
 import { socket } from '../services/socket';
 
-import { useState, useEffect, useContext  } from 'react';
+import { useState, useEffect, useContext, useRef   } from 'react';
 import { UserContext } from '../contexts/UserContext';
+import { Loading } from './Loading';
 
 
 const UnSigned = () => {
@@ -36,7 +37,7 @@ const Signed = () => {
 }
 
 const Menu = () => {
-  const { user, room, invites, sentInvite, setSentInvite, setInvites, setRoom,} = useContext(UserContext);
+  const { user, room, invites, sentInvite, loading, setSentInvite, setInvites, setRoom,} = useContext(UserContext);
 
   useEffect(() => {
     if (sentInvite) {
@@ -48,12 +49,12 @@ const Menu = () => {
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      
       <Link to="/singlePlayer" style={styles.option}>
         <Text style={styles.optionText}>Single Player</Text>
       </Link>
 
-      {user ? <Signed /> : <UnSigned />}
+      {user ? <Signed /> : loading ? <Loading/> : <UnSigned / >}
+      
       
     </ScrollView>
   );

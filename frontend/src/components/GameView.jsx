@@ -7,7 +7,7 @@ import { BlocksContext } from '../contexts/BlockContext';
 import Matrix from './Matrix';
 import BlockRenderer from './Blocks';
 import { Loading } from './Loading';
-
+import { rotate } from '../tools/Rotate';
 
 
 const Board = () => {
@@ -20,7 +20,8 @@ const Board = () => {
       setIsLoading(true)
       const response = await getSolutions()
       const parsedBoard = JSON.parse(response.board)
-      setData(parsedBoard)
+      const matrix = rotate(await parsedBoard.base)
+      setData(matrix)
       setBlocks(response.blocks)
       setIsLoading(false)
       console.log("d", response)
@@ -34,7 +35,7 @@ const Board = () => {
   return (
     <View>
       <Button title="new board" onPress={getData} />
-      {data && <Matrix matrix={data.base}/>}
+      {data && <Matrix matrix={data}/>}
       {isLoading 
         ? ( <Loading /> )
         : ( blocks && <BlockRenderer blocks={blocks} /> )

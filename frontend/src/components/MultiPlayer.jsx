@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState, useCallback } from 'react';
-import { View, Button, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
+import { View, Button, StyleSheet, Image, Text, TouchableOpacity, Animated } from 'react-native';
 import { BoardContext } from '../contexts/BoardContext';
 import { getSolutions } from '../services/blocks';
 import { BlocksContext } from '../contexts/BlockContext';
@@ -13,6 +13,10 @@ import { loadFriend, newWin } from '../services/users';
 
 import * as Animatable from 'react-native-animatable';
 
+import LottieView from "lottie-react-native";
+import { rotate } from '../tools/Rotate';
+
+const AnimatedLottieViewUserWait = Animated.createAnimatedComponent(LottieView);
 
 const InitialcountDown = 5000
 
@@ -33,6 +37,8 @@ const MultiPlayer = ({user, friend}) => {
   const [friendData, setFriendData] = useState(null)
   const [clicks, setClicks] = useState(0)
   const [uboText, setUboText] = useState("UBONGO")
+
+  const [matrix, setMatrix] = useState([])
   // send roomname / hostName 
   // send roomname / playerName
 
@@ -76,6 +82,13 @@ const MultiPlayer = ({user, friend}) => {
 
   }, [])
 
+  //rotate board 
+  useEffect( () => {
+
+    if (data&&data.base) setMatrix(rotate(data.base))
+
+  }, [data])
+  
   //count down
   useEffect( () => {
     if (friendReady && countdown > 0) {
@@ -201,7 +214,16 @@ const MultiPlayer = ({user, friend}) => {
       <View>
         { (!userReady && data && blocks) 
           ? (<Button title="Redy" onPress={sentRedy}/>)
-          : ( !friendReady && <Text style={styles.text} >waiting for {friend}</Text> )
+          : ( !friendReady && (<View>
+              <AnimatedLottieViewUserWait
+                source={require("../lotties/HourGlass.json")}
+                autoPlay
+                loop
+                style={{ width: 100, alignSelf:'center' }}
+              />
+              <Text style={styles.text} >Waiting for {friend}</Text>
+            
+            </View>) )
         }
       </View>
     )
@@ -215,7 +237,7 @@ const MultiPlayer = ({user, friend}) => {
 
   return (
     <View>
-      <Animatable.View animation={'bounceInUp'} duration={2000}>
+      <Animatable.View>
       { blocks && choseBlockRender() }
       {isLoading 
         ? ( <Loading /> )
@@ -223,25 +245,12 @@ const MultiPlayer = ({user, friend}) => {
       }
       </Animatable.View>
       {friendReady && userReady && (
-        <Animatable.View>
-          {(countdown === InitialcountDown) 
-            ? (<WhoReady />)
-            : ((countdown !== 0) && (
-            <Animatable.Text style={styles.text} animation={'bounceIn'}> 
-              starts in: {Math.floor(countdown/1000)} s
-            </Animatable.Text>))
-          }
-          {(countdown === 0) && (
-            <View style={styles.container}> 
-              <Animatable.View animation={'bounceInLeft'} duration={1000}>
-                  <Matrix matrix={data.base} />
-              </Animatable.View >
-              <Animatable.View animation={'bounceInRight'} duration={1000} delay={600}>
-                  <UbongoClicker />
-              </Animatable.View >
-            </View>
-          )}
-        </Animatable.View>
+        <View style={styles.container}> 
+          <Matrix matrix={matrix} />
+          <Animatable.View animation={'bounceInRight'} duration={1000} delay={5000}>
+              <UbongoClicker />
+          </Animatable.View >
+        </View>
       )}
     </View>
   );

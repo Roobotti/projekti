@@ -7,6 +7,7 @@ import {
 } from "react";
 import { loadAvatar, loadFriend, readUsersMe } from "../services/users";
 import { useAuthStorage } from "../hooks/useStorageContext";
+import { Loading } from "../components/Loading";
 
 export const UserContext = createContext();
 
@@ -24,6 +25,7 @@ export const UserContextProvider = ({ children }) => {
   const [sentInvite, setSentInvite] = useState(null);
   const [avatar, setAvatar] = useState(null);
   const [reFresh, setReFresh] = useState(false);
+  const [loading, setLoading] = useState();
 
   useEffect(() => {
     const f = async () => {
@@ -37,6 +39,7 @@ export const UserContextProvider = ({ children }) => {
   useEffect(() => {
     const fetcher = async () => {
       try {
+        setLoading(true);
         //get the user data from db
         const result = await readUsersMe(
           token || (await authStorage.getAccessToken())
@@ -57,10 +60,12 @@ export const UserContextProvider = ({ children }) => {
         setWins(wins);
         setLoses(loses);
         setAvatar(avatar);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching da user data:", error);
         setUser(null);
         setFriends([]);
+        setLoading(false);
       }
     };
     fetcher();
@@ -89,6 +94,7 @@ export const UserContextProvider = ({ children }) => {
         invites,
         sentInvite,
         avatar,
+        loading,
         login,
         logout,
         setSentRequests,

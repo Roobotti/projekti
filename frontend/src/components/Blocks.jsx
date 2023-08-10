@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Image, StyleSheet, ScrollView, ImageBackground } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+
 
 const blockImageMapping = {
   g1: require('../block_images/g1.png'),
@@ -24,14 +26,15 @@ const blockImageMapping = {
 }
 
 export const BlockRendererLarge = ({ blocks }) => {
-  console.log("jejj", blocks)
   const rows = Math.ceil(blocks.length / 2); // Calculate the number of rows needed
   return (
       <ScrollView >
         {[...Array(rows)].map((_, rowIndex) => (
           <View key={rowIndex} style={styles.row}>
             {blocks.slice(rowIndex * 2, rowIndex * 2 + 2).map((block, index) => (
-              <Image
+              <Animatable.Image
+                animation={'bounceIn'} 
+                duration={1000} 
                 key={index}
                 source={blockImageMapping[block]}
                 style={styles.blockImageLarge}
@@ -46,7 +49,6 @@ export const BlockRendererLarge = ({ blocks }) => {
 
 
 const BlockRenderer = ({ blocks }) => {
-  console.log("jejj", blocks)
   return (
       <ScrollView horizontal >
             {blocks.map((block) => (
