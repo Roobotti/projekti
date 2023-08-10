@@ -11,6 +11,9 @@ import { socket } from '../services/socket';
 import { UserContext } from '../contexts/UserContext';
 import { loadFriend, newWin } from '../services/users';
 
+import * as Animatable from 'react-native-animatable';
+
+
 const InitialcountDown = 5000
 
 const MultiPlayer = ({user, friend}) => {
@@ -168,8 +171,10 @@ const MultiPlayer = ({user, friend}) => {
 
   if (gameOver) {
     return( 
-      <View style={styles.winner_container}>
-        <Text style={styles.text}>!!UBONGO!!</Text>
+      <Animatable.View style={styles.winner_container} animation={'bounceIn'} duration={2000}>
+        <Animatable.Text style={styles.text}> 
+          !!UBONGO!!
+        </Animatable.Text>
 
         {win 
           ? (
@@ -184,9 +189,10 @@ const MultiPlayer = ({user, friend}) => {
             </View>
             )
           }
-        
+
         <Button title="new game?" onPress={newGame} />
-      </View>
+
+      </Animatable.View>
     )
   }
 
@@ -209,26 +215,33 @@ const MultiPlayer = ({user, friend}) => {
 
   return (
     <View>
-      <View>
+      <Animatable.View animation={'bounceInUp'} duration={2000}>
       { blocks && choseBlockRender() }
       {isLoading 
         ? ( <Loading /> )
         : ( <WhoReady /> )
       }
-      </View>
+      </Animatable.View>
       {friendReady && userReady && (
-        <View>
+        <Animatable.View>
           {(countdown === InitialcountDown) 
             ? (<WhoReady />)
-            : ((countdown !== 0) && <Text style={styles.text}> starts in: {Math.floor(countdown/1000)} s</Text>)
+            : ((countdown !== 0) && (
+            <Animatable.Text style={styles.text} animation={'bounceIn'}> 
+              starts in: {Math.floor(countdown/1000)} s
+            </Animatable.Text>))
           }
           {(countdown === 0) && (
             <View style={styles.container}> 
-              <Matrix matrix={data.base}/>
-              <UbongoClicker />
+              <Animatable.View animation={'bounceInLeft'} duration={1000}>
+                  <Matrix matrix={data.base} />
+              </Animatable.View >
+              <Animatable.View animation={'bounceInRight'} duration={1000} delay={600}>
+                  <UbongoClicker />
+              </Animatable.View >
             </View>
           )}
-        </View>
+        </Animatable.View>
       )}
     </View>
   );
