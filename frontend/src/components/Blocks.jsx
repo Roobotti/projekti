@@ -43,7 +43,6 @@ export const BlockRendererLarge = ({ blocks }) => {
           </View>
         ))}
         </ScrollView>
-
   );
 };
 
@@ -52,7 +51,10 @@ const BlockRenderer = ({ blocks }) => {
   return (
       <ScrollView horizontal >
             {blocks.map((block) => (
-              <Image
+              <Animatable.Image
+                animation={'bounceInLeft'} 
+                duration={1000}
+
                 key={block}
                 source={blockImageMapping[block]}
                 style={styles.blockImage}

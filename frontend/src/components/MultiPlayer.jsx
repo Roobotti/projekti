@@ -15,6 +15,7 @@ import * as Animatable from 'react-native-animatable';
 
 import LottieView from "lottie-react-native";
 import { rotate } from '../tools/Rotate';
+import { HourGlassTimer } from '../lotties/Timers';
 
 const AnimatedLottieViewUserWait = Animated.createAnimatedComponent(LottieView);
 
@@ -211,7 +212,7 @@ const MultiPlayer = ({user, friend}) => {
 
   const WhoReady = () => {
     return(
-      <View>
+      <View >
         { (!userReady && data && blocks) 
           ? (<Button title="Redy" onPress={sentRedy}/>)
           : ( !friendReady && (<View>
@@ -219,6 +220,7 @@ const MultiPlayer = ({user, friend}) => {
                 source={require("../lotties/HourGlass.json")}
                 autoPlay
                 loop
+                speed={2}
                 style={{ width: 100, alignSelf:'center' }}
               />
               <Text style={styles.text} >Waiting for {friend}</Text>
@@ -247,8 +249,9 @@ const MultiPlayer = ({user, friend}) => {
       {friendReady && userReady && (
         <View style={styles.container}> 
           <Matrix matrix={matrix} />
-          <Animatable.View animation={'bounceInRight'} duration={1000} delay={5000}>
-              <UbongoClicker />
+          <Animatable.View animation={'fadeIn'} duration={5000} delay={4000} style={{flexDirection: 'row', alignItems:'center'}}>
+              <UbongoClicker style={{alignSelf: 'center'}} />
+              <HourGlassTimer/>
           </Animatable.View >
         </View>
       )}

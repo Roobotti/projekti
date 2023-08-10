@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions, Text} from 'react-native';
 
 import * as Animatable from 'react-native-animatable';
+import * as Haptics from 'expo-haptics';
 
 const Matrix = ({matrix}) => {
 
@@ -24,7 +25,8 @@ const Matrix = ({matrix}) => {
               height={boxHeightInPixels}
               animation={'bounceInDown'}
               delay={(arrayLength-rowIndex)*200*arrayLength+colIndex*200}
-              duration={1000+rowIndex*500}
+              duration={rowIndex*200*arrayLength+colIndex*200}
+              onAnimationBegin ={() => {if (!value) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}}
               useNativeDriver={true}
               style={[
                 styles.box,

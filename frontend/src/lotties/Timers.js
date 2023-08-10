@@ -24,7 +24,7 @@ export const LottieLoad = () => {
   );
 };
 
-export const ControllingAnimationProgress = () => {
+export const HourGlassTimer = () => {
   const animationProgress = useRef(new Animated.Value(0));
   const animationProgress1 = useRef(new Animated.Value(0));
   const [state, setState] = useState(0);
@@ -32,7 +32,7 @@ export const ControllingAnimationProgress = () => {
   useEffect(() => {
     Animated.timing(animationProgress.current, {
       toValue: 1,
-      duration: 10000,
+      duration: 180000,
       easing: Easing.linear,
       useNativeDriver: false,
     }).start(() => {
