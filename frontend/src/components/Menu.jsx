@@ -1,6 +1,6 @@
 
 
-import { View, ScrollView, TouchableOpacity, Text, StyleSheet, Animated, Easing } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Text, StyleSheet, Animated, Easing, ImageBackground } from 'react-native';
 import { Link } from 'react-router-native';
 
 import { socket } from '../services/socket';
@@ -37,7 +37,7 @@ const Signed = () => {
 }
 
 const Menu = () => {
-  const { user, room, invites, sentInvite, loading, setSentInvite, setInvites, setRoom,} = useContext(UserContext);
+  const { user, room, invites, sentInvite, loading, fontsLoading, setSentInvite, setInvites, setRoom,} = useContext(UserContext);
 
   useEffect(() => {
     if (sentInvite) {
@@ -47,11 +47,18 @@ const Menu = () => {
     if (room) socket.emit("leave", {"user":user, "room":room})
   })
   
+  if (fontsLoading) return(
+    <ImageBackground source={require('../../assets/paint_brush.png')} resizeMode='stretch' style={{flex: 1, alignSelf:'center' ,justifyContent:'center'}}>
+      <Loading/>
+    </ImageBackground>)
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <ImageBackground source={require('../../assets/paint_brush.png')} resizeMode='stretch' style={{flex: 1, alignSelf:'center' ,justifyContent:'center'}}>
       <Link to="/singlePlayer" style={styles.option}>
-        <Text style={styles.optionText}>Single Player</Text>
+          <Text style={styles.optionText}>Single Player</Text>
       </Link>
+      </ImageBackground>
 
       {user ? <Signed /> : loading ? <Loading/> : <UnSigned / >}
       
@@ -76,6 +83,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 18,
+    fontFamily: 'Kablammo'
   },
 });
 
