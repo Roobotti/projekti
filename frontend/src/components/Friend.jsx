@@ -81,8 +81,8 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
         </TouchableOpacity>
 
       </View>
-      <TouchableOpacity onPress={() => onBack(null)}>
-          <Text style={styles.tab}> X </Text>
+      <TouchableOpacity onPress={() => onBack(null)} style={styles.tab}>
+          <Text style={{color: 'red', fontSize:20}}> X </Text>
       </TouchableOpacity>
     </View>
   );
@@ -108,7 +108,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   text: {
-    fontSize: 18,
+    fontSize: 20,
+
   },
   winning: {
     color: 'green',
@@ -132,13 +133,15 @@ const styles = StyleSheet.create({
   },
   tab: {
     alignSelf: 'center',
-    backgroundColor: 'red',
-    padding: 5,
-    paddingHorizontal: 8,
+    backgroundColor: 'rgba(1,1,1,0.4)',
+    padding: 20,
+    paddingHorizontal: 22,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderLeftWidth: 3,
     marginBottom: 20,
     borderRadius: 80,
-    fontSize: 20,
-  }
+  },
 });
 
 export default FriendProfile;

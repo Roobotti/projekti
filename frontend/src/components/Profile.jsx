@@ -98,9 +98,7 @@ export const Profile = () => {
 
       </ScrollView>
 
-      <View style={styles.tab}>
-          <Tab to="/" text="X"/>
-      </View>
+      <Tab to="/" text={<Text style={{color:'red', fontSize:20}}>X</Text>} style={styles.tab}/>
       
     </View>
   );
@@ -124,16 +122,21 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   avatar: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
     marginBottom: 50,
-    borderRadius: 50,
+    borderRadius: 100,
+    borderWidth: 3,
+    borderColor: 'rgba(1,1,1,0.3)',
     alignSelf: 'center',
   },
   tab: {
     alignSelf: 'center',
-    backgroundColor: 'red',
-    paddingHorizontal: 5,
+    backgroundColor: 'rgba(1,1,1,0.4)',
+    paddingHorizontal: 8,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderLeftWidth: 3,
     marginBottom: 20,
     borderRadius: 80
   },

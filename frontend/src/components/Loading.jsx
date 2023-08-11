@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingContainer: {
+    flex: 1,
     alignItems: 'center',
   },
   loadingText: {

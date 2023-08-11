@@ -33,13 +33,17 @@ const Board = () => {
   };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <Button title="new board" onPress={getData} />
-      {data && <Matrix matrix={data}/>}
-      {isLoading 
-        ? ( <Loading /> )
-        : ( blocks && <BlockRenderer blocks={blocks} /> )
-      }
+      <View style={{flex: 1, display:'flex', justifyContent:'space-evenly'}}>
+        <View>{data && <Matrix matrix={data}/>}</View>
+        <View>
+          {isLoading 
+            ? ( <Loading /> )
+            : ( blocks && <BlockRenderer blocks={blocks}/> )
+          }
+        </View>
+      </View>
     </View>
   );
 };

@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
+  SafeAreaView,
 } from "react-native";
 import MultiPlayer from './MultiPlayer';
 import { sendDeleteFriend, sendDeleteRequest, sendDeleteSentRequest, sendRequest } from '../services/users';
@@ -141,8 +142,9 @@ const Lobby = () => {
   if (game) return game
 
   return (
+    <SafeAreaView style={{flex: 1, }}>
     <ScrollView 
-      contentContainerStyle={styles.container}
+      style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
       {/* Input box for adding new friends */}
       <TextInput
@@ -243,9 +245,8 @@ const Lobby = () => {
       )
       }
     </Collapsible>
-    
-
   </ScrollView>
+  </SafeAreaView>
   );
   }
 
@@ -253,10 +254,7 @@ const Lobby = () => {
 const styles = StyleSheet.create({
 
   container: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'stretch',
-    padding: 20,
+    backgroundColor: 'pink'
   },
   addDelete: {
     flexDirection: 'row',

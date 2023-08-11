@@ -346,7 +346,8 @@ export const LobbyCollap = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F5FCFF',
+    flex: 1,
+    backgroundColor: 'transparent',
     alignItems: 'stretch',
     paddingTop: 30,
   },
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flex:1,
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'transparent',
     padding: 10,
   },
   headerText: {
@@ -371,17 +372,17 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
     textAlign: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     borderColor: 'black',
     borderWidth: 2,
     borderRadius: 10,
     
   },
   active: {
-    backgroundColor: 'rgba(255,255,255,1)',
+    backgroundColor: 'transparent',
   },
   inactive: {
-    backgroundColor: 'rgba(245,252,255,1)',
+    backgroundColor: 'transparent',
   },
   selectors: {
     marginBottom: 10,

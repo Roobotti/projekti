@@ -238,7 +238,8 @@ const MultiPlayer = ({user, friend}) => {
   }
 
   return (
-    <View>
+    <View style={{flex:1}}>
+      <View style={{flex:1, justifyContent:'space-between'}}>
       <Animatable.View>
       { blocks && choseBlockRender() }
       {isLoading 
@@ -255,6 +256,7 @@ const MultiPlayer = ({user, friend}) => {
           </Animatable.View >
         </View>
       )}
+      </View>
     </View>
   );
 };
@@ -276,6 +278,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   winner_container: {
+    flex: 1,
     alignItems: 'center',
     margin: 40,
   },
@@ -287,9 +290,11 @@ const styles = StyleSheet.create({
 
   },
   avatar: {
-    width: 150,
-    height: 150,
-    borderRadius: 150,
+    width: 200,
+    height: 200,
+    borderRadius: 200,
+    borderWidth: 1,
+    borderColor: 'black',
     marginBottom: 20,
 
   },

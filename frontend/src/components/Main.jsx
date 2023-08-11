@@ -28,7 +28,7 @@ const Main = () => {
    return (
     <View style={styles.container}>
       <ImageBackground 
-        source={require('../../assets/Warm_Red_Texture.jpg')}
+        source={require('../../assets/Grunge_Fiery.jpg')}
         resizeMode="cover"
         style={styles.image}
       >

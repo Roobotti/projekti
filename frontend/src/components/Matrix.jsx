@@ -29,7 +29,6 @@ const Matrix = ({matrix}) => {
               onAnimationBegin ={() => {if (!value) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}}
               useNativeDriver={true}
               style={[
-                styles.box,
                 value === 1 ? styles.whiteBox : styles.defaultBox,
               ]}
             />
@@ -65,6 +64,7 @@ const styles = StyleSheet.create({
   
   container: {
     padding: 5,
+    alignSelf: 'center',
     alignItems: 'center',
     gap:2
   },
@@ -76,7 +76,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   whiteBox: {
-    backgroundColor: 'black',
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    borderColor: 'rgba(0,0,0,0.60)',
+    borderWidth: 6,
+    borderTopWidth: 10,
+    borderRightWidth: 10,
+    elevation: 15,
+
+
   },
 });
 

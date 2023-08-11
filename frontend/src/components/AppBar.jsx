@@ -9,21 +9,17 @@ import theme from '../theme';
 
 const styles = StyleSheet.create({
   container: {
-    display: 'flex',
+    alignSelf: 'stretch',
     paddingTop: Constants.statusBarHeight,
     backgroundColor: theme.colors.appBar,
     // ...
   },
   tab: {
-
+    alignSelf:'flex-start',
     justifyContent: 'space-around',
     flexDirection: 'row',
     paddingHorizontal: 15
   },
-  scroll: {
-    gap: 40,
-    flexDirection: 'row'
-  }
 });
 
 const Tab = ({ text, to, ...props }) => {
@@ -37,13 +33,12 @@ const Tab = ({ text, to, ...props }) => {
 const AppBar = () => {
 
   return (
-    <View style={styles.container}>
-      <ScrollView horizontal style={styles.scroll}>
+      <View horizontal style={styles.container}>
         <View style={styles.tab}>
           <Tab to="/" text="Menu"/>
         </View>
-      </ScrollView>
-    </View>
+      </View>
+
   )
 };
 
