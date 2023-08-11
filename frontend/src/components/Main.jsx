@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ImageBackground } from 'react-native';
 import { Route, Routes, Navigate } from 'react-router-native';
 import AppBar from './AppBar';
 import { SignUp, SignIn, SignOut } from './Sign';
@@ -11,16 +11,27 @@ import SolutionsWrite from './SolutionsWrite';
 import { LobbyCollap } from './LobbyCollapsible';
 import { Profile } from './Profile';
 
+
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    flexShrink: 1,
+    flex: 1,
+    backgroundColor: 'black'
   },
+  image: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+
 });
 
 const Main = () => {
    return (
     <View style={styles.container}>
+      <ImageBackground 
+        source={require('../../assets/Warm_Red_Texture.jpg')}
+        resizeMode="cover"
+        style={styles.image}
+      >
       <AppBar />
       <Routes>
         <Route path="/" element={<Menu />} exact />
@@ -34,6 +45,7 @@ const Main = () => {
         <Route path="/profile" element={<Profile />} exact />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </ImageBackground>
     </View>
   );
 };

@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
 
     justifyContent: 'space-around',
     flexDirection: 'row',
-    paddingHorizontal: 20
+    paddingHorizontal: 15
   },
   scroll: {
     gap: 40,
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
 const Tab = ({ text, to, ...props }) => {
   return (
     <Link to={to} {...props}>
-      <Text fontSize="subheading" color="textSecondary" style={{padding: 20}}>{text}</Text>
+      <Text fontSize="subheading" color="textSecondary" style={{paddingBottom: 15}}>{text}</Text>
     </Link>
   )
 }
