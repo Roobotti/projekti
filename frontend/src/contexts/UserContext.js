@@ -39,6 +39,9 @@ export const UserContextProvider = ({ children }) => {
       await Font.loadAsync({
         Kablammo: require("../../assets/fonts/Kablammo-Regular.ttf"),
       });
+      await Font.loadAsync({
+        Flavors: require("../../assets/fonts/Flavors-Regular.ttf"),
+      });
       setFontsLoading(false);
     };
     load();

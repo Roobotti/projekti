@@ -16,11 +16,7 @@ const theme = {
     primeheading: 20,
   },
   fonts: {
-    main: Platform.select({
-      android: "Roboto",
-      ios: "Arial",
-      default: "System",
-    }),
+    main: "FreckleFace",
   },
   fontWeights: {
     normal: "400",

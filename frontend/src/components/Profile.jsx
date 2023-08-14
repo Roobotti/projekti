@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import {StatusBar, StyleSheet, View, TouchableOpacity, Image, ScrollView, Alert} from 'react-native';
+import {StatusBar, StyleSheet, View, TouchableOpacity, Image, ScrollView, Alert, ImageBackground} from 'react-native';
 import { Link, useNavigate } from 'react-router-native';
 import { UserContext } from '../contexts/UserContext';
 import * as ImagePicker from 'expo-image-picker';
@@ -27,14 +27,6 @@ const showAlert = (navigate) =>
       cancelable: true,
     },
   );
-
-const Tab = ({ text, to, ...props }) => {
-  return (
-    <Link to={to} {...props}>
-      <Text fontSize="subheading" color="textSecondary" style={{padding: 20}}>{text}</Text>
-    </Link>
-  )
-}
 
 const UserAvatar = ({source, onChange}) => {
   const [image, setImage] = useState(source);
@@ -88,18 +80,35 @@ export const Profile = () => {
           source={avatar}
         />
 
-        <Text style={styles.text} >Wins:{wins.length}</Text>
+        <View style={styles.deleteButton}>
+          <ImageBackground source={require('../../assets/paints/paint_wins.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+            <Text style={styles.text}>
+              Wins:  {wins.length}
+            </Text>
+          </ImageBackground>
+        </View>
 
-        <Text style={styles.text} >Loses:{loses.length}</Text>
+        <View style={styles.deleteButton}>
+          <ImageBackground source={require('../../assets/paints/paint_loses.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+            <Text style={styles.text}>
+              Loses:  {loses.length}
+            </Text>
+          </ImageBackground>
+        </View>
 
         <TouchableOpacity onPress={() => showAlert(navigate)} style={styles.deleteButton}>
-          <Text style={styles.deleteButtonText}>Sign Out</Text>
+          <ImageBackground source={require('../../assets/paints/paint_delete.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+            <Text style={styles.deleteButtonText}>Sign Out</Text>
+          </ImageBackground>
         </TouchableOpacity>
 
-      </ScrollView>
-
-      <Tab to="/" text={<Text style={{color:'red', fontSize:20}}>X</Text>} style={styles.tab}/>
+        
+        <TouchableOpacity onPress={() => navigate("/", { replace: true })} style={styles.deleteButton}>
+          <ImageBackground source={require('../../assets/paints/paint_X.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          </ImageBackground>
+        </TouchableOpacity>
       
+      </ScrollView>
     </View>
   );
 };
@@ -107,7 +116,7 @@ export const Profile = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    margin: 10,
+
     alignItems: 'center',
   },
   userRow: {
@@ -118,13 +127,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#d8d8db',
   },
   text: {
-    fontSize: 18,
-    marginBottom: 20
+    fontSize: 20,
+    alignSelf: 'center',
+    fontFamily: 'FreckleFace',
+    color: 'white',
+    opacity: 0.8,
+    marginBottom: 10
   },
   avatar: {
     width: 200,
     height: 200,
-    marginBottom: 50,
+    marginBottom: 20,
     borderRadius: 100,
     borderWidth: 3,
     borderColor: 'rgba(1,1,1,0.3)',
@@ -141,14 +154,20 @@ const styles = StyleSheet.create({
     borderRadius: 80
   },
   deleteButton: {
-    backgroundColor: 'red',
-    marginTop: 20,
-    padding: 10,
-    borderRadius: 8,
+    width: 120,
+    height: 80,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
   },
+  
   deleteButtonText: {
+    fontSize: 20,
+    alignSelf: 'center',
+    fontFamily: 'FreckleFace',
     color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+    opacity: 0.8
+    
   },
 });

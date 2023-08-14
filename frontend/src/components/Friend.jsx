@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Image, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
 import { loadFriend } from '../services/users';
 import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';
+
+import Text from './Text';
 
 const showAlert = (onDelete) =>
   Alert.alert(
@@ -76,13 +78,17 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
         <Text style={styles.wins}>You're {VsStatus(friendWins, friendLoses)}</Text>
         <VsText wins={friendWins} loses={friendLoses} />
 
-        <TouchableOpacity onPress={() => showAlert(onDelete)} style={styles.deleteButton}>
-          <Text style={styles.deleteButtonText}>Delete Friend</Text>
+        <TouchableOpacity onPress={() => showAlert(onDelete)} style={{...styles.deleteButton,width: 180}}>
+          <ImageBackground source={require('../../assets/paints/paint_delete.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+            <Text style={styles.deleteButtonText}>Delete Friend</Text>
+          </ImageBackground>
         </TouchableOpacity>
 
       </View>
-      <TouchableOpacity onPress={() => onBack(null)} style={styles.tab}>
-          <Text style={{color: 'red', fontSize:20}}> X </Text>
+      <TouchableOpacity onPress={() => onBack(null)} style={styles.deleteButton}>
+          <ImageBackground source={require('../../assets/paints/paint_X.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+            <Text style={{color: 'red', fontSize:20}}> X </Text>
+          </ImageBackground>
       </TouchableOpacity>
     </View>
   );
@@ -94,9 +100,13 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+    borderRadius: 100,
+    borderWidth: 3,
+    borderColor: 'rgba(1,1,1,0.3)',
+    alignSelf: 'center',
   },
   name: {
     fontSize: 24,
@@ -120,28 +130,22 @@ const styles = StyleSheet.create({
   tied: {
     color: 'black',
   },
-  deleteButton: {
-    backgroundColor: 'red',
-    marginTop: 20,
-    padding: 10,
-    borderRadius: 8,
-  },
   deleteButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  tab: {
+    fontSize: 18,
     alignSelf: 'center',
-    backgroundColor: 'rgba(1,1,1,0.4)',
-    padding: 20,
-    paddingHorizontal: 22,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderLeftWidth: 3,
-    marginBottom: 20,
-    borderRadius: 80,
+    fontFamily: 'FreckleFace',
+    color: 'white',
+    opacity: 0.8
   },
+  deleteButton: {
+    width: 120,
+    height: 80,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 30,
+  },
+  
 });
 
 export default FriendProfile;
