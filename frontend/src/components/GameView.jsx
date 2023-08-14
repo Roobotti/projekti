@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { View, Button } from 'react-native';
+import { View, Button, TouchableHighlight } from 'react-native';
 import { BoardContext } from '../contexts/BoardContext';
 import { getSolutions } from '../services/blocks';
 import Text from './Text';
@@ -8,6 +8,7 @@ import Matrix from './Matrix';
 import BlockRenderer from './Blocks';
 import { Loading } from './Loading';
 import { rotate } from '../tools/Rotate';
+import { TouchableOpacity } from 'react-native';
 
 
 const Board = () => {
@@ -34,7 +35,9 @@ const Board = () => {
 
   return (
     <View style={{flex: 1}}>
-      <Button title="new board" onPress={getData} />
+      <TouchableOpacity onPress={getData} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
+        <Text style={{alignSelf: 'center'}}>New board</Text>
+      </TouchableOpacity>
       <View style={{flex: 1, display:'flex', justifyContent:'space-evenly'}}>
         <View>{data && <Matrix matrix={data}/>}</View>
         <View>

@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState, useCallback } from 'react';
-import { View, Button, StyleSheet, Image, Text, TouchableOpacity, Animated } from 'react-native';
+import { View, Button, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
 import { BoardContext } from '../contexts/BoardContext';
 import { getSolutions } from '../services/blocks';
 import { BlocksContext } from '../contexts/BlockContext';
@@ -12,6 +12,8 @@ import { UserContext } from '../contexts/UserContext';
 import { loadFriend, newWin } from '../services/users';
 
 import * as Animatable from 'react-native-animatable';
+
+import Text from './Text';
 
 import LottieView from "lottie-react-native";
 import { rotate } from '../tools/Rotate';
@@ -285,7 +287,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 23,
     marginBottom: 20,
-    fontWeight: 'bold',
     alignSelf: 'center',
 
   },

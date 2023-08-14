@@ -32,7 +32,7 @@ const SignForm = ({onSubmit, mode}) => {
       <View style={styles.form}>
         <FormikTextInput name="username" placeholder="Username"  style={styles.holder}/>
         <FormikTextInput name="password" placeholder="Password" secureTextEntry  style={styles.holder}/>
-        <Pressable onPress={onSubmit}  style={{...styles.holder, alignItems: 'center', backgroundColor: theme.colors.blue}}>
+        <Pressable onPress={onSubmit}  style={{...styles.holder, alignItems: 'center', backgroundColor: 'rgba(33, 235, 184, 0.4)'}}>
           <Text>{mode}</Text>
         </Pressable>
       </View>
@@ -84,7 +84,7 @@ export const SignIn = () => {
   return (
     <View style={styles.container}>
       {message && <Text style={styles.message}> {message} </Text>}
-      <SignContainer onSubmit={onSubmit} mode="sign in" />
+        <SignContainer onSubmit={onSubmit} mode="sign in" />
       {loading && <Loading/>}
     </View>
   )

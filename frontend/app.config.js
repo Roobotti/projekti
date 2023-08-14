@@ -6,11 +6,12 @@ export default {
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
-  userInterfaceStyle: "light",
+  userInterfaceStyle: "dark",
+  backgroundColor: "black",
   splash: {
     image: "./assets/splash.png",
     resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    backgroundColor: "black",
   },
   updates: {
     fallbackToCacheTimeout: 0,
@@ -20,9 +21,10 @@ export default {
     supportsTablet: true,
   },
   android: {
+    softwareKeyboardLayoutMode: "pan",
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
-      backgroundColor: "#FFFFFF",
+      backgroundColor: "black",
     },
   },
   web: {

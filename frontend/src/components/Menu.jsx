@@ -57,10 +57,8 @@ const Menu = () => {
     if (room) socket.emit("leave", {"user":user, "room":room})
   })
   
-  if (fontsLoading) return(
-    <ImageBackground source={require('../../assets/paint_brush.png')} resizeMode='stretch' style={{flex: 1, alignSelf:'center' ,justifyContent:'center'}}>
-      <Loading/>
-    </ImageBackground>)
+  if (fontsLoading || loading) return <Loading/>
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -80,14 +78,18 @@ const Menu = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'space-around',
     paddingVertical: 50,
   },
   option: {
     width: 250,
     height: 120,
     justifyContent: 'center',
+    alignContent: 'center',
     alignItems: 'center',
+    opacity: 0.9,
     marginBottom: 30,
   },
   optionText: {

@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: '500',
   },
   content: {
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "gray",
+    borderColor: "rgba(0, 0, 0, 0.8)",
     borderRadius: 5,
     padding: 10,
     margin: 20,

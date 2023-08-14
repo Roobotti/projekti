@@ -87,7 +87,6 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
       </View>
       <TouchableOpacity onPress={() => onBack(null)} style={styles.deleteButton}>
           <ImageBackground source={require('../../assets/paints/paint_X.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
-            <Text style={{color: 'red', fontSize:20}}> X </Text>
           </ImageBackground>
       </TouchableOpacity>
     </View>

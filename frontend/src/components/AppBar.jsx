@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     alignSelf:'flex-start',
     justifyContent: 'space-around',
     flexDirection: 'row',
-    paddingHorizontal: 15
+    paddingHorizontal: 60
   },
 });
 
