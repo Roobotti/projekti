@@ -1,20 +1,23 @@
-import React, { useEffect, useContext, useState } from 'react';
-import { View, Button, TouchableHighlight } from 'react-native';
-import { BoardContext } from '../contexts/BoardContext';
+import React, { useEffect, useState } from 'react';
+import { View, TouchableOpacity } from 'react-native';
+
 import { getSolutions } from '../services/blocks';
 import Text from './Text';
-import { BlocksContext } from '../contexts/BlockContext';
+
 import Matrix from './Matrix';
 import BlockRenderer from './Blocks';
 import { Loading } from './Loading';
 import { rotate } from '../tools/Rotate';
-import { TouchableOpacity } from 'react-native';
 
 
 const Board = () => {
-  const { data, setData } = useContext(BoardContext);
-  const { blocks, setBlocks } = useContext(BlocksContext)
+  const [ data, setData ] = useState([])
+  const [ blocks, setBlocks ]  = useState([])
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect( () => {
+    getData()
+  },[])
 
   const getData = async () => {
     try {

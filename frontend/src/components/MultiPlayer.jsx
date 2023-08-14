@@ -138,6 +138,7 @@ const MultiPlayer = ({user, friend}) => {
     setUserReady(false)
     setFriendReady(false)
     setGameOver(false)
+    setUboText("UBONGO")
     setCountdown(InitialcountDown)
     setWin(false)
 
@@ -154,7 +155,6 @@ const MultiPlayer = ({user, friend}) => {
     }
   }
 
-
   const sentRedy = () => {
     socket.emit('userRedy', {"room":room, "user":user});
     setUserReady(true)
@@ -167,19 +167,18 @@ const MultiPlayer = ({user, friend}) => {
     setGameOver(true)
   };
 
-  const UbongoClicker = () => {
-
-    const handleUbongoClick = () => {
-      setClicks(clicks + 1)
-      if (clicks>=3) sentUbongo()
-    }
-
+  const handleUbongoClick = () => {
+    setClicks(clicks + 1)
+    if (clicks>=3) sentUbongo()
     if (clicks>0) setUboText(3-clicks)
     else setUboText("UBONGO")
+  }
+
+  const UbongoClicker = () => {
     return (
       <View>
         <TouchableOpacity style={styles.ubongo} onPress={() => handleUbongoClick()}>
-          <Text style={{fontWeight:'bold', fontSize:22}}>{uboText}</Text>
+          <Text style={{fontSize:28}}>{uboText}</Text>
         </TouchableOpacity>
       </View>
     )
@@ -188,8 +187,8 @@ const MultiPlayer = ({user, friend}) => {
   if (gameOver) {
     return( 
       <Animatable.View style={styles.winner_container} animation={'bounceIn'} duration={2000}>
-        <Animatable.Text style={styles.text}> 
-          !!UBONGO!!
+        <Animatable.Text> 
+          <Text style={{fontSize: 50}}>!!UBONGO!!</Text>
         </Animatable.Text>
 
         {win 
@@ -206,7 +205,9 @@ const MultiPlayer = ({user, friend}) => {
             )
           }
 
-        <Button title="new game?" onPress={newGame} />
+        <TouchableOpacity style={{...styles.ubongo, padding:10}} onPress={newGame}>
+          <Text style={{fontSize:22}}>New game?</Text>
+        </TouchableOpacity>
 
       </Animatable.View>
     )
@@ -216,7 +217,11 @@ const MultiPlayer = ({user, friend}) => {
     return(
       <View >
         { (!userReady && data && blocks) 
-          ? (<Button title="Redy" onPress={sentRedy}/>)
+          ? (
+            <TouchableOpacity  onPress={sentRedy} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(235, 164, 33, 0.4)'}}>
+              <Text style={{alignSelf: 'center'}}>Redy</Text>
+            </TouchableOpacity>
+            )
           : ( !friendReady && (<View>
               <AnimatedLottieViewUserWait
                 source={require("../lotties/HourGlass.json")}
@@ -273,10 +278,10 @@ const styles = StyleSheet.create({
   },
   ubongo: {
     margin: 20,
-    paddingHorizontal: 30,
-    paddingVertical: 30,
+    padding: 30,
     borderWidth: 5,
     borderColor: 'black',
+    backgroundColor: 'rgba(255, 196, 87, 0.2)',
     borderRadius: 20,
   },
   winner_container: {
@@ -296,7 +301,8 @@ const styles = StyleSheet.create({
     borderRadius: 200,
     borderWidth: 1,
     borderColor: 'black',
-    marginBottom: 20,
+    marginTop: 20,
+    marginBottom: 50,
 
   },
 });
