@@ -4,6 +4,23 @@ import { View, StyleSheet, Dimensions, Text} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import * as Haptics from 'expo-haptics';
 
+const color = (key) => {
+  switch (key) {
+    case 1:
+      return { ...styles.defaultBox, backgroundColor: 'rgba(0,0,0,0.90)' };
+    case "red":
+      return { ...styles.defaultBox, backgroundColor: 'rgba(250,0,0,0.90)' };
+    case "green":
+      return { ...styles.defaultBox, backgroundColor: 'rgba(0,250,0,0.90)' };
+    case "yellow":
+      return { ...styles.defaultBox, backgroundColor: 'rgba(250,250,0,0.90)' };
+    case "blue":
+      return { ...styles.defaultBox, backgroundColor: 'rgba(0,0,250,0.90)' };
+    default:
+      return styles.defaultBox;
+  }
+};
+
 const Matrix = ({matrix}) => {
 
   const windowWidth = Dimensions.get('window').width;
@@ -12,6 +29,7 @@ const Matrix = ({matrix}) => {
   const gap = windowWidth * 0.0120; // Adjust the scale factor for desired size
 
   const arrayLength = matrix.length
+  console.log("m", matrix)
 
   return (
     <View style={{...styles.container, gap:gap}}>
@@ -28,30 +46,7 @@ const Matrix = ({matrix}) => {
               duration={rowIndex*200*arrayLength+colIndex*200}
               onAnimationBegin ={() => {if (!value) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}}
               useNativeDriver={true}
-              style={[
-                value === 1 ? styles.whiteBox : styles.defaultBox,
-              ]}
-            />
-          ))}
-        </View>
-      ))}
-    </View>
-  );
-
-  return (
-    <View style={styles.container}>
-      {matrix
-        .filter((row) => row.includes(1))
-        .map((row, rowIndex) => (
-        <View key={rowIndex} style={styles.row}>
-          {row.map((value, colIndex) => (
-            <View
-              key={colIndex}
-              width={boxHeightInPixels}
-              height={boxHeightInPixels}
-              style={[
-                value === 1 ? styles.whiteBox : styles.defaultBox,
-              ]}
+              style={color(value)}
             />
           ))}
         </View>
@@ -74,16 +69,6 @@ const styles = StyleSheet.create({
   },
   defaultBox: {
     backgroundColor: 'transparent',
-  },
-  whiteBox: {
-    backgroundColor: 'rgba(0,0,0,0.92)',
-    borderColor: 'rgba(0,0,0,0.60)',
-    borderWidth: 6,
-    borderTopWidth: 10,
-    borderRightWidth: 10,
-    elevation: 15,
-
-
   },
 });
 

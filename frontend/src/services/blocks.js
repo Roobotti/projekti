@@ -22,6 +22,24 @@ export const getSolutions = async () => {
   const response = await fetch(`${baseUrl}&board`);
   const json = await response.json();
   console.log("res", json);
+  return json;
+};
 
+export const solve = async ({ board, blocks }) => {
+  console.log("blocks:", blocks);
+  console.log("board:", board);
+  const response = await fetch(`${baseUrl}/solution`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      board: board.coordinates,
+      blocks: blocks,
+    }),
+  });
+
+  const json = await response.json();
+  console.log("res", json);
   return json;
 };

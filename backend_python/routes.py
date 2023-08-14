@@ -9,7 +9,13 @@ from typing import Optional
 from pymongo_get_database import get_database
 from pymongo import UpdateOne, UpdateMany
 from typing import List
-from solver import generate_base, find_good_combination
+from solver import (
+    generate_base,
+    find_good_combination,
+    solve_puzzle,
+    generate_basic_puzzle,
+    piece_colors,
+)
 import random
 import json
 import numpy as np
@@ -39,12 +45,29 @@ def board_selected(index: int):
     return encodedNumpyBase
 
 
-@router.get("/solutions/{index}", response_description="get solution")
+##solutions stands for blocks ?
+@router.get("/solutions/{index}", response_description="get board and target blocks")
 def solution_selected(index: int):
     coordinates = list(item_details[min(index, 71)].values())[1]
     base = {"base": generate_base(coordinates), "coordinates": coordinates}
     encodedNumpyBase = json.dumps(base, default=lambda x: x.tolist())
     print(base)
+    return encodedNumpyBase
+
+
+@router.post("/blocks/solution", response_description="get solution")
+def solution_selected(body: SolutionRequest):
+    [count, solutions] = solve_puzzle(generate_basic_puzzle(body.board, 2), body.blocks)
+    print("count:", count)
+    print("board:", body.board)
+    solution = solutions[0][0]
+    non_zero_rows = ~np.all(solution == 0, axis=1)
+    non_zero_columns = ~np.all(solution == 0, axis=0)
+    encodedNumpyBase = json.dumps(
+        solution[non_zero_rows][:, non_zero_columns],
+        default=lambda x: np.vectorize(piece_colors.get)(x).tolist(),
+    )
+    print("solution:", encodedNumpyBase)
     return encodedNumpyBase
 
 

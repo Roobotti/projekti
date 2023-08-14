@@ -414,6 +414,7 @@ piece_colors = {
 }
 
 piece_colors_id = {11: "r1", 12: "g1", 13: "y1", 14: "b1"}
+piece_colors = {11: "red", 12: "green", 13: "yellow", 14: "blue"}
 
 piece_color_codes = {
     "r1": 11,
