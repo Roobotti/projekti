@@ -3,7 +3,7 @@ import { View, Button, StyleSheet, Image, TouchableOpacity, Animated } from 'rea
 import { BoardContext } from '../contexts/BoardContext';
 import { getSolutions } from '../services/blocks';
 import { BlocksContext } from '../contexts/BlockContext';
-import Matrix from './Matrix';
+import {Matrix, Hint} from './Matrix';
 import BlockRenderer, { BlockRendererLarge } from './Blocks';
 import { Loading } from './Loading';
 

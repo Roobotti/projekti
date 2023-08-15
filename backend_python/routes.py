@@ -59,7 +59,7 @@ def solution_selected(index: int):
 def solution_selected(body: SolutionRequest):
     [count, solutions] = solve_puzzle(generate_basic_puzzle(body.board, 2), body.blocks)
     print("count:", count)
-    print("board:", body.board)
+    print("solution:", solutions[0][0])
     solution = solutions[0][0]
     non_zero_rows = ~np.all(solution == 0, axis=1)
     non_zero_columns = ~np.all(solution == 0, axis=0)

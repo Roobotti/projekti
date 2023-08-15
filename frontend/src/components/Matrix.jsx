@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, Text} from 'react-native';
+import { View, StyleSheet, Dimensions, Text, TouchableOpacity} from 'react-native';
 
 import * as Animatable from 'react-native-animatable';
 import * as Haptics from 'expo-haptics';
@@ -21,7 +21,51 @@ const color = (key) => {
   }
 };
 
-const Matrix = ({matrix}) => {
+
+export const Hint = ({matrix}) => {
+
+  const windowWidth = Dimensions.get('window').width;
+
+  const boxHeightInPixels = windowWidth * 0.205; // Adjust the scale factor for desired size
+  const gap = windowWidth * 0.0120; // Adjust the scale factor for desired size
+
+  const arrayLength = matrix.length
+  console.log("m", matrix)
+
+  const [shown, setShown] = useState([])
+
+  let timeoutID
+
+  return (
+    <View style={{...styles.container, gap:gap}}>
+      {matrix
+        .map((row, rowIndex) => (
+        <View key={rowIndex} style={{...styles.row, gap:gap}}>
+          {row.map((value, colIndex) => (
+            <Animatable.View
+              key={colIndex}
+              width={boxHeightInPixels}
+              height={boxHeightInPixels}
+              animation={'fadeIn'}
+              delay={(arrayLength-rowIndex)*20*arrayLength+colIndex*20}
+              duration={100}
+              onAnimationBegin ={() => {if (!value) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}}
+              useNativeDriver={true}
+              style={color(value)}
+            >
+              {/* python code gives bit wierd lists*/}
+              {value && value !== "None" && <TouchableOpacity 
+                style={{flex: 1, alignSelf:'stretch', backgroundColor:'black', opacity:shown.includes([rowIndex, colIndex])}}
+              />}
+            </Animatable.View>
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+};
+
+export const Matrix = ({matrix}) => {
 
   const windowWidth = Dimensions.get('window').width;
 
@@ -71,5 +115,3 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
 });
-
-export default Matrix;
