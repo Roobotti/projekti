@@ -6,7 +6,6 @@ from pymongo import MongoClient
 from routes import router as board_router
 from socket_services import *
 
-from initalData import board_solutions
 
 import json
 import random
@@ -14,6 +13,7 @@ import string
 from typing import List, Dict
 
 config = dotenv_values(".env")
+
 
 app = FastAPI()
 socket_manager = SocketManager(app=app, cors_allowed_origins=[])

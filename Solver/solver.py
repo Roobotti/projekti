@@ -311,6 +311,8 @@ def load_block(target_pieces):
         plt.close(fig)
 
 
+load_block(["g1"])
+
 rotated_pieces = {}
 for code, coordinate in piece_coordinates.items():
     rotated_pieces[code] = piece_variations(generate_piece(coordinate))
@@ -390,18 +392,10 @@ li = [
     [[0, 0], [0, 1], [1, 1], [2, 1], [1, 2], [2, 2], [3, 2], [2, 3], [3, 3]],
 ]
 
-lis = [[(j[0], j[1]) for j in i] for i in li]
+# lis = [[(j[0], j[1]) for j in i] for i in li]
 
-print({repr(n): seq for (n, seq) in enumerate(lis)})
+# print({repr(n): seq for (n, seq) in enumerate(lis)})
 
 
 target_puzzle = [[2, 1], [3, 1], [4, 1], [1, 2], [2, 2], [3, 2], [0, 3], [1, 3], [2, 3]]
 target_blocks = ["b4", "r4", "r3", "r1"]
-
-print("start")
-tic = time.perf_counter()
-count, solution = find_good_combination(target_puzzle, 4)
-print(count)
-print(solution)
-toc = time.perf_counter()
-print(f"Done in {toc - tic:0.4f} seconds")

@@ -2,7 +2,12 @@ from pymongo_get_database import get_database
 from solver import find_good_combinations
 
 dbname = get_database()
-collection_name = dbname["own_solutions"]
+own_solutions = dbname["own_solutions"]
+
+
+def update():
+    print("jei")
+    own_solutions.update_many({}, {"$rename": {"solutions": "blocks"}})
 
 
 def init():
@@ -1260,5 +1265,4 @@ def board_solutions():
             }
         },
     ]
-
-    collection_name.insert_many(solution_list)
+    own_solutions.insert_many(solution_list)

@@ -19,7 +19,6 @@ const Board = () => {
   const [ blocks, setBlocks ]  = useState([])
   const [isLoading, setIsLoading] = useState(false);
   const [solution, setSolution] = useState(null)
-  const [showHint, setShowHint] = useState(false)
   const [hintText, setHintText] = useState('Hint availabe') 
   const [hintTimer, setHintTimer] = useState(0)
 
@@ -43,7 +42,6 @@ const Board = () => {
   const getData = async () => {
     try {
       setSolution(null)
-      setShowHint(false)
       setIsLoading(true)
       const response = await getSolutions()
       const parsedBoard = JSON.parse(response.board)
@@ -69,8 +67,8 @@ const Board = () => {
         <Text style={{alignSelf: 'center'}}>New board</Text>
       </TouchableOpacity>
       <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
-        <View>{!solution && data && <Matrix matrix={data}/>}</View>
-        <View pointerEvents={hintTimer?"none":"auto"} onTouchEnd={() => setHintTimer(5)}>{solution && <Hint matrix={solution}/>}</View>
+        <View >{!solution && data && <Matrix matrix={data}/>}</View>
+        <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={() => setHintTimer(5)}>{solution && <Hint matrix={solution}/>}</View>
       </View>
 
       <View style={{position:'absolute', bottom:5}}>

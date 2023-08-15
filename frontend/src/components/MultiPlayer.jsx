@@ -41,6 +41,9 @@ const MultiPlayer = ({user, friend}) => {
   const [clicks, setClicks] = useState(0)
   const [uboText, setUboText] = useState("UBONGO")
 
+  const [hintText, setHintText] = useState('Hint availabe') 
+  const [hintTimer, setHintTimer] = useState(0)
+
   const [matrix, setMatrix] = useState([])
   // send roomname / hostName 
   // send roomname / playerName
@@ -117,6 +120,20 @@ const MultiPlayer = ({user, friend}) => {
   }
 
   }, [clicks])
+
+  //hint timer
+  useEffect( () => {
+    setHintText(hintTimer?`   Next in ${hintTimer} s   `:'Hint available')
+    if ( hintTimer > 0) {
+      const hintInterval = setInterval( () => {
+        setHintTimer( c => c - 1)
+      }, 1000);
+      return () => {
+        clearInterval(hintInterval);
+      };
+  }
+
+  }, [hintTimer])
 
   useEffect( () => {
     if  (left) {setLeft(null)}

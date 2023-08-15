@@ -7,7 +7,6 @@ from services import *
 from config import ACCESS_TOKEN_EXPIRE_MINUTES
 from typing import Optional
 from pymongo_get_database import get_database
-from pymongo import UpdateOne, UpdateMany
 from typing import List
 from solver import (
     generate_base,
@@ -20,6 +19,7 @@ import random
 import json
 import numpy as np
 import base64
+from bson import ObjectId
 from io import BytesIO
 from PIL import Image
 
@@ -28,12 +28,51 @@ router = APIRouter()
 dbname = get_database()
 boards = dbname["own_boards"]
 solutions = dbname["own_solutions"]
+solutions2 = dbname["puzzle_data"]
 users = dbname["users"]
 
 item_details = boards.find()
 solutions_details = solutions.find()
+puzzle_details = solutions2.find()
 boards_length = boards.count_documents({})
 solutions_length = solutions.count_documents({})
+
+
+@router.post("/upLoadBlocks", response_description="genearte blocks for boards")
+def upLoadBlocks():
+    n = 0
+    for i in range(4):
+        for p in puzzle_details:
+            [blocks, sol] = find_good_combination(p["board"])
+            solArray = []
+            for s in sol:
+                solution = s[0]
+                non_zero_rows = ~np.all(solution == 0, axis=1)
+                non_zero_columns = ~np.all(solution == 0, axis=0)
+                encodedNumpyBase = json.dumps(
+                    solution[non_zero_rows][:, non_zero_columns],
+                    default=lambda x: np.vectorize(piece_colors.get)(x).tolist(),
+                )
+                solArray.append(json.loads(encodedNumpyBase))
+            solutions2.update_one(
+                {"board": p["board"]},
+                {"$addToSet": {"data": {"blocks": blocks, "solutions": solArray}}},
+                upsert=True,
+            )
+        n += 1
+        print(f"---------- kierros: {i}, lauta: {n} -----------")
+
+
+@router.post("/update", response_description="get board")
+def board_selected():
+    for i in range(72):
+        solution = solutions_details[i][str(i)]
+        solutions2.insert_one(
+            {
+                "board": solution["board"],
+                "blocks": [i for i in solution["solutions"] if not "g1" in i],
+            }
+        )
 
 
 @router.get("/boards/{index}", response_description="get board")

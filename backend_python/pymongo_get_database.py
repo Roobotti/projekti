@@ -6,7 +6,6 @@ from config import ATLAS_URI
 def get_database():
     # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
     client = MongoClient(ATLAS_URI, tlsCAFile=certifi.where())
-
     # Create the database for our example (we will use the same database throughout the tutorial
     return client["base"]
 
