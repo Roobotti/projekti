@@ -16,10 +16,9 @@ export const LottieLoad = () => {
   return (
     <AnimatedLottieView
       source={require("./HourGlass.json")}
+      speed={2}
       autoPlay
-      loop
-      speed={10}
-      style={{ width: 100 }}
+      style={{ width: 100, alignSelf: "center" }}
     />
   );
 };

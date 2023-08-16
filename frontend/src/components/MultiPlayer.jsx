@@ -16,17 +16,19 @@ import * as Animatable from 'react-native-animatable';
 import Text from './Text';
 
 import LottieView from "lottie-react-native";
-import { HourGlassTimer } from '../lotties/Timers';
+import { HourGlassTimer, LottieLoad } from '../lotties/Timers';
 
 const AnimatedLottieViewUserWait = Animated.createAnimatedComponent(LottieView);
 
 const InitialcountDown = 5000
+const gameDuration = 3*60
+const contestTime = 6
+const proveTime = 30
 
 const MultiPlayer = ({user, friend}) => {
   const {room, token, avatar, invites, setRoom, setInvites} = useContext(UserContext)
 
   const [isLoading, setIsLoading] = useState(false);
-
   const [userReady, setUserReady] = useState(false);
   const [friendReady, setFriendReady] = useState(false);
   const [countdown, setCountdown] = useState(InitialcountDown)
@@ -39,9 +41,12 @@ const MultiPlayer = ({user, friend}) => {
   const [clicks, setClicks] = useState(0)
   const [uboText, setUboText] = useState("UBONGO")
 
-
   const [hintText, setHintText] = useState('Hint availabe') 
-  const [hintTimer, setHintTimer] = useState(3*60)
+  const [hintTimer, setHintTimer] = useState(gameDuration)
+  const [contestTimer, setContestTimer] = useState(contestTime)
+  const [proveTimer, setProveTimer] = useState(0)
+  const [isContest, setIsContest] = useState(false)
+  const [contestLost, setContestLost] = useState(false)
 
   const [puzzle, setPuzzle] = useState([])
   // send roomname / hostName 
@@ -72,6 +77,13 @@ const MultiPlayer = ({user, friend}) => {
     } )
     socket.on("ubongo", () => { setGameOver(true) } )
 
+    socket.on("contested", () => { 
+      setIsContest(true) 
+      setProveTimer(proveTime)
+    })
+
+    socket.on("contestLost", () => { setContestLost(true) } )
+
     socket.on("left", handleLeft)
 
     socket.on(`${user}/post`, (data) => {
@@ -85,7 +97,6 @@ const MultiPlayer = ({user, friend}) => {
 
   }, [])
 
-  
   //count down
   useEffect( () => {
     if (friendReady && countdown > 0) {
@@ -102,11 +113,11 @@ const MultiPlayer = ({user, friend}) => {
   //click down
   useEffect( () => {
     if ( clicks > 0) {
-      const interval = setInterval( () => {
+      const clickInterval = setInterval( () => {
         setClicks( c => c - 1)
       }, 1000);
       return () => {
-        clearInterval(interval);
+        clearInterval(clickInterval);
       };
   }
 
@@ -114,17 +125,46 @@ const MultiPlayer = ({user, friend}) => {
 
   //hint timer
   useEffect( () => {
-    setHintText(hintTimer?`   Hint in ${hintTimer} s   `:'Hint available')
-    if ( hintTimer > 0) {
-      const hintInterval = setInterval( () => {
-        setHintTimer( c => c - 1)
-      }, 1000);
-      return () => {
-        clearInterval(hintInterval);
-      };
+    if (friendReady && userReady) {
+      setHintText(hintTimer?`   Hint in ${hintTimer} s   `:'Hint available')
+      if ( hintTimer > 0) {
+        const hintInterval = setInterval( () => {
+          setHintTimer( c => c - 1)
+        }, 1000);
+        return () => {
+          clearInterval(hintInterval);
+        };
+    }
   }
 
-  }, [hintTimer])
+  }, [hintTimer, friendReady, userReady])
+
+  //contest timer
+  useEffect( () => {
+    if (gameOver) {
+      if ( contestTimer > 0) {
+        const contestInterval = setInterval( () => {
+          setContestTimer( c => c - 1)
+        }, 1000);
+        return () => {
+          clearInterval(contestInterval);
+        };
+    }
+  }
+
+  }, [gameOver, contestTimer])
+
+  //prove timer
+  useEffect( () => {
+      if ( proveTimer > 0) {
+        const proveInterval = setInterval( () => {
+          setProveTimer( c => c - 1)
+        }, 1000);
+        return () => {
+          clearInterval(proveInterval);
+        };
+    }
+  }, [proveTimer])
 
   useEffect( () => {
     if  (left) {setLeft(null)}
@@ -148,6 +188,10 @@ const MultiPlayer = ({user, friend}) => {
     setGameOver(false)
     setUboText("UBONGO")
     setCountdown(InitialcountDown)
+    setHintTimer(gameDuration)
+    setContestTimer(contestTime)
+    setProveTimer(0)
+    setIsContest(false)
     setWin(false)
 
     if (host){getData()}
@@ -174,6 +218,12 @@ const MultiPlayer = ({user, friend}) => {
     setGameOver(true)
   };
 
+  const sendContest = () => {
+    socket.emit('contest', {"room":room});
+    setProveTimer(proveTime)
+    setIsContest(true)
+  }
+
   const handleUbongoClick = () => {
     setClicks(clicks + 1)
     if (clicks>=3) sentUbongo()
@@ -190,16 +240,41 @@ const MultiPlayer = ({user, friend}) => {
       </View>
     )
   }
-  const HintLabel = () => {
+
+  const WhoReady = () => {
+    return(
+      <View >
+        { (!userReady && puzzle.blocks) 
+          ? (
+            <TouchableOpacity  onPress={sentRedy} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(235, 164, 33, 0.4)'}}>
+              <Text style={{alignSelf: 'center'}}>Redy</Text>
+            </TouchableOpacity>
+            )
+          : ( !friendReady && (<View>
+              <LottieLoad
+              />
+              <Text style={styles.text} >Waiting for {friend}</Text>
+            
+            </View>) )
+        }
+      </View>
+    )
+  }
+
+  const choseBlockRender = () => {
     return (
-      <Animatable.View 
-        animation={'fadeIn'}
-        duration={3000}
-        style={styles.hint}
-        >
-        <Text style={{alignSelf: 'center'}}>{hintText}</Text>
+      friendReady && userReady ? <BlockRenderer blocks={puzzle.blocks} /> : <BlockRendererLarge blocks={puzzle.blocks} />
+    )
+  }
+
+  if (win && proveTimer ) {
+    return(
+      <Animatable.View style={styles.winner_container} animation={'bounceIn'} duration={2000}>
+        <Text style={{fontSize: 30}}>!!CONTEST!!</Text>
+        <Text style={{fontSize: 50}}>{proveTimer} s</Text>
       </Animatable.View>
     )
+
   }
 
   if (gameOver) {
@@ -213,52 +288,59 @@ const MultiPlayer = ({user, friend}) => {
           ? (
             <View>
               {<Image source={{ uri: `data:image/jpeg;base64,${avatar}` }} style={styles.avatar} />}
-              <Text style={styles.text} > You won </Text>
-            </View>)
+              <Text style={styles.text} > You won! </Text>
+              {contestTimer ? (
+                <View>
+                  <Text style={styles.text} >Waiting for contest</Text>
+                  <Text style={styles.text} >{ contestTimer } s </Text>
+                </View>
+              ) : (
+                <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={newGame}>
+                  <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
+                </TouchableOpacity>
+              )} 
+              
+            </View>
+          )
           : (
             <View>
               {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
-              <Text style={styles.text} > {friend} won </Text>
+              {isContest ? (
+                  <View>
+                    {proveTimer ? (
+                      <View>
+                        <Text style={styles.text} > {friend} is submiting the solution </Text>
+                        <Text style={styles.text} > {proveTimer} s </Text>
+                      </View>
+                    ) : (
+                      <View>
+                        <Text style={styles.text} > {contestLost ? friend : "You"} won </Text>
+                        <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={newGame}>
+                          <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )
+                    }
+                  </View>
+                ) : (
+
+                  <View>
+                      <Text style={styles.text} > {friend} won </Text>
+                      <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={newGame}>
+                        <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
+                      </TouchableOpacity>
+                      
+                      {contestTimer > 0 && <TouchableOpacity style={{...styles.ubongo, padding:15}} onPress={sendContest}>
+                        <Text style={{...styles.text, marginBottom: 0}}>Contest in {contestTimer} s?</Text>
+                      </TouchableOpacity>}
+                  </View>
+                )}
             </View>
             )
           }
 
-        <TouchableOpacity style={{...styles.ubongo, padding:10}} onPress={newGame}>
-          <Text style={{fontSize:22}}>New game?</Text>
-        </TouchableOpacity>
 
       </Animatable.View>
-    )
-  }
-
-  const WhoReady = () => {
-    return(
-      <View >
-        { (!userReady && puzzle.blocks) 
-          ? (
-            <TouchableOpacity  onPress={sentRedy} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(235, 164, 33, 0.4)'}}>
-              <Text style={{alignSelf: 'center'}}>Redy</Text>
-            </TouchableOpacity>
-            )
-          : ( !friendReady && (<View>
-              <AnimatedLottieViewUserWait
-                source={require("../lotties/HourGlass.json")}
-                autoPlay
-                loop
-                speed={2}
-                style={{ width: 100, alignSelf:'center' }}
-              />
-              <Text style={styles.text} >Waiting for {friend}</Text>
-            
-            </View>) )
-        }
-      </View>
-    )
-  }
-
-  const choseBlockRender = () => {
-    return (
-      friendReady && userReady ? <BlockRenderer blocks={puzzle.blocks} /> : <BlockRendererLarge blocks={puzzle.blocks} />
     )
   }
 
@@ -312,6 +394,8 @@ const styles = StyleSheet.create({
   ubongo: {
     margin: 20,
     padding: 30,
+    alignSelf: 'center',
+    textAlign: 'center',
     borderWidth: 5,
     borderColor: 'black',
     backgroundColor: 'rgba(255, 196, 87, 0.2)',
@@ -326,9 +410,9 @@ const styles = StyleSheet.create({
     fontSize: 23,
     marginBottom: 20,
     alignSelf: 'center',
-
   },
   avatar: {
+    alignSelf: 'center',
     width: 200,
     height: 200,
     borderRadius: 200,

@@ -135,6 +135,18 @@ async def handle_ubongo(sid, args):
     await app.sio.emit("game_data", {"solutions": [], "blocks": []}, room=room)
 
 
+@app.sio.on("contest")
+async def handle_contest(sid, args):
+    room = args["room"]
+    await app.sio.emit("contested", {}, room=room, skip_sid=sid)
+
+
+@app.sio.on("contestWin")
+async def handle_contest(sid, args):
+    room = args["room"]
+    await app.sio.emit("contestLost", {}, room=room, skip_sid=sid)
+
+
 @app.sio.on("invite")
 async def handle_invite(sid, args):
     print("invite", args)
