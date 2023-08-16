@@ -28,12 +28,14 @@ router = APIRouter()
 dbname = get_database()
 boards = dbname["own_boards"]
 solutions = dbname["own_solutions"]
-solutions2 = dbname["puzzle_data"]
+puzzles = dbname["puzzle_data"]
 users = dbname["users"]
 
 item_details = boards.find()
 solutions_details = solutions.find()
-puzzle_details = solutions2.find()
+puzzle_details = puzzles.find()
+puzzles_length = puzzles.count_documents({})
+
 boards_length = boards.count_documents({})
 solutions_length = solutions.count_documents({})
 
@@ -41,38 +43,81 @@ solutions_length = solutions.count_documents({})
 @router.post("/upLoadBlocks", response_description="genearte blocks for boards")
 def upLoadBlocks():
     n = 0
+    errors = 0
     for i in range(4):
         for p in puzzle_details:
-            [blocks, sol] = find_good_combination(p["board"])
-            solArray = []
-            for s in sol:
-                solution = s[0]
-                non_zero_rows = ~np.all(solution == 0, axis=1)
-                non_zero_columns = ~np.all(solution == 0, axis=0)
-                encodedNumpyBase = json.dumps(
-                    solution[non_zero_rows][:, non_zero_columns],
-                    default=lambda x: np.vectorize(piece_colors.get)(x).tolist(),
+            try:
+                [blocks, sol] = find_good_combination(p["board"])
+                solArray = []
+                for s in sol:
+                    solution = s[0]
+                    non_zero_rows = ~np.all(solution == 0, axis=1)
+                    non_zero_columns = ~np.all(solution == 0, axis=0)
+                    encodedNumpyBase = json.dumps(
+                        solution[non_zero_rows][:, non_zero_columns],
+                        default=lambda x: np.vectorize(piece_colors.get)(x).tolist(),
+                    )
+                    solArray.append(json.loads(encodedNumpyBase))
+                puzzles.update_one(
+                    {"board": p["board"]},
+                    {"$addToSet": {"data": {"blocks": blocks, "solutions": solArray}}},
+                    upsert=True,
                 )
-                solArray.append(json.loads(encodedNumpyBase))
-            solutions2.update_one(
-                {"board": p["board"]},
-                {"$addToSet": {"data": {"blocks": blocks, "solutions": solArray}}},
-                upsert=True,
+            except:
+                errors += 1
+            n += 1
+            print(
+                f"---------- kierros: {i} ladattu {int(n/72*100)}%, lauta: {n} errors: {errors} -----------"
             )
-        n += 1
-        print(f"---------- kierros: {i}, lauta: {n} -----------")
 
 
 @router.post("/update", response_description="get board")
 def board_selected():
+    errors = 0
     for i in range(72):
-        solution = solutions_details[i][str(i)]
-        solutions2.insert_one(
-            {
-                "board": solution["board"],
-                "blocks": [i for i in solution["solutions"] if not "g1" in i],
-            }
-        )
+        data = solutions_details[i][str(i)]
+        for blocks in data["solutions"]:
+            try:
+                solArray = []
+                [count, sol] = solve_puzzle(
+                    generate_basic_puzzle(data["board"], 2), blocks
+                )
+                for s in sol:
+                    solution = s[0]
+                    non_zero_rows = ~np.all(solution == 0, axis=1)
+                    non_zero_columns = ~np.all(solution == 0, axis=0)
+                    encodedNumpyBase = json.dumps(
+                        solution[non_zero_rows][:, non_zero_columns],
+                        default=lambda x: np.vectorize(piece_colors.get)(x).tolist(),
+                    )
+                    solArray.append(json.loads(encodedNumpyBase))
+                solutions2.update_one(
+                    {"board": data["board"]},
+                    {"$addToSet": {"data": {"blocks": blocks, "solutions": solArray}}},
+                    upsert=True,
+                )
+            except:
+                errors += 1
+        print(f"---------- ladattu {i/72} %, lauta: {i}, errors: {errors} -----------")
+
+
+@router.get("/puzzle", response_description="get blocks, board and solution")
+def blocks_and_board():
+    ##there might be some bad boards left
+    while True:
+        try:
+            random_int = random.randint(0, puzzles_length - 1)
+            print("Puzzle endpoint reached...")
+            puzzle = puzzle_details[random_int]
+            data = random.choice(puzzle["data"])
+
+            blocks = data["blocks"]
+            solutions = data["solutions"]
+
+            print("blocks:", blocks, "solutions:", len(solutions))
+            return {"blocks": blocks, "solutions": solutions}
+        except:
+            print("no solutions for board:", random_int)
 
 
 @router.get("/boards/{index}", response_description="get board")

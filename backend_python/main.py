@@ -31,7 +31,7 @@ app.add_middleware(
 current_rooms = {}
 empty_room = {
     "host": "",
-    "board": [],
+    "solutions": [],
     "blocks": [],
     "hostRedy": False,
     "playerRedy": False,
@@ -62,8 +62,8 @@ async def handle_join(sid, args):
         {
             "room": room,
             "host": current_rooms[room]["host"],
-            "board": current_rooms[room]["board"],
             "blocks": current_rooms[room]["blocks"],
+            "solutions": current_rooms[room]["solutions"],
         },
         room=sid,
     )
@@ -108,11 +108,13 @@ async def handle_redy(sid, args):
 @app.sio.on("data")
 async def handle_data(sid, args):
     room = args["room"]
-    board = args["board"]
+    solutions = args["solutions"]
     blocks = args["blocks"]
-    current_rooms[room]["board"] = board
+    current_rooms[room]["solutions"] = solutions
     current_rooms[room]["blocks"] = blocks
-    await app.sio.emit("game_data", {"board": board, "blocks": blocks}, room=room)
+    await app.sio.emit(
+        "game_data", {"solutions": solutions, "blocks": blocks}, room=room
+    )
 
 
 @app.sio.on("loading")
@@ -127,10 +129,10 @@ async def handle_ubongo(sid, args):
     room = args["room"]
     current_rooms[room]["hostRedy"] = False
     current_rooms[room]["playerRedy"] = False
-    current_rooms[room]["board"] = []
+    current_rooms[room]["solutions"] = []
     current_rooms[room]["blocks"] = []
     await app.sio.emit("ubongo", {}, room=room, skip_sid=sid)
-    await app.sio.emit("game_data", {"board": [], "blocks": []}, room=room)
+    await app.sio.emit("game_data", {"solutions": [], "blocks": []}, room=room)
 
 
 @app.sio.on("invite")

@@ -6,7 +6,7 @@ import { getOne, getSelected } from '../services/board'
 import { getSolutions } from '../services/blocks';
 
 import { BlocksContext } from '../contexts/BlockContext';
-import Matrix from './Matrix';
+import {Matrix} from './Matrix';
 import BlockRenderer from './Blocks';
 import { Loading } from './Loading';
 

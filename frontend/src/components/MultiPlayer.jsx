@@ -1,7 +1,9 @@
 import React, { useEffect, useContext, useState, useCallback } from 'react';
 import { View, Button, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
 import { BoardContext } from '../contexts/BoardContext';
-import { getSolutions } from '../services/blocks';
+
+import { getPuzzle } from '../services/puzzle';
+
 import { BlocksContext } from '../contexts/BlockContext';
 import {Matrix, Hint} from './Matrix';
 import BlockRenderer, { BlockRendererLarge } from './Blocks';
@@ -25,11 +27,9 @@ const InitialcountDown = 5000
 
 const MultiPlayer = ({user, friend}) => {
   const {room, token, avatar, invites, setRoom, setInvites} = useContext(UserContext)
-  const { data, setData } = useContext(BoardContext);
-  const { blocks, setBlocks } = useContext(BlocksContext)
+
   const [isLoading, setIsLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false)
-  const [abortController, setAbortController] = useState(null);
+
   const [userReady, setUserReady] = useState(false);
   const [friendReady, setFriendReady] = useState(false);
   const [countdown, setCountdown] = useState(InitialcountDown)
@@ -37,6 +37,7 @@ const MultiPlayer = ({user, friend}) => {
   const [win, setWin] = useState(false)
   const [left, setLeft] = useState(null)
   const [host, setHost] = useState(false)
+
   const [friendData, setFriendData] = useState(null)
   const [clicks, setClicks] = useState(0)
   const [uboText, setUboText] = useState("UBONGO")
@@ -44,7 +45,7 @@ const MultiPlayer = ({user, friend}) => {
   const [hintText, setHintText] = useState('Hint availabe') 
   const [hintTimer, setHintTimer] = useState(0)
 
-  const [matrix, setMatrix] = useState([])
+  const [puzzle, setPuzzle] = useState([])
   // send roomname / hostName 
   // send roomname / playerName
 
@@ -59,18 +60,16 @@ const MultiPlayer = ({user, friend}) => {
   useEffect( () => {
     socket.emit('join', {"user":user, "friend":friend});
 
-    socket.on("room", ({room, host, blocks, board}) => {
+    socket.on("room", ({room, host, blocks, solutions}) => {
       setRoom(room)
       setHost(host === user)
-      setData(board)
-      setBlocks(blocks)
+      setPuzzle({blocks, solutions})
       console.log("join")
     })
 
     socket.on("redy", () => { setFriendReady(true) } )
-    socket.on("game_data", ({board, blocks}) => { 
-      setData(board)
-      setBlocks(blocks)
+    socket.on("game_data", ({blocks, solutions}) => { 
+      setPuzzle({blocks, solutions})
       setIsLoading(false)
     } )
     socket.on("ubongo", () => { setGameOver(true) } )
@@ -88,12 +87,6 @@ const MultiPlayer = ({user, friend}) => {
 
   }, [])
 
-  //rotate board 
-  useEffect( () => {
-
-    if (data&&data.base) setMatrix(rotate(data.base))
-
-  }, [data])
   
   //count down
   useEffect( () => {
@@ -164,9 +157,8 @@ const MultiPlayer = ({user, friend}) => {
 
   const getData = async () => {
     try {      
-      const response = await getSolutions()
-      const parsedBoard = JSON.parse(response.board)
-      socket.emit('data', {"room":room, "blocks":response.blocks, "board":parsedBoard});
+      const response = await getPuzzle()
+      socket.emit('data', {"room":room, "blocks":response.blocks, "solutions":response.solutions});
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -233,7 +225,7 @@ const MultiPlayer = ({user, friend}) => {
   const WhoReady = () => {
     return(
       <View >
-        { (!userReady && data && blocks) 
+        { (!userReady && puzzle.blocks) 
           ? (
             <TouchableOpacity  onPress={sentRedy} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(235, 164, 33, 0.4)'}}>
               <Text style={{alignSelf: 'center'}}>Redy</Text>
@@ -257,7 +249,7 @@ const MultiPlayer = ({user, friend}) => {
 
   const choseBlockRender = () => {
     return (
-      friendReady && userReady ? <BlockRenderer blocks={blocks} /> : <BlockRendererLarge blocks={blocks} />
+      friendReady && userReady ? <BlockRenderer blocks={puzzle.blocks} /> : <BlockRendererLarge blocks={puzzle.blocks} />
     )
   }
 
@@ -265,7 +257,7 @@ const MultiPlayer = ({user, friend}) => {
     <View style={{flex:1}}>
       <View style={{flex:1, justifyContent:'space-between'}}>
       <Animatable.View>
-      { blocks && choseBlockRender() }
+      { puzzle.blocks && choseBlockRender() }
       {isLoading 
         ? ( <Loading /> )
         : ( <WhoReady /> )
@@ -273,7 +265,7 @@ const MultiPlayer = ({user, friend}) => {
       </Animatable.View>
       {friendReady && userReady && (
         <View style={styles.container}> 
-          <Matrix matrix={matrix} />
+          <Hint matrix={puzzle.solutions[0]} />
           <Animatable.View animation={'fadeIn'} duration={5000} delay={4000} style={{flexDirection: 'row', alignItems:'center'}}>
               <UbongoClicker style={{alignSelf: 'center'}} />
               <HourGlassTimer/>

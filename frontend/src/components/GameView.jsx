@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 
-import { getSolutions, solve } from '../services/blocks';
+import { getPuzzle } from '../services/puzzle';
+
 import Text from './Text';
 
 import {Matrix, Hint} from './Matrix';
@@ -15,10 +16,9 @@ import * as Animatable from 'react-native-animatable';
 const Board = () => {
   const ht = 5
 
-  const [ data, setData ] = useState([])
-  const [ blocks, setBlocks ]  = useState([])
+  const [ puzzle, setPuzzle ] = useState({})
+
   const [isLoading, setIsLoading] = useState(false);
-  const [solution, setSolution] = useState(null)
   const [hintText, setHintText] = useState('Hint availabe') 
   const [hintTimer, setHintTimer] = useState(0)
 
@@ -41,19 +41,11 @@ const Board = () => {
 
   const getData = async () => {
     try {
-      setSolution(null)
+      setPuzzle({})
       setIsLoading(true)
-      const response = await getSolutions()
-      const parsedBoard = JSON.parse(response.board)
-      console.log("base", await parsedBoard.base)
-      const matrix = rotate(await parsedBoard.base)
-      setData(matrix)
-      setBlocks(response.blocks)
+      const response = await getPuzzle()
+      setPuzzle({blocks: response.blocks, solutions: response.solutions })
       setIsLoading(false)
-
-      const sol = await solve({board: parsedBoard, blocks:response.blocks})
-      const parsedSol = JSON.parse(sol)
-      setSolution(await parsedSol)
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -67,18 +59,17 @@ const Board = () => {
         <Text style={{alignSelf: 'center'}}>New board</Text>
       </TouchableOpacity>
       <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
-        <View >{!solution && data && <Matrix matrix={data}/>}</View>
-        <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={() => setHintTimer(5)}>{solution && <Hint matrix={solution}/>}</View>
+        <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={() => setHintTimer(5)}>{puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}</View>
       </View>
 
       <View style={{position:'absolute', bottom:5}}>
         {isLoading 
           ? ( <Loading /> )
-          : ( blocks && <BlockRenderer blocks={blocks}/> )
+          : ( puzzle?.blocks && <BlockRenderer blocks={puzzle.blocks}/> )
         }
       </View>
 
-      {solution && <Animatable.View 
+      {puzzle && <Animatable.View 
         animation={'fadeIn'}
         duration={3000}
         style={{
