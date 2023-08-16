@@ -30,7 +30,6 @@ export const Hint = ({matrix}) => {
   const gap = windowWidth * 0.0120; // Adjust the scale factor for desired size
 
   const arrayLength = matrix.length
-  console.log("m", matrix)
 
   const [shown, setShown] = useState([])
 
@@ -46,16 +45,18 @@ export const Hint = ({matrix}) => {
               key={colIndex}
               width={boxHeightInPixels}
               height={boxHeightInPixels}
-              animation={'fadeIn'}
-              delay={(arrayLength-rowIndex)*20*arrayLength+colIndex*20}
-              duration={100}
+              animation={'bounceInDown'}
+              delay={(arrayLength-rowIndex)*200*arrayLength+colIndex*200}
+              duration={rowIndex*200*arrayLength+colIndex*200}
               onAnimationBegin ={() => {if (!value) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}}
               useNativeDriver={true}
               style={color(value)}
             >
               {/* python code gives bit wierd lists*/}
-              {value && value !== "None" && <TouchableOpacity 
-                style={{flex: 1, alignSelf:'stretch', backgroundColor:'black', opacity:shown.includes([rowIndex, colIndex])}}
+              {value && value !== "None" && <TouchableOpacity
+                /* blocks double tap*/
+                delayPressIn={0.4}
+                style={{flex: 1, padding:1, alignSelf:'stretch', backgroundColor:'black', opacity:shown.includes([rowIndex, colIndex])}}
               />}
             </Animatable.View>
           ))}
@@ -71,9 +72,7 @@ export const Matrix = ({matrix}) => {
 
   const boxHeightInPixels = windowWidth * 0.205; // Adjust the scale factor for desired size
   const gap = windowWidth * 0.0120; // Adjust the scale factor for desired size
-
   const arrayLength = matrix.length
-  console.log("m", matrix)
 
   return (
     <View style={{...styles.container, gap:gap}}>

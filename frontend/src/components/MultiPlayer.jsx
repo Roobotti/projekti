@@ -4,7 +4,6 @@ import { BoardContext } from '../contexts/BoardContext';
 
 import { getPuzzle } from '../services/puzzle';
 
-import { BlocksContext } from '../contexts/BlockContext';
 import {Matrix, Hint} from './Matrix';
 import BlockRenderer, { BlockRendererLarge } from './Blocks';
 import { Loading } from './Loading';
@@ -18,7 +17,6 @@ import * as Animatable from 'react-native-animatable';
 import Text from './Text';
 
 import LottieView from "lottie-react-native";
-import { rotate } from '../tools/Rotate';
 import { HourGlassTimer } from '../lotties/Timers';
 
 const AnimatedLottieViewUserWait = Animated.createAnimatedComponent(LottieView);
@@ -42,8 +40,9 @@ const MultiPlayer = ({user, friend}) => {
   const [clicks, setClicks] = useState(0)
   const [uboText, setUboText] = useState("UBONGO")
 
+
   const [hintText, setHintText] = useState('Hint availabe') 
-  const [hintTimer, setHintTimer] = useState(0)
+  const [hintTimer, setHintTimer] = useState(3*60)
 
   const [puzzle, setPuzzle] = useState([])
   // send roomname / hostName 
@@ -116,7 +115,7 @@ const MultiPlayer = ({user, friend}) => {
 
   //hint timer
   useEffect( () => {
-    setHintText(hintTimer?`   Next in ${hintTimer} s   `:'Hint available')
+    setHintText(hintTimer?`   Hint in ${hintTimer} s   `:'Hint available')
     if ( hintTimer > 0) {
       const hintInterval = setInterval( () => {
         setHintTimer( c => c - 1)
@@ -192,6 +191,17 @@ const MultiPlayer = ({user, friend}) => {
       </View>
     )
   }
+  const HintLabel = () => {
+    return (
+      <Animatable.View 
+        animation={'fadeIn'}
+        duration={3000}
+        style={styles.hint}
+        >
+        <Text style={{alignSelf: 'center'}}>{hintText}</Text>
+      </Animatable.View>
+    )
+  }
 
   if (gameOver) {
     return( 
@@ -255,34 +265,49 @@ const MultiPlayer = ({user, friend}) => {
 
   return (
     <View style={{flex:1}}>
-      <View style={{flex:1, justifyContent:'space-between'}}>
       <Animatable.View>
-      { puzzle.blocks && choseBlockRender() }
-      {isLoading 
-        ? ( <Loading /> )
-        : ( <WhoReady /> )
-      }
+        { puzzle.blocks && choseBlockRender() }
+        {isLoading 
+          ? ( <Loading /> )
+          : ( <WhoReady /> )
+        }
       </Animatable.View>
-      {friendReady && userReady && (
-        <View style={styles.container}> 
-          <Hint matrix={puzzle.solutions[0]} />
-          <Animatable.View animation={'fadeIn'} duration={5000} delay={4000} style={{flexDirection: 'row', alignItems:'center'}}>
-              <UbongoClicker style={{alignSelf: 'center'}} />
-              <HourGlassTimer/>
-          </Animatable.View >
-        </View>
-      )}
+      <View style={{flex:1, justifyContent:'center', marginBottom:120}}>
+        {friendReady && userReady && (
+          <View style={styles.container}> 
+            <View 
+              pointerEvents={hintTimer?"none":"auto"} 
+              onTouchEnd={() => setHintTimer(5)}
+            >
+              {puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}
+            </View>
+          </View>
+        )}
       </View>
+        {friendReady && userReady && <Animatable.View animation={'fadeIn'} duration={5000} delay={4000} style={{position:'absolute', alignSelf:'center', flexDirection: 'row', alignItems:'center', bottom:-10}}>
+                  <UbongoClicker style={{alignSelf: 'center'}} />
+                  <HourGlassTimer />
+        </Animatable.View >}
+
+        {friendReady && userReady && <Animatable.View 
+          animation={'fadeIn'}
+          duration={5000}
+          delay={4000}
+          style={styles.hint}
+          >
+          <Text style={{alignSelf: 'center'}}>{hintText}</Text>
+        </Animatable.View>
+        }
     </View>
+    
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    alignContent: 'space-around',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    alignSelf: 'center',
+    alignItems: 'center',
 
   },
   ubongo: {
@@ -312,9 +337,20 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     marginTop: 20,
     marginBottom: 50,
-
   },
+  hint: {
+    position:'absolute',
+    top: 120,
+    right: 10,
+    transform: [{rotate: '30deg'}],
+    alignSelf: 'center',
+    alignSelf:'stretch', 
+    padding:10, 
+    backgroundColor:'rgba(121, 217, 80, 0.3)',
+    borderRadius: 6,
+  }
 });
+
 
 export default MultiPlayer;
 
