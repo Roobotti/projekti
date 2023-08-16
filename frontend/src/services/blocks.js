@@ -18,13 +18,6 @@ export const getBlocks = async (data, signal) => {
   return json;
 };
 
-export const getSolutions = async () => {
-  const response = await fetch(`${baseUrl}&board`);
-  const json = await response.json();
-  console.log("res", json);
-  return json;
-};
-
 export const solve = async ({ board, blocks }) => {
   console.log("blocks:", blocks);
   console.log("board:", board);

@@ -1,5 +1,4 @@
-import { ScrollView, View, StyleSheet, Button } from 'react-native';
-import { useContext } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { Link } from 'react-router-native';
 import Text from './Text';
 import Constants from 'expo-constants';

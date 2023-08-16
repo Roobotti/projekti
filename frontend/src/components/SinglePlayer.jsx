@@ -5,10 +5,9 @@ import { getPuzzle } from '../services/puzzle';
 
 import Text from './Text';
 
-import {Matrix, Hint} from './Matrix';
+import { Hint} from './Matrix';
 import BlockRenderer from './Blocks';
 import { Loading } from './Loading';
-import { rotate } from '../tools/Rotate';
 
 import * as Animatable from 'react-native-animatable';
 

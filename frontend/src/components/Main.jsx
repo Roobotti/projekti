@@ -1,13 +1,12 @@
-import { StyleSheet, View, ImageBackground, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, ImageBackground } from 'react-native';
 import { Route, Routes, Navigate } from 'react-router-native';
 import AppBar from './AppBar';
 import { SignUp, SignIn, SignOut } from './Sign';
-import Board from './GameView';
+import Board from './SinglePlayer';
 import Menu from './Menu';
 import MultiPlayer from './MultiPlayer';
 import BoardWrite from "./BoardWrite"
-import SolutionsWrite from './SolutionsWrite';
-import { LobbyCollap } from './LobbyCollapsible';
+import { LobbyCollap } from './Lobby';
 import { Profile } from './Profile';
 import { Loading } from './Loading';
 import { useContext } from 'react';

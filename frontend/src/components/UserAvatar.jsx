@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Image, View, Platform, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { Button, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 
@@ -29,13 +29,3 @@ export const UserAvatar = ({source, onChange}) => {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  avatar: {
-    paddingTop: 20,
-    height: 100,
-    width: 100,
-    borderRadius: 100,
-    padding: 20,
-  },
-});

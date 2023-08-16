@@ -1,7 +1,6 @@
 
 import { Pressable, View, StyleSheet } from 'react-native';
 import { useNavigate } from 'react-router-native';
-import AuthStorage from '../utils/authStorage';
 
 import { Formik } from 'formik';
 import FormikTextInput from './FormikTextInput';
@@ -9,11 +8,9 @@ import FormikTextInput from './FormikTextInput';
 
 import { signIn, signUp, signOut } from '../services/users';
 import Text from './Text';
-import theme from '../theme';
 import * as yup from 'yup'
 import { useAuthStorage } from '../hooks/useStorageContext';
 import { UserContext } from "../contexts/UserContext";
-import { readUsersMe } from '../services/users';
 import { useContext, useEffect, useState } from 'react';
 import { Loading } from './Loading';
 

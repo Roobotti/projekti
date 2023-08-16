@@ -4,7 +4,6 @@ import { View, StyleSheet, Dimensions, TouchableOpacity, Text } from 'react-nati
 const BoardWrite = () => {
   const [matrix, setMatrix] = useState(Array.from({ length: 6 }, () => Array(4).fill(0)));
   const [newMatrix, setNewMatrix] = useState([])
-  const [num, setNum] = useState(0)
 
   const windowWidth = Dimensions.get('window').width;
   const boxHeightInPixels = windowWidth * 0.21; // Adjust the scale factor for desired size

@@ -1,10 +1,9 @@
 import React, { useEffect, useContext, useState, useCallback } from 'react';
-import { View, Button, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
-import { BoardContext } from '../contexts/BoardContext';
+import { View, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
 
 import { getPuzzle } from '../services/puzzle';
 
-import {Matrix, Hint} from './Matrix';
+import {Hint} from './Matrix';
 import BlockRenderer, { BlockRendererLarge } from './Blocks';
 import { Loading } from './Loading';
 

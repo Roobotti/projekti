@@ -1,11 +1,11 @@
 
 
-import { View, ScrollView, TouchableOpacity, Text, StyleSheet, Animated, Easing, ImageBackground } from 'react-native';
-import { Link, useNavigate } from 'react-router-native';
+import {  ScrollView, TouchableOpacity, Text, StyleSheet, ImageBackground } from 'react-native';
+import {  useNavigate } from 'react-router-native';
 
 import { socket } from '../services/socket';
 
-import { useState, useEffect, useContext, useRef   } from 'react';
+import { useEffect, useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';
 
