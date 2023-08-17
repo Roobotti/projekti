@@ -132,12 +132,12 @@ async def handle_ubongo(sid, args):
     current_rooms[room]["solutions"] = []
     current_rooms[room]["blocks"] = []
     await app.sio.emit("ubongo", {}, room=room, skip_sid=sid)
-    await app.sio.emit("game_data", {"solutions": [], "blocks": []}, room=room)
 
 
 @app.sio.on("contest")
 async def handle_contest(sid, args):
     room = args["room"]
+    print("contested")
     await app.sio.emit("contested", {}, room=room, skip_sid=sid)
 
 

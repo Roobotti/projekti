@@ -58,7 +58,7 @@ const Board = () => {
         <Text style={{alignSelf: 'center'}}>New board</Text>
       </TouchableOpacity>
       <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
-        <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={() => setHintTimer(5)}>{puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}</View>
+        <View pointerEvents={hintTimer?"none":"auto"} onTouchMove={() => setHintTimer(5)} onTouchEnd={() => setHintTimer(5)}>{puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}</View>
       </View>
 
       <View style={{position:'absolute', bottom:5}}>

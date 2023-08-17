@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, TouchableOpacity, Animated } from 'react-nativ
 
 import { getPuzzle } from '../services/puzzle';
 
-import {Hint} from './Matrix';
+import {ColorBlocks, Hint, PuzzleProve} from './Matrix';
 import BlockRenderer, { BlockRendererLarge } from './Blocks';
 import { Loading } from './Loading';
 
@@ -24,6 +24,7 @@ const InitialcountDown = 5000
 const gameDuration = 3*60
 const contestTime = 6
 const proveTime = 30
+const colors = ["red", "green", "blue", "yellow"]
 
 const MultiPlayer = ({user, friend}) => {
   const {room, token, avatar, invites, setRoom, setInvites} = useContext(UserContext)
@@ -49,6 +50,8 @@ const MultiPlayer = ({user, friend}) => {
   const [contestLost, setContestLost] = useState(false)
 
   const [puzzle, setPuzzle] = useState([])
+  const [colored, setColored] = useState([])
+  const [color, setColor] = useState(null)
   // send roomname / hostName 
   // send roomname / playerName
 
@@ -78,6 +81,7 @@ const MultiPlayer = ({user, friend}) => {
     socket.on("ubongo", () => { setGameOver(true) } )
 
     socket.on("contested", () => { 
+      console.log("contested")
       setIsContest(true) 
       setProveTimer(proveTime)
     })
@@ -114,13 +118,14 @@ const MultiPlayer = ({user, friend}) => {
   useEffect( () => {
     if ( clicks > 0) {
       const clickInterval = setInterval( () => {
+        if (clicks>1) {setUboText(4-clicks)}
+        else setUboText("UBONGO")
         setClicks( c => c - 1)
       }, 1000);
       return () => {
         clearInterval(clickInterval);
       };
   }
-
   }, [clicks])
 
   //hint timer
@@ -154,6 +159,10 @@ const MultiPlayer = ({user, friend}) => {
 
   }, [gameOver, contestTimer])
 
+  useEffect( () => {
+    if  (puzzle && puzzle.solutions) setColored(puzzle.solutions[0].map((r) => r.map((c) => colors.includes(c) ? 1 : c )))
+  }, [puzzle])
+
   //prove timer
   useEffect( () => {
       if ( proveTimer > 0) {
@@ -183,6 +192,7 @@ const MultiPlayer = ({user, friend}) => {
   }, [host])
 
   const newGame = async() => {
+    console.log("new game")
     setUserReady(false)
     setFriendReady(false)
     setGameOver(false)
@@ -219,22 +229,23 @@ const MultiPlayer = ({user, friend}) => {
   };
 
   const sendContest = () => {
+    console.log("pc", puzzle)
     socket.emit('contest', {"room":room});
     setProveTimer(proveTime)
     setIsContest(true)
   }
 
-  const handleUbongoClick = () => {
-    setClicks(clicks + 1)
+  const handleUbongoClick = async () => {
     if (clicks>=3) sentUbongo()
-    if (clicks>0) setUboText(3-clicks)
+    if (clicks>=0) setUboText(2-clicks)
     else setUboText("UBONGO")
+    setClicks(clicks + 1)
   }
 
-  const UbongoClicker = () => {
+  const UbongoClicker = ({uboText}) => {
     return (
       <View>
-        <TouchableOpacity style={styles.ubongo} onPress={() => handleUbongoClick()}>
+        <TouchableOpacity style={styles.ubongo} onPressIn={() => handleUbongoClick()}>
           <Text style={{fontSize:28}}>{uboText}</Text>
         </TouchableOpacity>
       </View>
@@ -257,6 +268,7 @@ const MultiPlayer = ({user, friend}) => {
             
             </View>) )
         }
+        
       </View>
     )
   }
@@ -269,10 +281,14 @@ const MultiPlayer = ({user, friend}) => {
 
   if (win && proveTimer ) {
     return(
-      <Animatable.View style={styles.winner_container} animation={'bounceIn'} duration={2000}>
-        <Text style={{fontSize: 30}}>!!CONTEST!!</Text>
-        <Text style={{fontSize: 50}}>{proveTimer} s</Text>
-      </Animatable.View>
+      <View style={{flex:1, alignSelf:'stretch', justifyContent:'space-between', marginBottom:10}}>
+        <Animatable.View style={styles.winner_container} animation={'bounceIn'} duration={1000}>
+          <Text style={{fontSize: 30}}>!!CONTEST!!</Text>
+          <Text style={{fontSize: 50}}>{proveTimer} s</Text>
+          <PuzzleProve matrix={colored} color={color} setColored={(c) => setColored(c)}/>
+        </Animatable.View>
+        <ColorBlocks colors={colors} color={color} setColor={(c) => setColor(c)} />
+      </View>
     )
 
   }
@@ -295,7 +311,7 @@ const MultiPlayer = ({user, friend}) => {
                   <Text style={styles.text} >{ contestTimer } s </Text>
                 </View>
               ) : (
-                <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={newGame}>
+                <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={() => newGame()}>
                   <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
                 </TouchableOpacity>
               )} 
@@ -315,7 +331,7 @@ const MultiPlayer = ({user, friend}) => {
                     ) : (
                       <View>
                         <Text style={styles.text} > {contestLost ? friend : "You"} won </Text>
-                        <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={newGame}>
+                        <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={() => newGame()}>
                           <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
                         </TouchableOpacity>
                       </View>
@@ -326,11 +342,11 @@ const MultiPlayer = ({user, friend}) => {
 
                   <View>
                       <Text style={styles.text} > {friend} won </Text>
-                      <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={newGame}>
+                      <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={() => newGame()}>
                         <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
                       </TouchableOpacity>
                       
-                      {contestTimer > 0 && <TouchableOpacity style={{...styles.ubongo, padding:15}} onPress={sendContest}>
+                      {contestTimer > 0 && <TouchableOpacity style={{...styles.ubongo, padding:15}} onPress={() => sendContest()}>
                         <Text style={{...styles.text, marginBottom: 0}}>Contest in {contestTimer} s?</Text>
                       </TouchableOpacity>}
                   </View>
@@ -358,6 +374,7 @@ const MultiPlayer = ({user, friend}) => {
           <View style={styles.container}> 
             <View 
               pointerEvents={hintTimer?"none":"auto"} 
+              onTouchMove={() => setHintTimer(5)}
               onTouchEnd={() => setHintTimer(5)}
             >
               {puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}
@@ -366,7 +383,7 @@ const MultiPlayer = ({user, friend}) => {
         )}
       </View>
         {friendReady && userReady && <Animatable.View animation={'fadeIn'} duration={5000} delay={4000} style={{position:'absolute', alignSelf:'center', flexDirection: 'row', alignItems:'center', bottom:-10}}>
-                  <UbongoClicker style={{alignSelf: 'center'}} />
+                  <UbongoClicker uboText={uboText} style={{alignSelf: 'center'}} />
                   <HourGlassTimer />
         </Animatable.View >}
 
