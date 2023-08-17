@@ -141,10 +141,11 @@ async def handle_contest(sid, args):
     await app.sio.emit("contested", {}, room=room, skip_sid=sid)
 
 
-@app.sio.on("contestWin")
+@app.sio.on("contest_result")
 async def handle_contest(sid, args):
     room = args["room"]
-    await app.sio.emit("contestLost", {}, room=room, skip_sid=sid)
+    result = args["result"]
+    await app.sio.emit("contestResult", {"result": result}, room=room, skip_sid=sid)
 
 
 @app.sio.on("invite")

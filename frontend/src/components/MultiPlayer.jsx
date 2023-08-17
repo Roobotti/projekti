@@ -46,8 +46,6 @@ const MultiPlayer = ({user, friend}) => {
   const [hintTimer, setHintTimer] = useState(gameDuration)
   const [contestTimer, setContestTimer] = useState(contestTime)
   const [proveTimer, setProveTimer] = useState(0)
-  const [isContest, setIsContest] = useState(false)
-  const [contestLost, setContestLost] = useState(false)
 
   const [puzzle, setPuzzle] = useState([])
   const [colored, setColored] = useState([])
@@ -82,11 +80,13 @@ const MultiPlayer = ({user, friend}) => {
 
     socket.on("contested", () => { 
       console.log("contested")
-      setIsContest(true) 
       setProveTimer(proveTime)
     })
 
-    socket.on("contestLost", () => { setContestLost(true) } )
+    socket.on("contestResult", ({result}) => { 
+      setProveTimer(0) 
+      setWin(!result)
+    } )
 
     socket.on("left", handleLeft)
 
@@ -165,6 +165,10 @@ const MultiPlayer = ({user, friend}) => {
 
   //prove timer
   useEffect( () => {
+      if (proveTimer === 1) {
+        setWin(!win)
+        setProveTimer(0)
+      }
       if ( proveTimer > 0) {
         const proveInterval = setInterval( () => {
           setProveTimer( c => c - 1)
@@ -201,7 +205,6 @@ const MultiPlayer = ({user, friend}) => {
     setHintTimer(gameDuration)
     setContestTimer(contestTime)
     setProveTimer(0)
-    setIsContest(false)
     setWin(false)
 
     if (host){getData()}
@@ -228,11 +231,19 @@ const MultiPlayer = ({user, friend}) => {
     setGameOver(true)
   };
 
+  const submitProve = () => {
+    const result = puzzle.solutions.includes(colored)
+    console.log("result", result)
+    socket.emit('contest_result', {"room":room, "result":result});
+    setProveTimer(0)
+    setContestTimer(0)
+    setWin(result)
+  }
+
   const sendContest = () => {
     console.log("pc", puzzle)
     socket.emit('contest', {"room":room});
-    setProveTimer(proveTime)
-    setIsContest(true)
+    setProveTimer(proveTime + 3)
   }
 
   const handleUbongoClick = async () => {
@@ -278,17 +289,21 @@ const MultiPlayer = ({user, friend}) => {
       friendReady && userReady ? <BlockRenderer blocks={puzzle.blocks} /> : <BlockRendererLarge blocks={puzzle.blocks} />
     )
   }
-
   if (win && proveTimer ) {
     return(
-      <View style={{flex:1, alignSelf:'stretch', justifyContent:'space-between', marginBottom:10}}>
-        <Animatable.View style={styles.winner_container} animation={'bounceIn'} duration={1000}>
-          <Text style={{fontSize: 30}}>!!CONTEST!!</Text>
-          <Text style={{fontSize: 50}}>{proveTimer} s</Text>
+        <Animatable.View style={{flex:1, alignSelf:'stretch', justifyContent:'space-between', marginBottom:10}} animation={'fadeIn'} duration={1000}>
+          <View style={{flex:1, alignSelf:'stretch', flexDirection:'row', justifyContent:'space-between'}}>
+            <TouchableOpacity style={{...styles.touchBasic, alignSelf:'flex-start'}} onPress={() => submitProve()}>
+              <Text style={styles.touchText}>
+                Submit
+              </Text>
+            </TouchableOpacity>
+            <Text style={{fontSize: 50}}>{proveTimer} s</Text>
+          </View>
           <PuzzleProve matrix={colored} color={color} setColored={(c) => setColored(c)}/>
+          <ColorBlocks colors={colors} color={color} setColor={(c) => setColor(c)} />
         </Animatable.View>
-        <ColorBlocks colors={colors} color={color} setColor={(c) => setColor(c)} />
-      </View>
+
     )
 
   }
@@ -311,8 +326,8 @@ const MultiPlayer = ({user, friend}) => {
                   <Text style={styles.text} >{ contestTimer } s </Text>
                 </View>
               ) : (
-                <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={() => newGame()}>
-                  <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
+                <TouchableOpacity style={styles.touchBasic} onPress={() => newGame()}>
+                  <Text  style={styles.touchText}>New game?</Text>
                 </TouchableOpacity>
               )} 
               
@@ -321,33 +336,20 @@ const MultiPlayer = ({user, friend}) => {
           : (
             <View>
               {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
-              {isContest ? (
+              {proveTimer ? (
                   <View>
-                    {proveTimer ? (
-                      <View>
                         <Text style={styles.text} > {friend} is submiting the solution </Text>
                         <Text style={styles.text} > {proveTimer} s </Text>
-                      </View>
-                    ) : (
-                      <View>
-                        <Text style={styles.text} > {contestLost ? friend : "You"} won </Text>
-                        <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={() => newGame()}>
-                          <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
-                        </TouchableOpacity>
-                      </View>
-                    )
-                    }
                   </View>
                 ) : (
-
                   <View>
                       <Text style={styles.text} > {friend} won </Text>
-                      <TouchableOpacity style={{...styles.ubongo, padding:15, margin:5}} onPress={() => newGame()}>
-                        <Text style={{...styles.text, marginBottom: 0}}>New game?</Text>
+                      <TouchableOpacity style={styles.touchBasic} onPress={() => newGame()}>
+                        <Text style={styles.touchText}>New game?</Text>
                       </TouchableOpacity>
                       
                       {contestTimer > 0 && <TouchableOpacity style={{...styles.ubongo, padding:15}} onPress={() => sendContest()}>
-                        <Text style={{...styles.text, marginBottom: 0}}>Contest in {contestTimer} s?</Text>
+                        <Text style={styles.touchText}>Contest in {contestTimer} s?</Text>
                       </TouchableOpacity>}
                   </View>
                 )}
@@ -417,6 +419,21 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     backgroundColor: 'rgba(255, 196, 87, 0.2)',
     borderRadius: 20,
+  },
+  touchBasic: {
+    alignSelf: 'center',
+    textAlign: 'center',
+    borderWidth: 5,
+    borderColor: 'black',
+    backgroundColor: 'rgba(255, 196, 87, 0.2)',
+    borderRadius: 20, 
+    padding:15, 
+    margin:5
+  },
+  touchText: {
+    fontSize: 23,
+    marginBottom: 0,
+    alignSelf: 'center',
   },
   winner_container: {
     flex: 1,

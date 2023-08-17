@@ -29,16 +29,17 @@ const colorMap = (key) => {
 
 export const ColorBlocks = ({colors, color, setColor }) => {
   return (
-    <View style={styles.blocks}>
+    <View style={{...styles.blocks}}>
       {colors.map((c) => (
+        <View key={c}>
           <TouchableOpacity
-            key={c}
             style={{...colorMap(c), width:boxHeightInPixels, height:boxHeightInPixels, opacity:c===color?1:0.5}}
             onPress={ () => {
               setColor(c)
             }}
           />
-          ))
+        </View>
+      ))
       }
     </View>
   )
@@ -48,7 +49,7 @@ export const PuzzleProve = ({matrix, color, setColored}) => {
   const arrayLength = matrix.length
 
   return (
-    <View style={{...styles.container, gap:gap}}>
+    <View style={{...styles.container, marginBottom:80, gap:gap}}>
       {matrix
         .map((row, rowIndex) => (
         <View key={rowIndex} style={{...styles.row, gap:gap}}>
@@ -158,11 +159,7 @@ const styles = StyleSheet.create({
   touchHighLight: 
     {flex: 1, padding:1, alignSelf:'stretch', borderWidth: 5, borderColor:'black'},
   blocks: {
-    position: 'absolute',
-    bottom: 5,
-    flex: 1,
-    gap: gap,
-    alignSelf: 'center',
+    alignContent:'space-between',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
   },
