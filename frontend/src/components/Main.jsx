@@ -4,7 +4,6 @@ import AppBar from './AppBar';
 import { SignUp, SignIn, SignOut } from './Sign';
 import Board from './SinglePlayer';
 import Menu from './Menu';
-import MultiPlayer from './MultiPlayer';
 import BoardWrite from "./BoardWrite"
 import { LobbyCollap } from './Lobby';
 import { Profile } from './Profile';
@@ -44,7 +43,6 @@ const Main = () => {
           <Routes>
             <Route path="/" element={<Menu />} exact />
             <Route path="/singlePlayer" element={<Board />} exact />
-            <Route path="/MultiPlayer/:host" render={(props) => <MultiPlayer {...props} />} exact/>
             <Route path="/Lobby" element={<LobbyCollap />} exact />
             <Route path="/SignIn" element={<SignIn />} exact />
             <Route path="/SignUp" element={<SignUp />} exact />

@@ -16,6 +16,7 @@ export const UserContextProvider = ({ children }) => {
   const authStorage = useAuthStorage();
   const [user, setUser] = useState(null);
   const [friends, setFriends] = useState([]);
+  const [friend, setFriend] = useState(null);
   const [requests, setRequests] = useState([]);
   const [sentRequests, setSentRequests] = useState([]);
   const [wins, setWins] = useState([]);
@@ -105,6 +106,7 @@ export const UserContextProvider = ({ children }) => {
       value={{
         user,
         friends,
+        friend,
         requests,
         sentRequests,
         wins,
@@ -116,6 +118,7 @@ export const UserContextProvider = ({ children }) => {
         avatar,
         loading,
         fontsLoading,
+        setFriend,
         login,
         logout,
         setSentRequests,

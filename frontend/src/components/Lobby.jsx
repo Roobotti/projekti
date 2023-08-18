@@ -35,7 +35,7 @@ import { Loading } from './Loading';
 
 
 export const LobbyCollap = () => {
-  const { user, friends, requests, token, sentRequests, wins, invites, setSentInvite, setReFresh, setFriends, setRequests, setInvites, setSentRequests } = useContext(UserContext);
+  const { user, friends, requests, token, sentRequests, wins, invites, setFriend, setSentInvite, setReFresh, setFriends, setRequests, setInvites, setSentRequests } = useContext(UserContext);
   const [newFriend, setNewFriend] = useState("");
   const [game, setGame] = useState(null)
   const [refreshing, setRefreshing] = useState(false);
@@ -191,12 +191,14 @@ export const LobbyCollap = () => {
     console.log("invite", user, friend)
     socket.emit("invite", {"user":user, "friend":friend});
     setSentInvite(friend)
-    setGame(<MultiPlayer user={user} friend={friend} />)
+    setFriend(friend)
+    setGame(<MultiPlayer/>)
   };
 
   const handleJoin = (friend) => {
     console.log("join")
-    setGame(<MultiPlayer user={user} friend={friend} />)
+    setFriend(friend)
+    setGame(<MultiPlayer/>)
 
   };
 
