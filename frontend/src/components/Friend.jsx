@@ -44,7 +44,7 @@ const VsStatus = (wins, loses) => {
 }
 
 const FriendProfile = ({ friend, onDelete, onBack }) => {
-  const {paint_delete, paint_X} = useState(AssetsContext)
+  const {paint_delete, paint_X} = useContext(AssetsContext)
   const [friendData, setFriendData] = useState(null);
   const {user} = useContext(UserContext)
   const [friendWins, setFriendWins] = useState(0)

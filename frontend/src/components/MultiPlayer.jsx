@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
 
 
@@ -21,7 +21,9 @@ const colors = ["red", "green", "blue", "yellow"]
 const MultiPlayer = () => {
   const {redEffect, greenEffect} = useContext(AssetsContext)
   const {friend, avatar} = useContext(UserContext)
-  const {submitProve, sendRedy, sendContest, newGame, handleUbongoClick, isLoading, userReady, friendReady, gameOver, win, friendData, hintText, uboText, hintTimer, setHintTimer, contestTimer, proveTimer, puzzle, colored, setColored, color, setColor} = useContext(GameContext)
+  const { submitProve, sendRedy, sendContest, newGame, handleUbongoClick, isLoading, userReady, friendReady, gameOver, win, friendData, hintText, uboText, hintTimer, setHintTimer, contestTimer, proveTimer, puzzle, colored, setColored, color, setColor} = useContext(GameContext)
+
+  useEffect(() => {() => newGame()}, [])
 
   const UbongoClicker = ({uboText}) => {
     return (

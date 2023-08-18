@@ -112,8 +112,8 @@ export const LobbyCollap = () => {
             {invites && invites.map((i) => (
               <View key={i.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${i.avatar}` }} style={styles.avatar}/>
-                <Text>{i.username}</Text>
-                <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleJoin(i.username)} >
+                <Text styles={{textAlign: 'center'}}>{i.username}</Text>
+                <TouchableOpacity style={styles.add} onPress={() => handleJoin(i.username)} >
                   <Text>Join</Text>
                 </TouchableOpacity>
               </View>
@@ -128,17 +128,17 @@ export const LobbyCollap = () => {
           {friends && friends.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
-                <TouchableOpacity style={{...styles.add, backgroundColor:'pink'}} onPress={() => handleProfile(friend.username)} >
+                <TouchableOpacity style={{...styles.add, backgroundColor:'rgba(64, 223, 255, 0.6)'}} onPress={() => handleProfile(friend.username)} >
                   <Text>{friend.username}</Text>
                 </TouchableOpacity>
                 {(invites && invites.map((i) => i.username).includes(friend.username))
                   ? (
-                    <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleJoin(friend.username)} >
+                    <TouchableOpacity style={styles.add} onPress={() => handleJoin(friend.username)} >
                       <Text>Join</Text>
                     </TouchableOpacity>
                   ) 
                   :(
-                    <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleInvite(friend.username)} >
+                    <TouchableOpacity style={styles.add} onPress={() => handleInvite(friend.username)} >
                       <Text>Host</Text>
                     </TouchableOpacity>
                   )
@@ -156,10 +156,10 @@ export const LobbyCollap = () => {
             <View key={friend.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
                 <Text style={{alignSelf:'center'}}>{friend.username}</Text>
-                <TouchableOpacity style={{...styles.add, backgroundColor:'green'}} onPress={() => handleAccept(friend.username)} >
+                <TouchableOpacity style={styles.add} onPress={() => handleAccept(friend.username)} >
                   <Text>Add</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.add} onPress={() => handleDeleteRequest(friend.username)} >
+                <TouchableOpacity style={{...styles.delete, marginLeft: 40}} onPress={() => handleDeleteRequest(friend.username)} >
                   <Text>Delete</Text>
                 </TouchableOpacity>
             </View>
@@ -374,7 +374,6 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
     textAlign: 'center',
-    backgroundColor: 'transparent',
     borderColor: 'black',
     borderWidth: 2,
     borderRadius: 10,
@@ -431,16 +430,16 @@ const styles = StyleSheet.create({
     rowGap:20, 
     display:'flex'
   },
-  delete: {
-    alignSelf: 'center',
-    backgroundColor: 'red',
-    padding: 15,
-    borderRadius: 20,
-    marginLeft: 40,
-  },
+
   add: {
     alignSelf: 'center',
-    backgroundColor: 'red',
+    backgroundColor: 'rgba(50, 199, 0, 0.6 )',
+    padding: 15,
+    borderRadius: 20,
+  },
+  delete: {
+    alignSelf: 'center',
+    backgroundColor: 'rgba(250, 0, 0, 0.6)',
     padding: 15,
     borderRadius: 20,
   },

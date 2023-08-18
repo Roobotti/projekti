@@ -28,8 +28,8 @@ const SignForm = ({onSubmit, mode}) => {
     return (
       <View style={styles.form}>
         <FormikTextInput name="username" placeholder="Username"  style={styles.holder}/>
-        <FormikTextInput name="password" placeholder="Password" secureTextEntry  style={styles.holder}/>
-        <Pressable onPress={onSubmit}  style={{...styles.holder, alignItems: 'center', backgroundColor: 'rgba(33, 235, 184, 0.4)'}}>
+        <FormikTextInput name="password" placeholder="Password" secureTextEntry borderColor='rgba(255,160,0,0.5)' style={styles.holder}/>
+        <Pressable onPress={onSubmit}  style={{...styles.holder, alignItems: 'center', backgroundColor: 'rgba(33, 235, 184, 0.4)', borderColor: 'rgba(33, 235, 184, 0.4)'}}>
           <Text>{mode}</Text>
         </Pressable>
       </View>
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
       borderRadius: 10,
       marginBottom: 20,
       borderWidth: 1,
-      borderStyle: 'solid',
-      borderColor: '#f9c2ff'
+      borderColor: 'rgba(255,160,0,0.5)',
+      backgroundColor: 'rgba(255,160,0,0.2)',
     },
     message: {
       padding: 10,

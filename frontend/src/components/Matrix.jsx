@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity} from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity, TouchableNativeFeedback} from 'react-native';
 
 import * as Animatable from 'react-native-animatable';
 import * as Haptics from 'expo-haptics';
@@ -45,8 +45,9 @@ export const ColorBlocks = ({colors, color, setColor }) => {
   )
 }
 
-export const PuzzleProve = ({matrix, color, setColored}) => {
+export const PuzzleProve = ({matrix, color='black', setColored}) => {
   const arrayLength = matrix.length
+  const [ripplers, setRipplers] = useState({})
 
   return (
     <View style={{...styles.container, marginBottom:80, gap:gap}}>
@@ -56,26 +57,34 @@ export const PuzzleProve = ({matrix, color, setColored}) => {
           {row.map((value, colIndex) => (
             <Animatable.View
               key={colIndex}
-              width={boxHeightInPixels}
-              height={boxHeightInPixels}
               animation={'fadeIn'}
               delay={(arrayLength-rowIndex)*20*arrayLength+colIndex*20}
               duration={rowIndex*20*arrayLength+colIndex*20}
               onAnimationBegin ={() => {if (!value) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}}
               useNativeDriver={true}
-              style={colorMap(value)}
             >
               {/* python code gives bit wierd lists*/}
-              {value && value !== "None" && <TouchableOpacity
-                delayPressIn={0}
-                onPress={() => {
-                  console.log("r: ", rowIndex, "c: ", colIndex,  "color: from", value, "to ", color )
-                  matrix[rowIndex][colIndex] = color
-                  setColored(matrix)
-                  }
-                 }
-                style={{flex: 1, padding:1, alignSelf:'stretch'}}
-              />}
+
+                <TouchableNativeFeedback
+                  disabled={value ? value === "None" : true}
+                  delayPressOut={0}
+                  onPressIn={() => {
+                    setRipplers({...ripplers, [`${colIndex},${rowIndex}`] : "color"})
+                    console.log("r: ", rowIndex, "c: ", colIndex,  "color: from", value, "to ", color )
+                    matrix[rowIndex][colIndex] = color
+                    setColored(matrix)
+                    }}
+
+                  background={TouchableNativeFeedback.Ripple(
+                    ripplers[`${colIndex},${rowIndex}`],
+                    false,
+                  )}
+                  style={{flex: 1, padding:1, alignSelf:'stretch'}}
+                  >
+                    <View width={boxHeightInPixels} height={boxHeightInPixels} style={colorMap(value)}></View>
+                  </TouchableNativeFeedback>
+
+              
             </Animatable.View>
           ))}
         </View>
@@ -95,21 +104,24 @@ export const Hint = ({matrix}) => {
           {row.map((value, colIndex) => (
             <Animatable.View
               key={colIndex}
-              width={boxHeightInPixels}
-              height={boxHeightInPixels}
               animation={'bounceInDown'}
               delay={(arrayLength-rowIndex)*200*arrayLength+colIndex*200}
               duration={rowIndex*200*arrayLength+colIndex*200}
               onAnimationBegin ={() => {if (!value) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}}
               useNativeDriver={true}
-              style={colorMap(value)}
             >
-              {/* python code gives bit wierd lists*/}
-              {value && value !== "None" && <TouchableOpacity
-                /* blocks double tap*/
-                delayPressIn={40}
-                style={{flex: 1, padding:1, alignSelf:'stretch', backgroundColor:'black'}}
-              />}
+
+            <TouchableNativeFeedback
+              disabled={value ? value === "None" : true}
+              delayPressOut={300}
+              background={TouchableNativeFeedback.Ripple(
+                value,
+                false,
+              )}
+              style={{flex: 1, padding:1, alignSelf:'stretch'}}
+            >
+              <View width={boxHeightInPixels} height={boxHeightInPixels} style={colorMap((value ? value === "None" : true) ? 0 : 1)}></View>
+            </TouchableNativeFeedback>
             </Animatable.View>
           ))}
         </View>

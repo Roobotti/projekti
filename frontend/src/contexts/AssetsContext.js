@@ -46,6 +46,7 @@ export const AssetsContextProvider = ({ children }) => {
   useEffect(() => {
     const loadImages = async () => {
       try {
+        console.log("loading");
         const [
           img1,
           img3,
@@ -112,6 +113,10 @@ export const AssetsContextProvider = ({ children }) => {
           require("../../assets/block_images/r2.png"),
           require("../../assets/block_images/r3.png"),
           require("../../assets/block_images/r4.png"),
+          require("../../assets/block_images/y1.png"),
+          require("../../assets/block_images/y2.png"),
+          require("../../assets/block_images/y3.png"),
+          require("../../assets/block_images/y4.png"),
         ]);
         setBlockImageMapping({
           g1: g1_block,
@@ -131,14 +136,13 @@ export const AssetsContextProvider = ({ children }) => {
           y3: y3_block,
           y4: y4_block,
         });
-
+        console.log("loaded");
         setImagesLoading(false);
       } catch (error) {
         console.error("Error loading images:", error);
         setImagesLoading(false);
       }
     };
-
     loadImages();
   }, []);
 

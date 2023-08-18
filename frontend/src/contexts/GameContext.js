@@ -14,7 +14,7 @@ import { loadFriend, newWin } from "../services/users";
 const InitialcountDown = 5000;
 const gameDuration = 3 * 60;
 const contestTime = 6;
-const proveTime = 30;
+const proveTime = 30 * 100;
 const colors = ["red", "green", "blue", "yellow"];
 
 export const GameContext = createContext();
@@ -43,7 +43,7 @@ export const GameContextProvider = ({ children }) => {
 
   const [puzzle, setPuzzle] = useState([]);
   const [colored, setColored] = useState([]);
-  const [color, setColor] = useState(null);
+  const [color, setColor] = useState("red");
 
   const initialize = () => {
     setIsLoading(false);
@@ -129,7 +129,7 @@ export const GameContextProvider = ({ children }) => {
   const sendContest = () => {
     console.log("pc", puzzle);
     socket.emit("contest", { room: room });
-    setProveTimer(proveTime + 3);
+    setProveTimer(proveTime + 1);
   };
 
   const handleUbongoClick = async () => {
@@ -139,6 +139,8 @@ export const GameContextProvider = ({ children }) => {
     else setUboText("UBONGO");
     setClicks(clicks + 1);
   };
+
+  useEffect(() => initialize(), []);
 
   useEffect(() => {
     if (friend) {
@@ -160,8 +162,8 @@ export const GameContextProvider = ({ children }) => {
   }, [host, friend]);
 
   useEffect(() => {
+    initialize();
     if (friend) {
-      initialize();
       socket.emit("join", { user: user, friend: friend });
       socket.on("room", ({ room, host, blocks, solutions }) => {
         setRoom(room);
@@ -295,6 +297,7 @@ export const GameContextProvider = ({ children }) => {
         sendContest,
         newGame,
         handleUbongoClick,
+        initialize,
         isLoading,
         userReady,
         friendReady,
@@ -305,6 +308,7 @@ export const GameContextProvider = ({ children }) => {
         uboText,
         hintTimer,
         setHintTimer,
+        setUserReady,
         contestTimer,
         proveTimer,
         puzzle,

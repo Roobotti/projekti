@@ -12,14 +12,8 @@ export const Loading = () => {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
+    position: "absolute", top:200, alignSelf:'center', alignItems: "center"
   },
   loadingText: {
     margin: 110,
