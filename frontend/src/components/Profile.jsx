@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { uploadAvatar } from '../services/users';
 
 import Text from './Text';
+import { AssetsContext } from '../contexts/AssetsContext';
 
 
 const showAlert = (navigate) =>
@@ -57,7 +58,8 @@ const UserAvatar = ({source, onChange}) => {
 }
 
 export const Profile = () => {
-  const {avatar, token, user, friends, wins, loses, setAvatar, setReFresh} = useContext(UserContext)
+  const {paint_wins, paint_loses, paint_delete, paint_X} = UserContext(AssetsContext)
+  const {avatar, token, user, wins, loses, setAvatar, setReFresh} = useContext(UserContext)
   const navigate = useNavigate();
 
   useEffect( () => {
@@ -81,7 +83,7 @@ export const Profile = () => {
         />
 
         <View style={styles.deleteButton}>
-          <ImageBackground source={require('../../assets/paints/paint_wins.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_wins} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.text}>
               Wins:  {wins.length}
             </Text>
@@ -89,7 +91,7 @@ export const Profile = () => {
         </View>
 
         <View style={styles.deleteButton}>
-          <ImageBackground source={require('../../assets/paints/paint_loses.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_loses} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.text}>
               Loses:  {loses.length}
             </Text>
@@ -97,14 +99,14 @@ export const Profile = () => {
         </View>
 
         <TouchableOpacity onPress={() => showAlert(navigate)} style={styles.deleteButton}>
-          <ImageBackground source={require('../../assets/paints/paint_delete.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_delete} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.deleteButtonText}>Sign Out</Text>
           </ImageBackground>
         </TouchableOpacity>
 
         
         <TouchableOpacity onPress={() => navigate("/", { replace: true })} style={styles.deleteButton}>
-          <ImageBackground source={require('../../assets/paints/paint_X.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_X} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
           </ImageBackground>
         </TouchableOpacity>
       

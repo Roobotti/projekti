@@ -13,7 +13,6 @@ import * as Animatable from 'react-native-animatable';
 
 
 const Board = () => {
-  const ht = 5
 
   const [ puzzle, setPuzzle ] = useState({})
 

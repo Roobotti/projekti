@@ -141,7 +141,6 @@ export const SignOut = () => {
 };
 
 
-
 const styles = StyleSheet.create({
     container: {
       display: 'flex'

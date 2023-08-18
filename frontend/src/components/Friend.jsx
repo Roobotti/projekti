@@ -6,6 +6,7 @@ import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';
 
 import Text from './Text';
+import { AssetsContext } from '../contexts/AssetsContext';
 
 const showAlert = (onDelete) =>
   Alert.alert(
@@ -43,6 +44,7 @@ const VsStatus = (wins, loses) => {
 }
 
 const FriendProfile = ({ friend, onDelete, onBack }) => {
+  const {paint_delete, paint_X} = useState(AssetsContext)
   const [friendData, setFriendData] = useState(null);
   const {user} = useContext(UserContext)
   const [friendWins, setFriendWins] = useState(0)
@@ -79,14 +81,14 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
         <VsText wins={friendWins} loses={friendLoses} />
 
         <TouchableOpacity onPress={() => showAlert(onDelete)} style={{...styles.deleteButton,width: 180}}>
-          <ImageBackground source={require('../../assets/paints/paint_delete.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_delete} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.deleteButtonText}>Delete Friend</Text>
           </ImageBackground>
         </TouchableOpacity>
 
       </View>
       <TouchableOpacity onPress={() => onBack(null)} style={styles.deleteButton}>
-          <ImageBackground source={require('../../assets/paints/paint_X.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_X} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
           </ImageBackground>
       </TouchableOpacity>
     </View>

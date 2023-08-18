@@ -14,12 +14,12 @@ import Text from './Text';
 
 import { HourGlassTimer, LottieLoad } from '../lotties/Timers';
 import { GameContext } from '../contexts/GameContext';
+import { AssetsContext } from '../contexts/AssetsContext';
 
 const colors = ["red", "green", "blue", "yellow"]
-const redEffect = require('../../assets/redEffect.png')
-const greenEffect = require('../../assets/greenEffect.png')
 
 const MultiPlayer = () => {
+  const {redEffect, greenEffect} = useContext(AssetsContext)
   const {friend, avatar} = useContext(UserContext)
   const {submitProve, sendRedy, sendContest, newGame, handleUbongoClick, isLoading, userReady, friendReady, gameOver, win, friendData, hintText, uboText, hintTimer, setHintTimer, contestTimer, proveTimer, puzzle, colored, setColored, color, setColor} = useContext(GameContext)
 

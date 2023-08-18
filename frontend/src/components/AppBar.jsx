@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
 const Tab = ({ text, to, ...props }) => {
   return (
     <Link to={to} {...props}>
-      <Text fontSize="subheading" color="textSecondary" style={{paddingBottom: 15}}>{text}</Text>
+      <Text fontSize="subheading" style={{paddingBottom: 15, color: 'white'}}>{text}</Text>
     </Link>
   )
 }

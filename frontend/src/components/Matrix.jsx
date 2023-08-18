@@ -58,9 +58,9 @@ export const PuzzleProve = ({matrix, color, setColored}) => {
               key={colIndex}
               width={boxHeightInPixels}
               height={boxHeightInPixels}
-              animation={'bounceInDown'}
-              delay={(arrayLength-rowIndex)*200*arrayLength+colIndex*200}
-              duration={rowIndex*200*arrayLength+colIndex*200}
+              animation={'fadeIn'}
+              delay={(arrayLength-rowIndex)*20*arrayLength+colIndex*20}
+              duration={rowIndex*20*arrayLength+colIndex*20}
               onAnimationBegin ={() => {if (!value) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}}
               useNativeDriver={true}
               style={colorMap(value)}
@@ -83,8 +83,6 @@ export const PuzzleProve = ({matrix, color, setColored}) => {
     </View>
   );
 };
-
-
 
 export const Hint = ({matrix}) => {
   const arrayLength = matrix.length

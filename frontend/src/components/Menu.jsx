@@ -8,18 +8,18 @@ import { socket } from '../services/socket';
 import { useEffect, useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';
+import { AssetsContext } from '../contexts/AssetsContext';
 
-
-const UnSigned = ({navigate}) => {
+const UnSigned = ({navigate, paint_1}) => {
   return (
     <>
       <TouchableOpacity onPress={() => navigate("/SignIn", { replace: true })} style={styles.option}>
-        <ImageBackground source={require('../../assets/paints/paint_1.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+        <ImageBackground source={paint_1} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
           <Text style={styles.optionText}>Sign in</Text>
         </ImageBackground>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigate("/SignUp", { replace: true })} style={styles.option}>
-        <ImageBackground source={require('../../assets/paints/paint_1.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+        <ImageBackground source={paint_1} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
           <Text style={styles.optionText}>Sign up</Text>
         </ImageBackground>
 
@@ -28,16 +28,16 @@ const UnSigned = ({navigate}) => {
   )
 }
 
-const Signed = ({navigate}) => {
+const Signed = ({navigate, paint_1, paint_profile}) => {
   return (
     <>
       <TouchableOpacity onPress={() => navigate("/Lobby", { replace: true })} style={styles.option}>
-        <ImageBackground source={require('../../assets/paints/paint_1.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+        <ImageBackground source={paint_1} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
           <Text style={styles.optionText}>Multiplayer</Text>
         </ImageBackground>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigate("/profile", { replace: true })}  style={styles.option}>
-        <ImageBackground source={require('../../assets/paints/paint_profile.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+        <ImageBackground source={paint_profile} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
           <Text style={styles.optionText}>Profile</Text>
         </ImageBackground>
       </TouchableOpacity>
@@ -46,7 +46,8 @@ const Signed = ({navigate}) => {
 }
 
 const Menu = () => {
-  const { user, room, invites, sentInvite, loading, fontsLoading, setSentInvite, setInvites, setRoom,} = useContext(UserContext);
+  const { assetsLoading, paint_1, paint_3, paint_profile} = useContext(AssetsContext)
+  const { user, room, sentInvite, loading, setSentInvite} = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,19 +58,18 @@ const Menu = () => {
     if (room) socket.emit("leave", {"user":user, "room":room})
   })
   
-  if (fontsLoading || loading) return <Loading/>
-
+  if (assetsLoading || loading) return <Loading/>
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       
         <TouchableOpacity onPress={() => navigate("/singlePlayer", { replace: true })} style={styles.option}>
-          <ImageBackground source={require('../../assets/paints/paint_3.png')} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_3} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.optionText}>Single Player</Text>
           </ImageBackground>
         </TouchableOpacity>
 
-      {user ? <Signed navigate={navigate}/> : loading ? <Loading/> : <UnSigned navigate={navigate}/ >}
+      {user ? <Signed navigate={navigate} paint_1={paint_1} paint_profile={paint_profile} /> : loading ? <Loading/> : <UnSigned navigate={navigate} paint_1={paint_1}/ >}
       
       
     </ScrollView>

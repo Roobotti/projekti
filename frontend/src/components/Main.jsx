@@ -10,6 +10,8 @@ import { Profile } from './Profile';
 import { Loading } from './Loading';
 import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
+import { AssetsContext } from '../contexts/AssetsContext';
+import { View } from 'react-native-animatable';
 
 
 const styles = StyleSheet.create({
@@ -20,22 +22,17 @@ const styles = StyleSheet.create({
 });
 
 const Main = () => {
-  const { fontsLoading} = useContext(UserContext);
+  const { assetsLoading, caveWall} = useContext(AssetsContext);
 
-    if (fontsLoading) return(
-      <ImageBackground 
-        source={require('../../assets/caveWall.png')}
-        resizeMode='stretch'
-        style={styles.container}
-      >
-        <Loading/>
-
-      </ImageBackground>
+    if (assetsLoading) return(
+        <View>
+          <Loading/>
+        </View>
     )
 
    return (
     <ImageBackground 
-        source={require('../../assets/caveWall.png')}
+        source={caveWall}
         resizeMode='stretch'
         style={styles.container}
       >
