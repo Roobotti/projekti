@@ -8,6 +8,7 @@ import AuthStorageContext from "./src/contexts/AuthStorageContext";
 import AuthStorage from "./src/utils/authStorage";
 
 import { UserContextProvider } from "./src/contexts/UserContext";
+import { GameContextProvider } from "./src/contexts/GameContext";
 
 const authStorage = new AuthStorage();
 const queryClient = new QueryClient();
@@ -20,7 +21,9 @@ const App = () => {
       <NativeRouter>
         <AuthStorageContext.Provider value={authStorage}>
           <UserContextProvider>
-            <Main />
+            <GameContextProvider>
+              <Main />
+            </GameContextProvider>
           </UserContextProvider>
         </AuthStorageContext.Provider>
       </NativeRouter>

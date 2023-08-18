@@ -40,19 +40,19 @@ const Main = () => {
         resizeMode='stretch'
         style={styles.container}
       >
-        <AppBar />
-        <Routes>
-          <Route path="/" element={<Menu />} exact />
-          <Route path="/singlePlayer" element={<Board />} exact />
-          <Route path="/MultiPlayer/:host" render={(props) => <MultiPlayer {...props} />} exact/>
-          <Route path="/Lobby" element={<LobbyCollap />} exact />
-          <Route path="/SignIn" element={<SignIn />} exact />
-          <Route path="/SignUp" element={<SignUp />} exact />
-          <Route path="/SignOut" element={<SignOut />} exact />
-          <Route path="/boardWrite" element={<BoardWrite />} exact />
-          <Route path="/profile" element={<Profile />} exact />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+          <AppBar />
+          <Routes>
+            <Route path="/" element={<Menu />} exact />
+            <Route path="/singlePlayer" element={<Board />} exact />
+            <Route path="/MultiPlayer/:host" render={(props) => <MultiPlayer {...props} />} exact/>
+            <Route path="/Lobby" element={<LobbyCollap />} exact />
+            <Route path="/SignIn" element={<SignIn />} exact />
+            <Route path="/SignUp" element={<SignUp />} exact />
+            <Route path="/SignOut" element={<SignOut />} exact />
+            <Route path="/boardWrite" element={<BoardWrite />} exact />
+            <Route path="/profile" element={<Profile />} exact />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
     </ImageBackground>
   );
 };

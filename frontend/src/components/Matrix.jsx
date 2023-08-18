@@ -13,15 +13,15 @@ const gap = windowWidth * 0.0120; // Adjust the scale factor for desired size
 const colorMap = (key) => {
   switch (key) {
     case 1:
-      return { ...styles.defaultBox, backgroundColor: 'rgba(0,0,0,0.90)' };
+      return { ...styles.defaultBox, backgroundColor: 'rgba(0,0,0,0.85)' };
     case "red":
-      return { ...styles.defaultBox, backgroundColor: 'rgba(250,0,0,0.90)' };
+      return { ...styles.defaultBox, backgroundColor: 'rgba(250,0,0,1)' };
     case "green":
-      return { ...styles.defaultBox, backgroundColor: 'rgba(0,250,0,0.90)' };
+      return { ...styles.defaultBox, backgroundColor: 'rgba(0,250,0,1)' };
     case "yellow":
-      return { ...styles.defaultBox, backgroundColor: 'rgba(250,250,0,0.90)' };
+      return { ...styles.defaultBox, backgroundColor: 'rgba(250,250,0,1)' };
     case "blue":
-      return { ...styles.defaultBox, backgroundColor: 'rgba(0,0,250,0.90)' };
+      return { ...styles.defaultBox, backgroundColor: 'rgba(0,0,250,1)' };
     default:
       return styles.defaultBox;
   }

@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState, useCallback } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, Animated, ImageBackground } from 'react-native';
 
 import { getPuzzle } from '../services/puzzle';
 
@@ -17,6 +17,7 @@ import Text from './Text';
 
 import LottieView from "lottie-react-native";
 import { HourGlassTimer, LottieLoad } from '../lotties/Timers';
+import { GameContext } from '../contexts/GameContext';
 
 const AnimatedLottieViewUserWait = Animated.createAnimatedComponent(LottieView);
 
@@ -28,40 +29,18 @@ const colors = ["red", "green", "blue", "yellow"]
 
 const MultiPlayer = ({user, friend}) => {
   const {room, token, avatar, invites, setRoom, setInvites} = useContext(UserContext)
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [userReady, setUserReady] = useState(false);
-  const [friendReady, setFriendReady] = useState(false);
-  const [countdown, setCountdown] = useState(InitialcountDown)
-  const [gameOver, setGameOver] = useState(false)
-  const [win, setWin] = useState(false)
-  const [left, setLeft] = useState(null)
-  const [host, setHost] = useState(false)
-
-  const [friendData, setFriendData] = useState(null)
-  const [clicks, setClicks] = useState(0)
-  const [uboText, setUboText] = useState("UBONGO")
-
-  const [hintText, setHintText] = useState('Hint availabe') 
-  const [hintTimer, setHintTimer] = useState(gameDuration)
-  const [contestTimer, setContestTimer] = useState(contestTime)
-  const [proveTimer, setProveTimer] = useState(0)
-
-  const [puzzle, setPuzzle] = useState([])
-  const [colored, setColored] = useState([])
-  const [color, setColor] = useState(null)
-  // send roomname / hostName 
-  // send roomname / playerName
+  const {initialize, isLoading, setIsLoading, userReady, setUserReady, friendReady, setFriendReady, countdown, setCountdown, gameOver, setGameOver, win, setWin, left, setLeft, host, setHost, friendData, setFriendData, clicks, setClicks, hintText, setHintText, uboText, setUboText, hintTimer, setHintTimer, contestTimer, setContestTimer, proveTimer, setProveTimer, puzzle, setPuzzle, colored, setColored, color, setColor} = useContext(GameContext)
 
   const handleLeft = useCallback( () => {
-      socket.emit('host', {"user":user, "friend":friend, "userReady":userReady})
-      setLeft(friend)
-      setHost(true)
-      console.log(friend, "left");
+    socket.emit('host', {"user":user, "friend":friend, "userReady":userReady})
+    setLeft(friend)
+    setHost(true)
+    console.log(friend, "left");
   })
-
   // main -> if logged in socket on...
   useEffect( () => {
+    initialize()
+
     socket.emit('join', {"user":user, "friend":friend});
 
     socket.on("room", ({room, host, blocks, solutions}) => {
@@ -159,8 +138,9 @@ const MultiPlayer = ({user, friend}) => {
 
   }, [gameOver, contestTimer])
 
+ // setting colored
   useEffect( () => {
-    if  (puzzle && puzzle.solutions) setColored(puzzle.solutions[0].map((r) => r.map((c) => colors.includes(c) ? 1 : c )))
+    if  (puzzle.solutions && puzzle.solutions[0]) setColored(puzzle.solutions[0].map((r) => r.map((c) => colors.includes(c) ? 1 : c )))
   }, [puzzle])
 
   //prove timer
@@ -219,12 +199,12 @@ const MultiPlayer = ({user, friend}) => {
     }
   }
 
-  const sentRedy = () => {
+  const sendRedy = () => {
     socket.emit('userRedy', {"room":room, "user":user});
     setUserReady(true)
   };
 
-  const sentUbongo = () => {
+  const sendUbongo = () => {
     socket.emit('ubongo', {"room":room});
     newWin(token, friend)
     setWin(true)
@@ -247,7 +227,8 @@ const MultiPlayer = ({user, friend}) => {
   }
 
   const handleUbongoClick = async () => {
-    if (clicks>=3) sentUbongo()
+    console.log("click")
+    if (clicks>=3) sendUbongo()
     if (clicks>=0) setUboText(2-clicks)
     else setUboText("UBONGO")
     setClicks(clicks + 1)
@@ -256,7 +237,7 @@ const MultiPlayer = ({user, friend}) => {
   const UbongoClicker = ({uboText}) => {
     return (
       <View>
-        <TouchableOpacity style={styles.ubongo} onPressIn={() => handleUbongoClick()}>
+        <TouchableOpacity style={styles.ubongo} onPress={handleUbongoClick}>
           <Text style={{fontSize:28}}>{uboText}</Text>
         </TouchableOpacity>
       </View>
@@ -268,7 +249,7 @@ const MultiPlayer = ({user, friend}) => {
       <View >
         { (!userReady && puzzle.blocks) 
           ? (
-            <TouchableOpacity  onPress={sentRedy} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(235, 164, 33, 0.4)'}}>
+            <TouchableOpacity  onPress={sendRedy} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(235, 164, 33, 0.4)'}}>
               <Text style={{alignSelf: 'center'}}>Redy</Text>
             </TouchableOpacity>
             )
@@ -289,6 +270,7 @@ const MultiPlayer = ({user, friend}) => {
       friendReady && userReady ? <BlockRenderer blocks={puzzle.blocks} /> : <BlockRendererLarge blocks={puzzle.blocks} />
     )
   }
+
   if (win && proveTimer ) {
     return(
         <Animatable.View style={{flex:1, alignSelf:'stretch', justifyContent:'space-between', marginBottom:10}} animation={'fadeIn'} duration={1000}>
@@ -298,7 +280,7 @@ const MultiPlayer = ({user, friend}) => {
                 Submit
               </Text>
             </TouchableOpacity>
-            <Text style={{fontSize: 50}}>{proveTimer} s</Text>
+            <Text style={{fontSize: 50}}>{proveTimer-1} s</Text>
           </View>
           <PuzzleProve matrix={colored} color={color} setColored={(c) => setColored(c)}/>
           <ColorBlocks colors={colors} color={color} setColor={(c) => setColor(c)} />
@@ -309,7 +291,13 @@ const MultiPlayer = ({user, friend}) => {
   }
 
   if (gameOver) {
+    const effect = win ? require('../../assets/greenEffect.png') : require('../../assets/redEffect.png')
     return( 
+      <ImageBackground
+        source={effect}
+        resizeMode='stretch'
+        style={{...styles.container, flex:1}}
+      >
       <Animatable.View style={styles.winner_container} animation={'bounceIn'} duration={2000}>
         <Animatable.Text> 
           <Text style={{fontSize: 50}}>!!UBONGO!!</Text>
@@ -326,7 +314,7 @@ const MultiPlayer = ({user, friend}) => {
                   <Text style={styles.text} >{ contestTimer } s </Text>
                 </View>
               ) : (
-                <TouchableOpacity style={styles.touchBasic} onPress={() => newGame()}>
+                <TouchableOpacity style={styles.touchBasic} onPress={newGame}>
                   <Text  style={styles.touchText}>New game?</Text>
                 </TouchableOpacity>
               )} 
@@ -339,16 +327,16 @@ const MultiPlayer = ({user, friend}) => {
               {proveTimer ? (
                   <View>
                         <Text style={styles.text} > {friend} is submiting the solution </Text>
-                        <Text style={styles.text} > {proveTimer} s </Text>
+                        <Text style={styles.text} > {proveTimer - 1} s </Text>
                   </View>
                 ) : (
                   <View>
                       <Text style={styles.text} > {friend} won </Text>
-                      <TouchableOpacity style={styles.touchBasic} onPress={() => newGame()}>
+                      <TouchableOpacity style={styles.touchBasic} onPress={newGame}>
                         <Text style={styles.touchText}>New game?</Text>
                       </TouchableOpacity>
                       
-                      {contestTimer > 0 && <TouchableOpacity style={{...styles.ubongo, padding:15}} onPress={() => sendContest()}>
+                      {contestTimer > 0 && <TouchableOpacity style={{...styles.ubongo, padding:15}} onPress={sendContest}>
                         <Text style={styles.touchText}>Contest in {contestTimer} s?</Text>
                       </TouchableOpacity>}
                   </View>
@@ -359,13 +347,14 @@ const MultiPlayer = ({user, friend}) => {
 
 
       </Animatable.View>
+      </ImageBackground>
     )
   }
-
+  
   return (
     <View style={{flex:1}}>
       <Animatable.View>
-        { puzzle.blocks && choseBlockRender() }
+        { puzzle?.blocks && choseBlockRender() }
         {isLoading 
           ? ( <Loading /> )
           : ( <WhoReady /> )
