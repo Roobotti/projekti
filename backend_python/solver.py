@@ -1,6 +1,5 @@
 import numpy as np
 from numpy import array
-import matplotlib.pyplot as plt
 from itertools import permutations
 import random
 
@@ -206,53 +205,6 @@ def color_pieces(solved_puzzle, value):
         if ret[i, j, k] != value:
             ret[i, j, k] = 0
     return ret
-
-
-def plot_solutions(target_pieces, puzzle_solution, solution_count):
-    if solution_count:
-        print(solution_count, "solution(s) found")
-        for solution_id in range(solution_count):
-            fig = plt.figure(figsize=(7, 7))
-            ax = fig.add_subplot(111, projection="3d", aspect="auto")
-
-            for piece in target_pieces:
-                piece_position = color_pieces(
-                    puzzle_solution[solution_id], piece_color_codes[piece]
-                )
-                ax.voxels(
-                    piece_position.T,
-                    facecolors=piece_colors[piece],
-                    edgecolor="gray",
-                )
-
-            plt.axis("off")
-            plt.axis("auto")
-
-            plt.show()
-    else:
-        print("No solution")
-
-
-def plot_combo(target_pieces):
-    fig = plt.figure(figsize=(7, 7))
-    i = 0
-    for i, piece in enumerate(target_pieces):
-        ax = fig.add_subplot(1, 4, i + 1, projection="3d")
-        ax.axis("off")
-        block = generate_block(piece_coordinates[piece])
-
-        ax.set_xlim(0, block.shape[0])
-        ax.set_ylim(0, block.shape[1])
-        ax.set_zlim(0, block.shape[2])  # Set the maximum height for the plot
-
-        ax.voxels(
-            block,
-            facecolors=piece_colors[piece],
-            edgecolor="gray",
-        )
-
-    plt.axis("off")
-    plt.show()
 
 
 def find_good_combination(target_puzzle, piece_count=4):
