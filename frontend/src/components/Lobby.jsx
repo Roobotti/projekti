@@ -41,54 +41,11 @@ export const LobbyCollap = () => {
   const [refreshing, setRefreshing] = useState(false);
     // Ddefault active selector
   const [activeSections, setActiveSections] = useState([]);
-  // Collapsed condition for the single collapsible
-  const [collapsed, setCollapsed] = useState(true);
+
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
 
-  useEffect( () => {
-    socket.emit('active', {user})
-    socket.on("connect", () => {
-    console.log("connected");
-    socket.emit("connection")
-  });
-    socket.on("disconnect", () => {
-    console.log("disconnected"); // undefined
-  });
-
-  socket.on(`${user}/post`, async (data) => {
-    console.log("sender", data.user, "user", user)
-    const friend =  await loadFriendData(data.user)
-    switch (data.type) {
-      case "invite":
-        if (!invites.map((f) => f.username).includes(data.user)) {
-          await setInvites([...invites, await friend]);
-        }
-          break;
-      case "cancel_invite":
-          await setInvites(invites.filter((i) => i.username !== data.user));
-          console.log("invite_removed");
-          break;
-      case "accept":
-        if (!friends.map((f) => f.username).includes(data.user)) {
-          await setFriends([...friends, await friend])
-        }
-        await setRequests(requests.filter((f) => f.username !== data.user))
-        console.log("accept");
-        break;
-      case "request":
-        if (!requests.map((r) => r.username).includes(await friend.username)) {
-          await setRequests([...requests, await friend])
-        }
-        console.log("request");
-        break;
-
-    }
-
-  });
-
-  }, [user])
   
   //message timeout
   useEffect(() => {

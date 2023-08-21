@@ -10,6 +10,8 @@ import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';
 import { AssetsContext } from '../contexts/AssetsContext';
 
+import {  loadFriendData} from '../services/users';
+
 const UnSigned = ({navigate, paint_1}) => {
   return (
     <>
@@ -47,7 +49,7 @@ const Signed = ({navigate, paint_1, paint_profile}) => {
 
 const Menu = () => {
   const { assetsLoading, paint_1, paint_3, paint_profile} = useContext(AssetsContext)
-  const { user, room, sentInvite, loading, setSentInvite} = useContext(UserContext);
+  const { user, room, friends, invites, sentInvite, loading, setSentInvite, setFriend, setInvites, setFriends} = useContext(UserContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,6 +58,8 @@ const Menu = () => {
       setSentInvite(null)
     }
     if (room) socket.emit("leave", {"user":user, "room":room})
+    setFriend(null)
+
   })
   
   if (assetsLoading || loading) return <Loading/>

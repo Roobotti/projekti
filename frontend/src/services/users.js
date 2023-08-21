@@ -78,7 +78,6 @@ export const uploadAvatar = async (token, avatar) => {
     },
     body: JSON.stringify(avatar),
   });
-  console.log("Success:");
 
   if (!response.ok) {
     throw new Error("Failed to fetch uploadAvatar");
@@ -93,7 +92,6 @@ export const loadFriend = async (friend) => {
     const response = await fetch(`${baseUrl}/friend/${friend}`, {
       method: "GET",
     });
-    console.log("Success:");
 
     return response;
   } catch (error) {
@@ -106,7 +104,6 @@ export const loadFriendData = async (friend) => {
     const response = await fetch(`${baseUrl}/friend/${friend}`, {
       method: "GET",
     });
-    console.log("Success:");
 
     if (!response.ok) {
       throw new Error("Failed to load friend");

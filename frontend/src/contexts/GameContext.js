@@ -140,8 +140,6 @@ export const GameContextProvider = ({ children }) => {
     setClicks(clicks + 1);
   };
 
-  useEffect(() => initialize(), []);
-
   useEffect(() => {
     if (friend) {
       if (left) {
@@ -193,15 +191,6 @@ export const GameContextProvider = ({ children }) => {
       });
 
       socket.on("left", handleLeft);
-
-      socket.on(`${user}/post`, (data) => {
-        switch (data.type) {
-          case "cancel_invite":
-            setInvites(invites.filter((i) => i !== data.user));
-            console.log("invite_removed");
-            break;
-        }
-      });
     }
   }, [friend]);
 
@@ -219,17 +208,14 @@ export const GameContextProvider = ({ children }) => {
 
   //click down
   useEffect(() => {
-    if (clicks > 0) {
-      const clickInterval = setInterval(() => {
-        if (clicks > 1) {
-          setUboText(4 - clicks);
-        } else setUboText("UBONGO");
-        setClicks((c) => c - 1);
-      }, 1000);
-      return () => {
-        clearInterval(clickInterval);
-      };
-    }
+    const clickTimer = setTimeout(() => {
+      setClicks(0);
+      setUboText("UBONGO");
+    }, 1000);
+
+    return () => {
+      clearTimeout(clickTimer);
+    };
   }, [clicks]);
 
   //hint timer

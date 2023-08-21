@@ -23,8 +23,6 @@ const MultiPlayer = () => {
   const {friend, avatar} = useContext(UserContext)
   const { submitProve, sendRedy, sendContest, newGame, handleUbongoClick, isLoading, userReady, friendReady, gameOver, win, friendData, hintText, uboText, hintTimer, setHintTimer, contestTimer, proveTimer, puzzle, colored, setColored, color, setColor} = useContext(GameContext)
 
-  useEffect(() => {() => newGame()}, [])
-
   const UbongoClicker = ({uboText}) => {
     return (
       <View>

@@ -2,6 +2,10 @@ import { createContext, useEffect, useState } from "react";
 import { readUsersMe } from "../services/users";
 import { useAuthStorage } from "../hooks/useStorageContext";
 
+import { loadFriendData } from "../services/users";
+
+import { socket } from "../services/socket";
+
 export const UserContext = createContext();
 
 export const UserContextProvider = ({ children }) => {
@@ -20,6 +24,46 @@ export const UserContextProvider = ({ children }) => {
   const [avatar, setAvatar] = useState(null);
   const [reFresh, setReFresh] = useState(false);
   const [loading, setLoading] = useState();
+
+  //socket handling
+  useEffect(() => {
+    socket.on(`${user}/post`, async (data) => {
+      console.log("sender", data.user, "user", user);
+      const friend = await loadFriendData(data.user);
+      switch (data.type) {
+        case "invite":
+          if (!invites.map((f) => f.username).includes(data.user)) {
+            setInvites((prevInvites) => [...prevInvites, friend]);
+          }
+          break;
+        case "cancel_invite":
+          setInvites((prevInvites) =>
+            prevInvites.filter((i) => i.username !== data.user)
+          );
+          console.log("Invite_removed");
+          break;
+        case "accept":
+          if (!friends.map((f) => f.username).includes(data.user)) {
+            setFriends((prevFriends) => [...prevFriends, friend]);
+          }
+          setRequests((prevRequests) =>
+            prevRequests.filter((f) => f.username !== data.user)
+          );
+          console.log("accept");
+          break;
+        case "request":
+          if (!requests.map((r) => r.username).includes(friend.username)) {
+            setRequests((prevRequests) => [...prevRequests, friend]);
+          }
+          console.log("request");
+          break;
+      }
+    });
+
+    return () => {
+      socket.off(`${user}/post`);
+    };
+  });
 
   useEffect(() => {
     const f = async () => {
