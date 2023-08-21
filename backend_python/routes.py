@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
-from typing import Annotated
 
 from services import *
 from config import ACCESS_TOKEN_EXPIRE_MINUTES
