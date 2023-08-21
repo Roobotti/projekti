@@ -19,11 +19,6 @@ class SignUpRequest(BaseModel):
     password: str
 
 
-class SolutionRequest(BaseModel):
-    board: list[list[int]]
-    blocks: list[str]
-
-
 class Token(BaseModel):
     access_token: str
     token_type: str
