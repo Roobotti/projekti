@@ -1,6 +1,3 @@
-import string
-from typing import List, Dict
-
 # Store the room ids mapping to the room property object
 # The room property object looks like this {"roomId": str, "players": List[Player]}
 rooms = {}

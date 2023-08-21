@@ -1,15 +1,10 @@
-import jwt
-
-from fastapi import APIRouter, Depends, Request, HTTPException, Body, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Body
 
 
 from services import *
 from config import ACCESS_TOKEN_EXPIRE_MINUTES
-from typing import Optional
 from pymongo_get_database import get_database
-from typing import List
 from solver import (
-    generate_base,
     find_good_combination,
     solve_puzzle,
     generate_basic_puzzle,
@@ -18,10 +13,6 @@ from solver import (
 import random
 import json
 import numpy as np
-import base64
-from bson import ObjectId
-from io import BytesIO
-from PIL import Image
 
 router = APIRouter()
 

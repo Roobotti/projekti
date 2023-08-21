@@ -7,11 +7,6 @@ from routes import router as board_router
 from socket_services import *
 
 
-import json
-import random
-import string
-from typing import List, Dict
-
 config = dotenv_values(".env")
 
 

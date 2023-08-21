@@ -7,11 +7,11 @@ export default {
   orientation: "portrait",
   icon: "./assets/icon.png",
   userInterfaceStyle: "dark",
-  backgroundColor: "black",
+  backgroundColor: "#000000",
   splash: {
     image: "./assets/splash.png",
     resizeMode: "contain",
-    backgroundColor: "black",
+    backgroundColor: "#000000",
   },
   updates: {
     fallbackToCacheTimeout: 0,
@@ -24,7 +24,7 @@ export default {
     softwareKeyboardLayoutMode: "pan",
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
-      backgroundColor: "black",
+      backgroundColor: "#000000",
     },
   },
   web: {

@@ -1,10 +1,7 @@
 import numpy as np
 from numpy import array
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from itertools import permutations
-import itertools
-from datetime import datetime
 import random
 
 from components import *

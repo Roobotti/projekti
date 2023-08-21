@@ -1,6 +1,5 @@
 from pymongo_get_database import get_database
-from pandas import DataFrame
-from solver import generate_base
+
 
 import requests
 import json
@@ -12,7 +11,6 @@ item_details = collection_name.find()
 collection_length = collection_name.count_documents({})
 
 
-# Define the URL of the Flask server
 url = "http://localhost:6969/blocks"
 url2 = "http://localhost:6969/board"
 
