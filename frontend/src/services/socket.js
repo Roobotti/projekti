@@ -5,5 +5,4 @@ const baseUrl = `${Constants.manifest.extra.uri}`;
 
 export const socket = io(baseUrl, {
   transports: ["websocket"],
-  secure: true,
 });
