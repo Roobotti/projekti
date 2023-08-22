@@ -11,7 +11,6 @@ config = dotenv_values(".env")
 
 
 app = FastAPI()
-socket_manager = SocketManager(app=app, cors_allowed_origins=[])
 
 origins = ["*"]
 
@@ -22,6 +21,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT"],
     allow_headers=["*"],
 )
+
+socket_manager = SocketManager(app=app)
 
 current_rooms = {}
 empty_room = {
