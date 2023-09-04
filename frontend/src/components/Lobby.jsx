@@ -2,6 +2,8 @@
 
 import React, { useEffect, useContext, useState } from 'react';
 
+import { Dimensions } from 'react-native';
+
 import {
   SafeAreaView,
   ScrollView,
@@ -32,6 +34,9 @@ import { socket } from '../services/socket';
 import FriendProfile from './Friend';
 import { Loading } from './Loading';
 
+
+const { width } = Dimensions.get('window');
+const windowWidth = width;
 
 
 export const LobbyCollap = () => {
@@ -116,7 +121,7 @@ export const LobbyCollap = () => {
                 <TouchableOpacity style={styles.add} onPress={() => handleAccept(friend.username)} >
                   <Text>Add</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{...styles.delete, marginLeft: 40}} onPress={() => handleDeleteRequest(friend.username)} >
+                <TouchableOpacity style={styles.delete} onPress={() => handleDeleteRequest(friend.username)} >
                   <Text>Delete</Text>
                 </TouchableOpacity>
             </View>
@@ -156,7 +161,6 @@ export const LobbyCollap = () => {
     console.log("join")
     setFriend(friend)
     setGame(<MultiPlayer/>)
-
   };
 
   const handleProfile = (friend) => {
@@ -242,7 +246,6 @@ export const LobbyCollap = () => {
   };
 
   const renderContent = (section, _, isActive) => {
-    //Accordion Content view
     return (
       <Animatable.View
         duration={400}
@@ -277,16 +280,12 @@ export const LobbyCollap = () => {
           {/*Code for Accordion/Expandable List starts here*/}
           <Accordion
             activeSections={activeSections}
-            //for any default active section
             sections={CONTENT}
             //title and content of accordion
             touchableComponent={TouchableOpacity}
-            //which type of touchable component you want
-            //It can be the following Touchables
-            //TouchableHighlight, TouchableNativeFeedback
-            //TouchableOpacity , TouchableWithoutFeedback
+
             expandMultiple={false}
-            //Do you want to expand mutiple at a time or single at a time
+
             renderHeader={renderHeader}
             //Header Component(View) to render
             renderContent={renderContent}
@@ -296,7 +295,6 @@ export const LobbyCollap = () => {
             onChange={setSections}
             //setting the state of active sections
           />
-          {/*Code for Accordion/Expandable List ends here*/}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -373,19 +371,18 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   user_container: {
-    flex: 1,
-    width: 300,  /* Or whatever */
-    margin: 'auto', /* Magic! */
     flexDirection: 'row',
-    alignSelf: 'flex-start',
-    justifyContent: 'space-between',
     textAlignVertical: 'center',
+    justifyContent: 'space-evenly',
+
     
   },
   map_container: {
-    flex:1, 
-    rowGap:20, 
-    display:'flex'
+    display: 'flex',
+    width: windowWidth-20,
+    gap: 20,
+    alignSelf: 'center',
+    padding: 10,
   },
 
   add: {

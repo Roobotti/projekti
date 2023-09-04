@@ -6,10 +6,8 @@ from config import ACCESS_TOKEN_EXPIRE_MINUTES
 from pymongo_get_database import get_database
 from solver import (
     find_good_combination,
-    solve_puzzle,
-    generate_basic_puzzle,
-    piece_colors,
 )
+from components import piece_colors
 import random
 import json
 import numpy as np
@@ -60,36 +58,6 @@ def upLoadBlocks():
             print(
                 f"---------- kierros: {i} ladattu {int(n/72*100)}%, lauta: {n} errors: {errors} -----------"
             )
-
-
-@router.post("/update", response_description="get board")
-def board_selected():
-    errors = 0
-    for i in range(72):
-        data = solutions_details[i][str(i)]
-        for blocks in data["solutions"]:
-            try:
-                solArray = []
-                [count, sol] = solve_puzzle(
-                    generate_basic_puzzle(data["board"], 2), blocks
-                )
-                for s in sol:
-                    solution = s[0]
-                    non_zero_rows = ~np.all(solution == 0, axis=1)
-                    non_zero_columns = ~np.all(solution == 0, axis=0)
-                    encodedNumpyBase = json.dumps(
-                        solution[non_zero_rows][:, non_zero_columns],
-                        default=lambda x: np.vectorize(piece_colors.get)(x).tolist(),
-                    )
-                    solArray.append(json.loads(encodedNumpyBase))
-                solutions2.update_one(
-                    {"board": data["board"]},
-                    {"$addToSet": {"data": {"blocks": blocks, "solutions": solArray}}},
-                    upsert=True,
-                )
-            except:
-                errors += 1
-        print(f"---------- ladattu {i/72} %, lauta: {i}, errors: {errors} -----------")
 
 
 @router.get("/puzzle", response_description="get blocks, board and solution")

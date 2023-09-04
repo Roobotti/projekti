@@ -12,9 +12,9 @@ import { getPuzzle } from "../services/puzzle";
 import { loadFriend, newWin } from "../services/users";
 
 const InitialcountDown = 5000;
-const gameDuration = 3 * 60;
+const gameDuration = 3;
 const contestTime = 6;
-const proveTime = 30 * 100;
+const proveTime = 20;
 const colors = ["red", "green", "blue", "yellow"];
 
 export const GameContext = createContext();
@@ -118,7 +118,10 @@ export const GameContextProvider = ({ children }) => {
   };
 
   const submitProve = () => {
-    const result = puzzle.solutions.includes(colored);
+    console.log("PROVE__", puzzle.solutions);
+    console.log("0: ", puzzle.solutions[0]);
+    console.log(colored);
+    const result = puzzle.solutions.some((r) => r === colored);
     console.log("result", result);
     socket.emit("contest_result", { room: room, result: result });
     setProveTimer(0);

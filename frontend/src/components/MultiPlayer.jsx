@@ -84,8 +84,8 @@ const MultiPlayer = () => {
     return( 
       <ImageBackground
         source={effect}
-        resizeMode='stretch'
-        style={{...styles.container, flex:1}}
+        resizeMode='cover'
+        style={{ flex:1, justifyContent: 'center'}}
       >
       <Animatable.View style={styles.winner_container} animation={'bounceIn'} duration={2000}>
         <Animatable.Text> 
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'black',
     marginTop: 20,
-    marginBottom: 50,
+    marginBottom: 20,
   },
   hint: {
     position:'absolute',
