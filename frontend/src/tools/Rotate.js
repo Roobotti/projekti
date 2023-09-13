@@ -1,5 +1,6 @@
-import { useState } from "react";
-
+/**
+ * Rotates the matrix to right
+ */
 export const rotate = (matrix) => {
   console.log("kala");
   matrix = matrix.filter((row) => row.some((r) => r));
@@ -17,6 +18,5 @@ export const rotate = (matrix) => {
       newArray[i].push(matrix[j][i]);
     }
   }
-  console.log("kala2", newArray);
   return newArray;
 };

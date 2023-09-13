@@ -65,6 +65,7 @@ export const UserContextProvider = ({ children }) => {
     };
   });
 
+  //get the acces token
   useEffect(() => {
     const f = async () => {
       const t = await authStorage.getAccessToken();
@@ -74,6 +75,7 @@ export const UserContextProvider = ({ children }) => {
     f();
   }, [user]);
 
+  // reloads the  userdata
   useEffect(() => {
     const fetcher = async () => {
       try {
@@ -82,16 +84,16 @@ export const UserContextProvider = ({ children }) => {
         const result = await readUsersMe(
           token || (await authStorage.getAccessToken())
         );
-        const friends = (await result) ? result.friends : [];
-        const user = (await result) ? result.username : null;
-        const requests = (await result) ? result.requests : [];
-        const wins = (await result) ? result.wins : [];
-        const loses = (await result) ? result.loses : [];
-        const avatar = (await result) ? result.avatar : null;
-        const sentRequests = (await result) ? result.sentRequests : [];
+        const friends = result ? result.friends : [];
+        const user = result ? result.username : null;
+        const requests = result ? result.requests : [];
+        const wins = result ? result.wins : [];
+        const loses = result ? result.loses : [];
+        const avatar = result ? result.avatar : null;
+        const sentRequests = result ? result.sentRequests : [];
 
         console.log("user:", user);
-        setUser(await user);
+        setUser(user);
         setFriends(await friends);
         setRequests(requests);
         setSentRequests(sentRequests);
@@ -109,10 +111,18 @@ export const UserContextProvider = ({ children }) => {
     fetcher();
   }, [token, reFresh]);
 
+  /**
+   * sets the users access token
+   *
+   * @param {string} token
+   */
   const login = (token) => {
     setToken(token);
   };
 
+  /**
+   * sets the user and its access token to null
+   */
   const logout = () => {
     setUser(null);
     setToken(null);

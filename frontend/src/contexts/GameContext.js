@@ -117,6 +117,9 @@ export const GameContextProvider = ({ children }) => {
     setGameOver(true);
   };
 
+  /**
+   * submits the prove and updates winner
+   */
   const submitProve = () => {
     console.log("PROVE__", puzzle.solutions);
     console.log("0: ", puzzle.solutions[0]);
@@ -129,12 +132,19 @@ export const GameContextProvider = ({ children }) => {
     setWin(result);
   };
 
+  /**
+   * emits contest for opponent
+   */
   const sendContest = () => {
     console.log("pc", puzzle);
     socket.emit("contest", { room: room });
     setProveTimer(proveTime + 1);
   };
 
+  /**
+   * @fires setClicks
+   * @fires sendUbongo or setUboText
+   */
   const handleUbongoClick = async () => {
     console.log("click");
     if (clicks >= 3) sendUbongo();
@@ -143,6 +153,7 @@ export const GameContextProvider = ({ children }) => {
     setClicks(clicks + 1);
   };
 
+  //handles friend lefting
   useEffect(() => {
     if (friend) {
       if (left) {
@@ -162,6 +173,7 @@ export const GameContextProvider = ({ children }) => {
     }
   }, [host, friend]);
 
+  //handles the sockets
   useEffect(() => {
     initialize();
     if (friend) {

@@ -62,14 +62,14 @@ def upLoadBlocks():
 
 @router.get("/puzzle", response_description="get blocks, board and solution")
 def blocks_and_board():
-    ##there might be some bad boards left
+    # in case there is added board with out solutions
     while True:
         try:
             random_int = random.randint(0, puzzles_length - 1)
             print("Puzzle endpoint reached...")
             puzzle = puzzle_details[random_int]
-            data = random.choice(puzzle["data"])
 
+            data = random.choice(puzzle["data"])
             blocks = data["blocks"]
             solutions = data["solutions"]
 
@@ -307,5 +307,4 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    print("access_token", access_token)
     return {"access_token": access_token, "token_type": "bearer"}
