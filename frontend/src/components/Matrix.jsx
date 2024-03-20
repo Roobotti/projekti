@@ -130,28 +130,6 @@ export const Hint = ({matrix}) => {
   );
 };
 
-export const Solution = ({matrix}) => {
-  return (
-    <View style={{...styles.container, gap:gap}}>
-      {matrix
-        .map((row, rowIndex) => (
-        <View key={rowIndex} style={{...styles.row, gap:gap}}>
-          {row.map((value, colIndex) => (
-            <Animatable.View
-              key={colIndex}
-              animation={'bounceInDown'}
-              duration={200}
-            >
-
-              <View width={boxHeightInPixels} height={boxHeightInPixels} style={colorMap((value ? value === "None" : true) ? 0 : value)}></View>
-
-            </Animatable.View>
-          ))}
-        </View>
-      ))}
-    </View>
-  );
-};
 
 export const Matrix = ({matrix}) => {
   const arrayLength = matrix.length

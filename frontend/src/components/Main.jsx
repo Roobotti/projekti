@@ -4,7 +4,9 @@ import AppBar from './AppBar';
 import { SignUp, SignIn, SignOut } from './Sign';
 import Board from './SinglePlayer';
 import Menu from './Menu';
-import DevTest from './DevTest';
+import DevTest from '../devComponents/SolutionTest';
+import DevMenu from '../devComponents/DevMenu';
+import Build3dTest from '../devComponents/Build3DTest';
 import BoardWrite from "./BoardWrite"
 import { LobbyCollap } from './Lobby';
 import { Profile } from './Profile';
@@ -40,7 +42,9 @@ const Main = () => {
           <AppBar />
           <Routes>
             <Route path="/" element={<Menu />} exact />
-            <Route path="/DevTest" element={<DevTest />} exact />
+            <Route path="/SolutionTest" element={<DevTest />} exact />
+            <Route path="/DevMenu" element={<DevMenu />} exact />
+            <Route path="/3DbuildTest" element={<Build3dTest />} exact />
             <Route path="/singlePlayer" element={<Board />} exact />
             <Route path="/Lobby" element={<LobbyCollap />} exact />
             <Route path="/SignIn" element={<SignIn />} exact />

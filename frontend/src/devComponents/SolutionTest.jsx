@@ -3,11 +3,12 @@ import { View, TouchableOpacity } from 'react-native';
 
 import { getPuzzle } from '../services/puzzle';
 
-import Text from './Text';
+import Text from '../components/Text';
 
-import { Hint, Solution} from './Matrix';
-import BlockRenderer from './Blocks';
-import { Loading } from './Loading';
+import { Hint } from '../components/Matrix';
+import { DevSolution } from './devMatrix';
+import BlockRenderer from '../components/Blocks';
+import { Loading } from '../components/Loading';
 import { debounce } from 'lodash';
 
 
@@ -81,7 +82,7 @@ const DevTest = () => {
         {solution 
           ? (
             <View> 
-              {puzzle?.solutions && <Solution matrix={puzzle.solutions[solution - 1]}/>} 
+              {puzzle?.solutions && <DevSolution matrix={puzzle.solutions[solution - 1]}/>} 
             </View>
           )
           : (
