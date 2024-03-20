@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import { io } from "socket.io-client";
 
-const baseUrl = `${Constants.manifest.extra.uri}`;
+const baseUrl = `${Constants.expoConfig.extra.uri}`;
 
 /**
  * Creates a socket to the path

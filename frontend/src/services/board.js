@@ -1,6 +1,6 @@
 import axios from "axios";
 import Constants from "expo-constants";
-const baseUrl = `${Constants.manifest.extra.uri}/api/board`;
+const baseUrl = `${Constants.expoConfig.extra.uri}/api/board`;
 
 export const getSelected = async (board) => {
   console.log(baseUrl);

@@ -11,6 +11,7 @@ import { UserContext } from '../contexts/UserContext';
 import * as Animatable from 'react-native-animatable';
 
 import Text from './Text';
+import { debounce } from 'lodash';
 
 import { HourGlassTimer, LottieLoad } from '../lotties/Timers';
 import { GameContext } from '../contexts/GameContext';
@@ -22,6 +23,12 @@ const MultiPlayer = () => {
   const {redEffect, greenEffect} = useContext(AssetsContext)
   const {friend, avatar} = useContext(UserContext)
   const { submitProve, sendRedy, sendContest, newGame, handleUbongoClick, isLoading, userReady, friendReady, gameOver, win, friendData, hintText, uboText, hintTimer, setHintTimer, contestTimer, proveTimer, puzzle, colored, setColored, color, setColor} = useContext(GameContext)
+  
+  const handleTouchStart = () => {
+    setHintTimer(5)
+    debounceSetTimer()
+  }
+  const debounceSetTimer = debounce(() => { setHintTimer(5)}, 1000);
 
   const UbongoClicker = ({uboText}) => {
     return (
@@ -154,8 +161,7 @@ const MultiPlayer = () => {
           <View style={styles.container}> 
             <View 
               pointerEvents={hintTimer?"none":"auto"} 
-              onTouchMove={() => setHintTimer(5)}
-              onTouchEnd={() => setHintTimer(5)}
+              onTouchStart={handleTouchStart}
             >
               {puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}
             </View>

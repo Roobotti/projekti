@@ -1,4 +1,5 @@
-const { getDefaultConfig } = require("@expo/metro-config");
+// prettier-ignore
+const { getDefaultConfig } = require('@expo/metro-config');
 
 const defaultConfig = getDefaultConfig(__dirname);
 

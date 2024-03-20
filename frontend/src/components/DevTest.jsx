@@ -5,21 +5,23 @@ import { getPuzzle } from '../services/puzzle';
 
 import Text from './Text';
 
-import { Hint} from './Matrix';
+import { Hint, Solution} from './Matrix';
 import BlockRenderer from './Blocks';
 import { Loading } from './Loading';
 import { debounce } from 'lodash';
 
+
 import * as Animatable from 'react-native-animatable';
 
 
-const Board = () => {
+const DevTest = () => {
 
   const [ puzzle, setPuzzle ] = useState({})
 
   const [isLoading, setIsLoading] = useState(false);
   const [hintText, setHintText] = useState('Hint availabe') 
   const [hintTimer, setHintTimer] = useState(0)
+  const [solution, setSolution] = useState(0)
 
   useEffect( () => {
     getData()
@@ -51,6 +53,10 @@ const Board = () => {
     }
   };
 
+  const handleNextSolution = (n) => {
+    puzzle.solutions.length - solution ? setSolution(solution + n) : setSolution(0)
+  }
+
   const handleTouchStart = () => {
     setHintTimer(5)
     debounceSetTimer()
@@ -62,8 +68,28 @@ const Board = () => {
       <TouchableOpacity onPress={getData} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
         <Text style={{alignSelf: 'center'}}>New board</Text>
       </TouchableOpacity>
+
+      <View style={{flexDirection: 'row', justifyContent:'space-evenly'}}>
+        <TouchableOpacity onPress={() => handleNextSolution(1)} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
+            <Text style={{alignSelf: 'center'}}>
+              Next solution {puzzle?.solutions?.length - solution} 
+            </Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
-        <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={handleTouchStart}>{puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}</View>
+        {solution 
+          ? (
+            <View> 
+              {puzzle?.solutions && <Solution matrix={puzzle.solutions[solution - 1]}/>} 
+            </View>
+          )
+          : (
+            <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={handleTouchStart}>
+              {puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}
+            </View>
+          )
+        }
       </View>
 
       <View style={{position:'absolute', bottom:5}}>
@@ -96,4 +122,4 @@ const Board = () => {
   );
 };
 
-export default Board;
+export default DevTest;

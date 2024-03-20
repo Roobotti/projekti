@@ -33,8 +33,9 @@ const AppBar = () => {
 
   return (
       <View horizontal style={styles.container}>
-        <View style={styles.tab}>
+        <View style={{...styles.tab, gap: 100}}>
           <Tab to="/" text="Menu"/>
+          <Tab to="/DevTest" text="DevTest"/>
         </View>
       </View>
 
