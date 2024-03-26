@@ -6,7 +6,7 @@ import { getPuzzle } from '../services/puzzle';
 import Text from '../components/Text';
 
 import { Hint} from '../components/Matrix';
-import BlockRenderer from '../components/Blocks';
+import DevBlockRenderer  from './devBlocks'
 import { Loading } from '../components/Loading';
 import { debounce } from 'lodash';
 
@@ -73,30 +73,20 @@ const Build3DTest = () => {
       <View style={{flexDirection: 'row', justifyContent:'space-evenly'}}>
         <TouchableOpacity onPress={() => handleNextSolution(1)} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
             <Text style={{alignSelf: 'center'}}>
-              Next solution {puzzle?.solutions?.length - solution} 
+              sho 
             </Text>
         </TouchableOpacity>
       </View>
 
       <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
-        {solution 
-          ? (
-            <View > 
-              {puzzle?.solutions && <DevSolution matrix={puzzle.solutions[solution - 1]}/>} 
-            </View>
-          )
-          : (
-            <View style={{flex: 1}}> 
-              {puzzle?.solutions && <Matrix3D matrix={puzzle.solutions[0]}/>}
-            </View>
-          )
-        }
+        {puzzle?.solutions && <Matrix3D matrix={puzzle.solutions[0]}/>} 
       </View>
 
       <View style={{position:'absolute', bottom:5}}>
         {isLoading 
           ? ( <Loading /> )
-          : ( puzzle?.blocks && <BlockRenderer blocks={puzzle.blocks}/> )
+          : ( puzzle?.blocks && <DevBlockRenderer blocks={puzzle.blocks}/> )
+
         }
       </View>
 

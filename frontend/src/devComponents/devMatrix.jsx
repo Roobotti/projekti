@@ -1,16 +1,19 @@
-import React, {useRef, useState } from 'react';
+import React, {useRef, useState, useCallback, useContext, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, TouchableNativeFeedback} from 'react-native';
 import { Matrix } from '../components/Matrix';
-import { Canvas } from '@react-three/fiber/native';
+import { Canvas, useThree } from '@react-three/fiber/native';
 
 import * as Animatable from 'react-native-animatable';
 import * as Haptics from 'expo-haptics';
+import { GameContext } from '../contexts/GameContext';
 
 
 const windowWidth = Dimensions.get('window').width;
 
 const boxHeightInPixels = windowWidth * 0.205; // Adjust the scale factor for desired size
 const gap = windowWidth * 0.0120; // Adjust the scale factor for desired size
+
+const state = () => useThree()
 
 const colorMap = (key) => {
   switch (key) {
@@ -29,27 +32,85 @@ const colorMap = (key) => {
   }
 };
 
+
 const Box = (props)  => {
     const mesh = useRef()
+    const [boxColor, setBoxColor] = useState(props.color);
+    const [boxBlock, setBoxBlock] = useState(null)
+    const [opacity, setOpacity] = useState(props.opacity);
+    const {color, selectedBlock} = useContext(GameContext)
 
-    return (
-      <mesh
-        position= {props.position}
-        ref={mesh}
-        scale={[1, 1, 1]}
-      >
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial 
-          color={props.color} 
-          transparent={true} 
-          opacity={props.opacity-0.1} 
-          flatShading={true}
-          metalness={0.1}
-          />
-      </mesh>
-    )
+
+    const onClick = useCallback((e) => {
+      e.stopPropagation()
+      if (selectedBlock === boxBlock) {
+        setBoxColor("gray")
+        setBoxBlock(null)
+        setOpacity(0.2)
+      }
+      else {
+        setBoxColor(color)
+        setBoxBlock(selectedBlock)
+        setOpacity(0.8)
+      }
+
+
+    }, [boxBlock]);
+
+    const onHold = useCallback((e) => {
+      e.stopPropagation()
+      setBoxColor(color)
+      setOpacity(0.8)
+    }, [color]);
+
+    return opacity 
+      ? ( 
+          <mesh
+            position= {props.position}
+            ref={mesh}
+            scale={[1, 1, 1]}
+            onClick={onClick}
+            onPointerMove={onHold}
+          >
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial 
+              color={boxColor} 
+              transparent={true} 
+              opacity={opacity-0.1} 
+              flatShading={true}
+              metalness={0.1}
+              />
+          </mesh>
+        )
+        : (
+          <></>
+        )
+      
   }
 
+export const Board3D = ({matrix}) => {
+  const offset = matrix.length/(-2)+0.5
+  return (
+      <Canvas 
+        camera={{ position: [0, 6, 6], near: 1, far: 20 }}>
+        <ambientLight intensity={0.6} />
+        <spotLight position={[0, 10, 10]} angle={0.30} penumbra={1} />
+        <pointLight position={[-10, -10, -10]} />
+        <group position={[offset*1.2, 0, 0]} scale={1.2}>
+          {matrix.map((row, rowIndex) =>
+            row.map((value, colIndex) => (
+              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 0, colIndex]} {...colorMap(value)} />
+            ))
+          )}
+          {matrix.map((row, rowIndex) =>
+            row.map((value, colIndex) => (
+              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 1, colIndex]} {...colorMap(value)} />
+            ))
+          )}
+        </group>
+      </Canvas>
+  );
+};
 
 export const Matrix3D = ({matrix}) => {
   const offset = matrix.length/(-2)+0.5
@@ -76,25 +137,26 @@ export const Matrix3D = ({matrix}) => {
 };
 
 export const DevSolution = ({matrix}) => {
+  const offset = matrix.length/(-2)+0.5
   return (
-    <View style={{...styles.container, gap:gap}}>
-      {matrix
-        .map((row, rowIndex) => (
-        <View key={rowIndex} style={{...styles.row, gap:gap}}>
-          {row.map((value, colIndex) => (
-            <Animatable.View
-              key={colIndex}
-              animation={'jello'}
-              duration={500}
-            >
-
-              <View width={boxHeightInPixels} height={boxHeightInPixels} style={colorMap((value ? value === "None" : true) ? 0 : value)}></View>
-
-            </Animatable.View>
-          ))}
-        </View>
-      ))}
-    </View>
+      <Canvas 
+        camera={{ position: [0, 6, 6], near: 1, far: 20 }}>
+        <ambientLight intensity={0.6} />
+        <spotLight position={[0, 10, 10]} angle={0.30} penumbra={1} />
+        <pointLight position={[-10, -10, -10]} />
+        <group position={[offset*1.2, 0, 0]} scale={1.2}>
+          {matrix.map((row, rowIndex) =>
+            row.map((value, colIndex) => (
+              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 0, colIndex]} {...colorMap(value)} />
+            ))
+          )}
+          {matrix.map((row, rowIndex) =>
+            row.map((value, colIndex) => (
+              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 1, colIndex]} {...colorMap(value)} />
+            ))
+          )}
+        </group>
+      </Canvas>
   );
 };
 
