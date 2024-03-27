@@ -8,10 +8,13 @@ backend_python/.env
 backend_python/venv
 
 Solver/__pycache__
+
 backend_python/__pycache__
 frontend/node_modules
 backend_python/node_modules
 
 frontend/%ProgramData%
-Solver
 node_modules
+Solver/helper.py
+Solver/components.py
+Solver/solver.py
