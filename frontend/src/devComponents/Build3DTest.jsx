@@ -13,6 +13,8 @@ import { debounce } from 'lodash';
 
 import * as Animatable from 'react-native-animatable';
 import { Matrix3D, DevSolution } from './devMatrix';
+import { useContext } from 'react';
+import { GameContext } from '../contexts/GameContext';
 
 
 const Build3DTest = () => {
@@ -23,6 +25,8 @@ const Build3DTest = () => {
   const [hintText, setHintText] = useState('Hint availabe') 
   const [hintTimer, setHintTimer] = useState(0)
   const [solution, setSolution] = useState(0)
+
+  const {visibleTop, setVisibleTop} = useContext(GameContext)
 
   useEffect( () => {
     getData()
@@ -71,9 +75,9 @@ const Build3DTest = () => {
       </TouchableOpacity>
 
       <View style={{flexDirection: 'row', justifyContent:'space-evenly'}}>
-        <TouchableOpacity onPress={() => handleNextSolution(1)} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
+        <TouchableOpacity onPress={() => setVisibleTop(!visibleTop)} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
             <Text style={{alignSelf: 'center'}}>
-              sho 
+              {visibleTop ? "Hide top layer" : "Show top layer"}
             </Text>
         </TouchableOpacity>
       </View>

@@ -36,9 +36,9 @@ const colorMap = (key) => {
 const Box = (props)  => {
     const mesh = useRef()
     const [boxColor, setBoxColor] = useState(props.color);
-    const [boxBlock, setBoxBlock] = useState(null)
+    const [boxBlock, setBoxBlock] = useState("")
     const [opacity, setOpacity] = useState(props.opacity);
-    const {color, selectedBlock} = useContext(GameContext)
+    const {color, selectedBlock, visibleTop} = useContext(GameContext)
 
 
     const onClick = useCallback((e) => {
@@ -55,7 +55,7 @@ const Box = (props)  => {
       }
 
 
-    }, [boxBlock]);
+    }, [color, opacity, boxBlock]);
 
     const onHold = useCallback((e) => {
       e.stopPropagation()
@@ -63,7 +63,7 @@ const Box = (props)  => {
       setOpacity(0.8)
     }, [color]);
 
-    return opacity 
+    return opacity && (visibleTop && props.position[1])
       ? ( 
           <mesh
             position= {props.position}
