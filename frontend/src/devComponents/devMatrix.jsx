@@ -2,10 +2,12 @@ import React, {useRef, useState, useCallback, useContext, useEffect } from 'reac
 import { View, StyleSheet, Dimensions, TouchableOpacity, TouchableNativeFeedback} from 'react-native';
 import { Matrix } from '../components/Matrix';
 import { Canvas, useThree } from '@react-three/fiber/native';
+import {Outlines, Edges} from '@react-three/drei'
 
 import * as Animatable from 'react-native-animatable';
 import * as Haptics from 'expo-haptics';
 import { GameContext } from '../contexts/GameContext';
+import { Line } from 'three';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -40,7 +42,6 @@ const Box = (props)  => {
     const [opacity, setOpacity] = useState(props.opacity);
     const {color, selectedBlock, visibleTop} = useContext(GameContext)
 
-
     const onClick = useCallback((e) => {
       e.stopPropagation()
       if (selectedBlock === boxBlock) {
@@ -65,22 +66,31 @@ const Box = (props)  => {
 
     return opacity && !(!visibleTop && props.position[1])
       ? ( 
-          <mesh
-            position= {props.position}
-            ref={mesh}
-            scale={[1, 1, 1]}
-            onClick={onClick}
-            onPointerMove={onHold}
-          >
-            <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial 
-              color={boxColor} 
-              transparent={true} 
-              opacity={opacity-0.1} 
-              flatShading={true}
-              metalness={0.1}
+          <>
+            <mesh
+              position= {props.position}
+              ref={mesh}
+              scale={[1, 1, 1]}
+              onClick={onClick}
+              onPointerMove={onHold}
+            >
+              <boxGeometry args={[, 1, 1]} />
+              <meshStandardMaterial 
+                color={boxColor} 
+                transparent={true} 
+                opacity={selectedBlock === boxBlock ? opacity+0.4 : opacity-0.2} 
+                flatShading={true}
+                metalness={0.1}
+                />
+              <Edges
+                  linewidth={1}
+                  scale={0.98}
+                  threshold={15}
+                  color={selectedBlock === boxBlock ? "white" : "black"}
               />
-          </mesh>
+            </mesh>
+          </>
+
         )
         : (
           <></>
@@ -116,14 +126,15 @@ export const Matrix3D = ({matrix}) => {
   const offset = matrix.length/(-2)+0.5
   return (
       <Canvas 
-        camera={{ position: [0, 6, 6], near: 1, far: 20 }}>
+        camera={{ position: [0, 6, 6]}}>
+        
         <ambientLight intensity={0.6} />
         <spotLight position={[0, 10, 10]} angle={0.30} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
         <group position={[offset*1.2, 0, 0]} scale={1.2}>
           {matrix.map((row, rowIndex) =>
             row.map((value, colIndex) => (
-              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 0, colIndex]} {...colorMap(value)} />
+                <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 0, colIndex]} {...colorMap(value)} />
             ))
           )}
           {matrix.map((row, rowIndex) =>
@@ -132,6 +143,7 @@ export const Matrix3D = ({matrix}) => {
             ))
           )}
         </group>
+      
       </Canvas>
   );
 };
