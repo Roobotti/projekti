@@ -63,7 +63,7 @@ const Box = (props)  => {
       setOpacity(0.8)
     }, [color]);
 
-    return opacity && (visibleTop && props.position[1])
+    return opacity && !(!visibleTop && props.position[1])
       ? ( 
           <mesh
             position= {props.position}
@@ -137,26 +137,25 @@ export const Matrix3D = ({matrix}) => {
 };
 
 export const DevSolution = ({matrix}) => {
-  const offset = matrix.length/(-2)+0.5
   return (
-      <Canvas 
-        camera={{ position: [0, 6, 6], near: 1, far: 20 }}>
-        <ambientLight intensity={0.6} />
-        <spotLight position={[0, 10, 10]} angle={0.30} penumbra={1} />
-        <pointLight position={[-10, -10, -10]} />
-        <group position={[offset*1.2, 0, 0]} scale={1.2}>
-          {matrix.map((row, rowIndex) =>
-            row.map((value, colIndex) => (
-              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 0, colIndex]} {...colorMap(value)} />
-            ))
-          )}
-          {matrix.map((row, rowIndex) =>
-            row.map((value, colIndex) => (
-              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 1, colIndex]} {...colorMap(value)} />
-            ))
-          )}
-        </group>
-      </Canvas>
+    <View style={{...styles.container, gap:gap}}>
+      {matrix
+        .map((row, rowIndex) => (
+        <View key={rowIndex} style={{...styles.row, gap:gap}}>
+          {row.map((value, colIndex) => (
+            <Animatable.View
+              key={colIndex}
+              animation={'jello'}
+              duration={500}
+            >
+
+              <View width={boxHeightInPixels} height={boxHeightInPixels} style={colorMap((value ? value === "None" : true) ? 0 : value)}></View>
+
+            </Animatable.View>
+          ))}
+        </View>
+      ))}
+    </View>
   );
 };
 
