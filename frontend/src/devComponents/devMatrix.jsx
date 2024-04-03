@@ -6,8 +6,8 @@ import {Outlines, Edges} from '@react-three/drei'
 
 import * as Animatable from 'react-native-animatable';
 import * as Haptics from 'expo-haptics';
-import { GameContext } from '../contexts/GameContext';
-import { Line } from 'three';
+import { Game3dContext } from '../contexts/Game3dContext';
+import { Line, Vector3 } from 'three';
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -40,19 +40,36 @@ const Box = (props)  => {
     const [boxColor, setBoxColor] = useState(props.color);
     const [boxBlock, setBoxBlock] = useState("")
     const [opacity, setOpacity] = useState(props.opacity);
-    const {color, selectedBlock, visibleTop} = useContext(GameContext)
+    const [pos, setPos] = useState([props.position[0], props.position[1], props.position[2]])
+    const [h, setH] = useState(0.1);
+    const {color, selectedBlock, visibleTop, addBlockPart, deleteBlockPart, validBlocks} = useContext(Game3dContext)
+    
+    useEffect(() => {
+      setPos([pos[0], (h<1) ? props.position[1]-0.5 : props.position[1], pos[2]])
+    }, [h]);
+
+    useEffect(() => {
+      if (validBlocks.length) {
+        setOpacity((validBlocks.some((b) => b === boxBlock)) ? 1 : opacity)
+      }
+    }, [validBlocks]);
 
     const onClick = useCallback((e) => {
       e.stopPropagation()
       if (selectedBlock === boxBlock) {
         setBoxColor("gray")
         setBoxBlock(null)
-        setOpacity(0.2)
+        setH(0.05)
+        deleteBlockPart(selectedBlock, [...props.position])
+        
+        
       }
       else {
         setBoxColor(color)
         setBoxBlock(selectedBlock)
-        setOpacity(0.8)
+        setH(1)
+        addBlockPart(selectedBlock, [...props.position])
+        console.log(validBlocks)
       }
 
 
@@ -68,23 +85,22 @@ const Box = (props)  => {
       ? ( 
           <>
             <mesh
-              position= {props.position}
+              position = {pos}
               ref={mesh}
-              scale={[1, 1, 1]}
+              scale={[0.99, h, 0.99]}
               onClick={onClick}
-              onPointerMove={onHold}
             >
-              <boxGeometry args={[, 1, 1]} />
+              <boxGeometry args={[1, 1, 1]} />
               <meshStandardMaterial 
                 color={boxColor} 
                 transparent={true} 
-                opacity={selectedBlock === boxBlock ? opacity+0.4 : opacity-0.2} 
+                opacity={opacity} 
                 flatShading={true}
                 metalness={0.1}
                 />
               <Edges
-                  linewidth={1}
-                  scale={0.98}
+                  linewidth={0.5}
+                  scale={1}
                   threshold={15}
                   color={selectedBlock === boxBlock ? "white" : "black"}
               />

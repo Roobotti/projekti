@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { AssetsContext } from '../contexts/AssetsContext';
-import { GameContext } from '../contexts/GameContext';
+import { Game3dContext } from '../contexts/Game3dContext';
 
 const colorMap = (key) => {
   switch (key[0]) {
@@ -22,7 +22,7 @@ const colorMap = (key) => {
 
 const TouchableBlock = ({id}) => {
   const {blockImageMapping} = useContext(AssetsContext)
-  const {setColor, setSelectedBlock} = useContext(GameContext)
+  const {setColor, setSelectedBlock} = useContext(Game3dContext)
   
   const handleClick = () => {
     setColor(colorMap(id))

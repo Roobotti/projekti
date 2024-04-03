@@ -45,9 +45,6 @@ export const GameContextProvider = ({ children }) => {
   const [colored, setColored] = useState([]);
   const [color, setColor] = useState("red");
 
-  const [selectedBlock, setSelectedBlock] = useState(null);
-  const [visibleTop, setVisibleTop] = useState(true);
-
   const initialize = () => {
     setIsLoading(false);
     setUserReady(false);
@@ -311,9 +308,7 @@ export const GameContextProvider = ({ children }) => {
         hintText,
         uboText,
         hintTimer,
-        visibleTop,
 
-        selectedBlock,
         setHintTimer,
         setUserReady,
         contestTimer,
@@ -322,9 +317,6 @@ export const GameContextProvider = ({ children }) => {
         colored,
         setColored,
         color,
-        setColor,
-        setSelectedBlock,
-        setVisibleTop,
       }}
     >
       {children}

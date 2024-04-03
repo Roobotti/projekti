@@ -15,9 +15,10 @@ import * as Animatable from 'react-native-animatable';
 import { Matrix3D, DevSolution } from './devMatrix';
 import { useContext } from 'react';
 import { GameContext } from '../contexts/GameContext';
+import { Game3dContext } from '../contexts/Game3dContext';
 
 
-const Build3DTest = () => {
+const Build3dTest = () => {
 
   const [ puzzle, setPuzzle ] = useState({})
 
@@ -26,11 +27,19 @@ const Build3DTest = () => {
   const [hintTimer, setHintTimer] = useState(0)
   const [solution, setSolution] = useState(0)
 
-  const {visibleTop, setVisibleTop} = useContext(GameContext)
+  const {visibleTop, setVisibleTop} = useContext(Game3dContext)
+  const {setBlocks} = useContext(Game3dContext)
 
   useEffect( () => {
     getData()
   },[])
+  
+  useEffect( () => {
+    if (puzzle?.blocks) {
+       setBlocks(puzzle.blocks)
+    }
+
+  },[puzzle])
 
   useEffect( () => {
     setHintText(hintTimer?`   Next in ${hintTimer} s   `:'Hint available')
@@ -117,4 +126,4 @@ const Build3DTest = () => {
   );
 };
 
-export default Build3DTest;
+export default Build3dTest;

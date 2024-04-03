@@ -6,7 +6,7 @@ import Board from './SinglePlayer';
 import Menu from './Menu';
 import DevTest from '../devComponents/SolutionTest';
 import DevMenu from '../devComponents/DevMenu';
-import Build3dTest from '../devComponents/Build3DTest';
+import Build3dTest from '../devComponents/Build3dTest';
 import BoardWrite from "./BoardWrite"
 import { LobbyCollap } from './Lobby';
 import { Profile } from './Profile';

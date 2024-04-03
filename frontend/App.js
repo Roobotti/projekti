@@ -9,6 +9,7 @@ import AuthStorage from "./src/utils/authStorage";
 
 import { UserContextProvider } from "./src/contexts/UserContext";
 import { GameContextProvider } from "./src/contexts/GameContext";
+import { Game3dContextProvider } from "./src/contexts/Game3dContext";
 import { AssetsContextProvider } from "./src/contexts/AssetsContext";
 
 const authStorage = new AuthStorage();
@@ -24,7 +25,9 @@ const App = () => {
           <AssetsContextProvider>
             <UserContextProvider>
               <GameContextProvider>
-                <Main />
+                <Game3dContextProvider>
+                  <Main />
+                </Game3dContextProvider>
               </GameContextProvider>
             </UserContextProvider>
           </AssetsContextProvider>
