@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, PanResponder, Animated } from 'react-native';
 
 import { getPuzzle } from '../services/puzzle';
 
@@ -11,8 +11,10 @@ import BlockRenderer from '../components/Blocks';
 import { Loading } from '../components/Loading';
 import { debounce } from 'lodash';
 
-
+import {Outlines, Box, OrbitControls} from '@react-three/drei'
 import * as Animatable from 'react-native-animatable';
+
+import { Box } from 'react-three-fiber';
 
 
 const DevTest = () => {
@@ -122,5 +124,6 @@ const DevTest = () => {
     </View>
   );
 };
+
 
 export default DevTest;

@@ -17,6 +17,9 @@ import { useContext } from 'react';
 import { GameContext } from '../contexts/GameContext';
 import { Game3dContext } from '../contexts/Game3dContext';
 
+import {Outlines, Edges, OrbitControls} from '@react-three/drei'
+
+
 
 const Build3dTest = () => {
 

@@ -2,7 +2,7 @@ import React, {useRef, useState, useCallback, useContext, useEffect } from 'reac
 import { View, StyleSheet, Dimensions, TouchableOpacity, TouchableNativeFeedback} from 'react-native';
 import { Matrix } from '../components/Matrix';
 import { Canvas, useThree } from '@react-three/fiber/native';
-import {Outlines, Edges} from '@react-three/drei'
+import {Outlines, Edges, OrbitControls} from '@react-three/drei'
 
 import * as Animatable from 'react-native-animatable';
 import * as Haptics from 'expo-haptics';
@@ -14,21 +14,22 @@ const windowWidth = Dimensions.get('window').width;
 
 const boxHeightInPixels = windowWidth * 0.205; // Adjust the scale factor for desired size
 const gap = windowWidth * 0.0120; // Adjust the scale factor for desired size
+const opacity = 0.6
 
 const state = () => useThree()
 
 const colorMap = (key) => {
   switch (key) {
     case 1:
-      return { color: 'rgb(0,0,0)', opacity: 0.8 };
+      return { color: 'rgb(0,0,0)', opacity: opacity };
     case "red":
-      return { color: 'rgb(250,0,0)', opacity: 0.8 };
+      return { color: 'rgb(250,0,0)', opacity: opacity };
     case "green":
-      return { color: 'rgb(0,250,0)', opacity: 0.8 };
+      return { color: 'rgb(0,250,0)', opacity: opacity };
     case "yellow":
-      return { color: 'rgb(250,250,0)', opacity: 0.8 };
+      return { color: 'rgb(250,250,0)', opacity: opacity };
     case "blue":
-      return { color: 'rgb(0,0,250)', opacity: 0.8 };
+      return { color: 'rgb(0,0,250)', opacity: opacity };
     default:
       return { color: 'rgb(0,0,250)', opacity: 0};
   }
@@ -42,7 +43,7 @@ const Box = (props)  => {
     const [opacity, setOpacity] = useState(props.opacity);
     const [pos, setPos] = useState([props.position[0], props.position[1], props.position[2]])
     const [h, setH] = useState(0.1);
-    const {color, selectedBlock, visibleTop, addBlockPart, deleteBlockPart, validBlocks} = useContext(Game3dContext)
+    const {color, selectedBlock, visibleTop, addBlockPart, deleteBlockPart, validBlocks, reValidate} = useContext(Game3dContext)
     
     useEffect(() => {
       setPos([pos[0], (h<1) ? props.position[1]-0.5 : props.position[1], pos[2]])
@@ -50,9 +51,9 @@ const Box = (props)  => {
 
     useEffect(() => {
       if (validBlocks.length) {
-        setOpacity((validBlocks.some((b) => b === boxBlock)) ? 1 : opacity)
+        setOpacity((validBlocks.includes(boxBlock)) ? 0.8 : props.opacity)
       }
-    }, [validBlocks]);
+    }, [validBlocks,reValidate]);
 
     const onClick = useCallback((e) => {
       e.stopPropagation()
@@ -68,6 +69,7 @@ const Box = (props)  => {
         setBoxColor(color)
         setBoxBlock(selectedBlock)
         setH(1)
+        deleteBlockPart(boxBlock, [...props.position])
         addBlockPart(selectedBlock, [...props.position])
         console.log(validBlocks)
       }
@@ -143,7 +145,6 @@ export const Matrix3D = ({matrix}) => {
   return (
       <Canvas 
         camera={{ position: [0, 6, 6]}}>
-        
         <ambientLight intensity={0.6} />
         <spotLight position={[0, 10, 10]} angle={0.30} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
@@ -159,7 +160,6 @@ export const Matrix3D = ({matrix}) => {
             ))
           )}
         </group>
-      
       </Canvas>
   );
 };
