@@ -38,6 +38,7 @@ const TouchableBlock = ({id}) => {
         style={styles.blockImage}
       />
     </TouchableOpacity>
+    
   )
 }
 

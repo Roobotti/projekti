@@ -47,7 +47,7 @@ export const Game3dContextProvider = ({ children }) => {
   }, [blocks]);
 
   useEffect(() => {
-    if (reValidate) {
+    if (true) {
       setReValidate(false);
       for (let i = 0; i < 4; i++) {
         if (blocks?.length && blockParts[i].length) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, TouchableOpacity, StyleSheet, PanResponder, Animated } from 'react-native';
 
 import { getPuzzle } from '../services/puzzle';
@@ -11,13 +11,15 @@ import BlockRenderer from '../components/Blocks';
 import { Loading } from '../components/Loading';
 import { debounce } from 'lodash';
 
-import {Outlines, Box, OrbitControls} from '@react-three/drei'
 import * as Animatable from 'react-native-animatable';
+import { GLView } from 'expo-gl';
+import {  Canvas, Box } from '@react-three/fiber/native';
 
-import { Box } from 'react-three-fiber';
+import useControls from "r3f-native-orbitcontrols"
 
+const DEG45 = Math.PI / 4;
 
-const DevTest = () => {
+const DevTest2 = () => {
 
   const [ puzzle, setPuzzle ] = useState({})
 
@@ -125,5 +127,19 @@ const DevTest = () => {
   );
 };
 
+const DevTest = () => {
+  const [OrbitControls, events] = useControls()
+	return (
+    <View style={{flex: 1}} {...events}>
+			<Canvas>
+				<OrbitControls />
 
+				<mesh>
+					<boxGeometry />
+					<meshBasicMaterial color={0xff0000} wireframe />
+				</mesh>
+			</Canvas>
+      </View>
+	);
+}
 export default DevTest;

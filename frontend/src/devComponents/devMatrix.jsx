@@ -2,12 +2,13 @@ import React, {useRef, useState, useCallback, useContext, useEffect } from 'reac
 import { View, StyleSheet, Dimensions, TouchableOpacity, TouchableNativeFeedback} from 'react-native';
 import { Matrix } from '../components/Matrix';
 import { Canvas, useThree } from '@react-three/fiber/native';
-import {Outlines, Edges, OrbitControls} from '@react-three/drei'
+import {Outlines, Edges, ArcballControls} from '@react-three/drei'
 
 import * as Animatable from 'react-native-animatable';
 import * as Haptics from 'expo-haptics';
 import { Game3dContext } from '../contexts/Game3dContext';
-import { Line, Vector3 } from 'three';
+import useControls from "r3f-native-orbitcontrols"
+
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -16,22 +17,26 @@ const boxHeightInPixels = windowWidth * 0.205; // Adjust the scale factor for de
 const gap = windowWidth * 0.0120; // Adjust the scale factor for desired size
 const opacity = 0.6
 
-const state = () => useThree()
+
+
+const red     = 'rgb(240, 160, 182)'
+const green   = 'rgb(126, 216, 177)'
+const blue    = 'rgb(120, 150, 255)'
+const yellow  = 'rgb(231, 249, 142)'
 
 const colorMap = (key) => {
   switch (key) {
-    case 1:
-      return { color: 'rgb(0,0,0)', opacity: opacity };
+    case 1: return { color: 'rgb(0,0,0)', opacity: opacity };
     case "red":
-      return { color: 'rgb(250,0,0)', opacity: opacity };
+      return { color: red, opacity: opacity };
     case "green":
-      return { color: 'rgb(0,250,0)', opacity: opacity };
+      return { color: green, opacity: opacity };
     case "yellow":
-      return { color: 'rgb(250,250,0)', opacity: opacity };
+      return { color: yellow, opacity: opacity };
     case "blue":
-      return { color: 'rgb(0,0,250)', opacity: opacity };
+      return { color: blue, opacity: opacity };
     default:
-      return { color: 'rgb(0,0,250)', opacity: 0};
+      return { color: 'rgb(0,200,200)', opacity: 0};
   }
 };
 
@@ -51,9 +56,9 @@ const Box = (props)  => {
 
     useEffect(() => {
       if (validBlocks.length) {
-        setOpacity((validBlocks.includes(boxBlock)) ? 0.8 : props.opacity)
+        setOpacity((validBlocks.includes(boxBlock)) ? 0.9 : props.opacity)
       }
-    }, [validBlocks,reValidate]);
+    }, [validBlocks, reValidate]);
 
     const onClick = useCallback((e) => {
       e.stopPropagation()
@@ -68,6 +73,8 @@ const Box = (props)  => {
       else {
         setBoxColor(color)
         setBoxBlock(selectedBlock)
+        console.log(color)
+        console.log(colorMap(color))
         setH(1)
         deleteBlockPart(boxBlock, [...props.position])
         addBlockPart(selectedBlock, [...props.position])
@@ -89,19 +96,19 @@ const Box = (props)  => {
             <mesh
               position = {pos}
               ref={mesh}
-              scale={[0.99, h, 0.99]}
+              scale={[1, h, 1]}
               onClick={onClick}
             >
               <boxGeometry args={[1, 1, 1]} />
               <meshStandardMaterial 
-                color={boxColor} 
+                color={colorMap(boxColor).color} 
                 transparent={true} 
-                opacity={opacity} 
+                opacity={(validBlocks.includes(boxBlock)) ? 0.9 : props.opacity} 
                 flatShading={true}
                 metalness={0.1}
                 />
               <Edges
-                  linewidth={0.5}
+                  linewidth={0.6}
                   scale={1}
                   threshold={15}
                   color={selectedBlock === boxBlock ? "white" : "black"}
@@ -142,9 +149,12 @@ export const Board3D = ({matrix}) => {
 
 export const Matrix3D = ({matrix}) => {
   const offset = matrix.length/(-2)+0.5
+  const [OrbitControls, events] = useControls()
   return (
+    <View style={{flex: 1}} {...events}>
       <Canvas 
         camera={{ position: [0, 6, 6]}}>
+        <OrbitControls />
         <ambientLight intensity={0.6} />
         <spotLight position={[0, 10, 10]} angle={0.30} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
@@ -161,6 +171,7 @@ export const Matrix3D = ({matrix}) => {
           )}
         </group>
       </Canvas>
+      </View>
   );
 };
 
