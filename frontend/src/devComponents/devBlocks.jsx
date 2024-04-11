@@ -42,7 +42,34 @@ const TouchableBlock = ({id}) => {
   )
 }
 
-const DevBlockRenderer = ({ blocks }) => {
+const TouchableVariationBlock = ({id, color}) => {
+  const {blockImageVariationsMapping} = useContext(AssetsContext)
+  const {setColor, setSelectedBlock} = useContext(Game3dContext)
+  
+  const handleClick = () => {
+    setColor(color)
+    setSelectedBlock(id)
+  }
+
+  const handlePress = () => {
+    setColor(color)
+    setSelectedBlock(id)
+  }
+
+  return (
+    <TouchableOpacity onPress={() => handleClick()}>
+      <Animatable.Image
+        animation={'bounceInLeft'} 
+        duration={1000}
+        source={blockImageVariationsMapping[id][color]}
+        style={styles.blockImage}
+      />
+    </TouchableOpacity>
+    
+  )
+}
+
+export const DevBlockRenderer = ({ blocks }) => {
   
   return (
       <ScrollView horizontal>
@@ -53,6 +80,19 @@ const DevBlockRenderer = ({ blocks }) => {
 
   );
 };
+
+export const DevBlockRenderer4colors = ({ blocks }) => {
+  colors = ["red", "green", "blue", "yellow"]
+  return (
+      <ScrollView horizontal>
+            {blocks.map((id, i) => (
+              <TouchableVariationBlock key={id} id={id} color={colors[i]}/>
+        ))}
+        </ScrollView>
+
+  );
+};
+
 
 const styles = StyleSheet.create({
   container: {
@@ -75,5 +115,3 @@ const styles = StyleSheet.create({
     resizeMode: 'center'
   },
 });
-
-export default DevBlockRenderer;

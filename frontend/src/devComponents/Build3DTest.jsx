@@ -6,7 +6,7 @@ import { getPuzzle } from '../services/puzzle';
 import Text from '../components/Text';
 
 import { Hint} from '../components/Matrix';
-import DevBlockRenderer  from './devBlocks'
+import {DevBlockRenderer, DevBlockRenderer4colors}  from './devBlocks'
 import { Loading } from '../components/Loading';
 import { debounce } from 'lodash';
 
@@ -101,7 +101,7 @@ const Build3dTest = () => {
       <View style={{position:'absolute', bottom:5}}>
         {isLoading 
           ? ( <Loading /> )
-          : ( puzzle?.blocks && <DevBlockRenderer blocks={puzzle.blocks}/> )
+          : ( puzzle?.blocks && <DevBlockRenderer4colors blocks={puzzle.blocks}/> )
 
         }
       </View>

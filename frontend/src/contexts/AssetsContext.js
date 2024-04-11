@@ -19,6 +19,8 @@ export const AssetsContextProvider = ({ children }) => {
   const [redEffect, set_redEffect] = useState(null);
   const [caveWall, set_caveWall] = useState(null);
   const [blockImageMapping, setBlockImageMapping] = useState(null);
+  const [blockImageVariationsMapping, setBlockImageVariationsMapping] =
+    useState(null);
 
   useEffect(() => {
     if (!fontsLoading && !imagesLoading) setLoading(false);
@@ -136,6 +138,220 @@ export const AssetsContextProvider = ({ children }) => {
           y3: y3_block,
           y4: y4_block,
         });
+
+        const [
+          g1_blocks,
+          g2_blocks,
+          g3_blocks,
+          g4_blocks,
+          b1_blocks,
+          b2_blocks,
+          b3_blocks,
+          b4_blocks,
+          r1_blocks,
+          r2_blocks,
+          r3_blocks,
+          r4_blocks,
+          y1_blocks,
+          y2_blocks,
+          y3_blocks,
+          y4_blocks,
+        ] = await Promise.all([
+          [
+            require("../../assets/block_color_variations/g1/blue.png"),
+            require("../../assets/block_color_variations/g1/green.png"),
+            require("../../assets/block_color_variations/g1/red.png"),
+            require("../../assets/block_color_variations/g1/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/g2/blue.png"),
+            require("../../assets/block_color_variations/g2/green.png"),
+            require("../../assets/block_color_variations/g2/red.png"),
+            require("../../assets/block_color_variations/g2/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/g3/blue.png"),
+            require("../../assets/block_color_variations/g3/green.png"),
+            require("../../assets/block_color_variations/g3/red.png"),
+            require("../../assets/block_color_variations/g3/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/g4/blue.png"),
+            require("../../assets/block_color_variations/g4/green.png"),
+            require("../../assets/block_color_variations/g4/red.png"),
+            require("../../assets/block_color_variations/g4/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/b1/blue.png"),
+            require("../../assets/block_color_variations/b1/green.png"),
+            require("../../assets/block_color_variations/b1/red.png"),
+            require("../../assets/block_color_variations/b1/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/b2/blue.png"),
+            require("../../assets/block_color_variations/b2/green.png"),
+            require("../../assets/block_color_variations/b2/red.png"),
+            require("../../assets/block_color_variations/b2/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/b3/blue.png"),
+            require("../../assets/block_color_variations/b3/green.png"),
+            require("../../assets/block_color_variations/b3/red.png"),
+            require("../../assets/block_color_variations/b3/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/b4/blue.png"),
+            require("../../assets/block_color_variations/b4/green.png"),
+            require("../../assets/block_color_variations/b4/red.png"),
+            require("../../assets/block_color_variations/b4/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/r1/blue.png"),
+            require("../../assets/block_color_variations/r1/green.png"),
+            require("../../assets/block_color_variations/r1/red.png"),
+            require("../../assets/block_color_variations/r1/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/r2/blue.png"),
+            require("../../assets/block_color_variations/r2/green.png"),
+            require("../../assets/block_color_variations/r2/red.png"),
+            require("../../assets/block_color_variations/r2/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/r3/blue.png"),
+            require("../../assets/block_color_variations/r3/green.png"),
+            require("../../assets/block_color_variations/r3/red.png"),
+            require("../../assets/block_color_variations/r3/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/r4/blue.png"),
+            require("../../assets/block_color_variations/r4/green.png"),
+            require("../../assets/block_color_variations/r4/red.png"),
+            require("../../assets/block_color_variations/r4/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/y1/blue.png"),
+            require("../../assets/block_color_variations/y1/green.png"),
+            require("../../assets/block_color_variations/y1/red.png"),
+            require("../../assets/block_color_variations/y1/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/y2/blue.png"),
+            require("../../assets/block_color_variations/y2/green.png"),
+            require("../../assets/block_color_variations/y2/red.png"),
+            require("../../assets/block_color_variations/y2/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/y3/blue.png"),
+            require("../../assets/block_color_variations/y3/green.png"),
+            require("../../assets/block_color_variations/y3/red.png"),
+            require("../../assets/block_color_variations/y3/yellow.png"),
+          ],
+          [
+            require("../../assets/block_color_variations/y4/blue.png"),
+            require("../../assets/block_color_variations/y4/green.png"),
+            require("../../assets/block_color_variations/y4/red.png"),
+            require("../../assets/block_color_variations/y4/yellow.png"),
+          ],
+        ]);
+        setBlockImageVariationsMapping({
+          g1: {
+            blue: g1_blocks[0],
+            green: g1_blocks[1],
+            red: g1_blocks[2],
+            yellow: g1_blocks[3],
+          },
+          g2: {
+            blue: g2_blocks[0],
+            green: g2_blocks[1],
+            red: g2_blocks[2],
+            yellow: g2_blocks[3],
+          },
+          g3: {
+            blue: g3_blocks[0],
+            green: g3_blocks[1],
+            red: g3_blocks[2],
+            yellow: g3_blocks[3],
+          },
+          g4: {
+            blue: g4_blocks[0],
+            green: g4_blocks[1],
+            red: g4_blocks[2],
+            yellow: g4_blocks[3],
+          },
+          b1: {
+            blue: b1_blocks[0],
+            green: b1_blocks[1],
+            red: b1_blocks[2],
+            yellow: b1_blocks[3],
+          },
+          b2: {
+            blue: b2_blocks[0],
+            green: b2_blocks[1],
+            red: b2_blocks[2],
+            yellow: b2_blocks[3],
+          },
+          b3: {
+            blue: b3_blocks[0],
+            green: b3_blocks[1],
+            red: b3_blocks[2],
+            yellow: b3_blocks[3],
+          },
+          b4: {
+            blue: b4_blocks[0],
+            green: b4_blocks[1],
+            red: b4_blocks[2],
+            yellow: b4_blocks[3],
+          },
+          r1: {
+            blue: r1_blocks[0],
+            green: r1_blocks[1],
+            red: r1_blocks[2],
+            yellow: r1_blocks[3],
+          },
+          r2: {
+            blue: r2_blocks[0],
+            green: r2_blocks[1],
+            red: r2_blocks[2],
+            yellow: r2_blocks[3],
+          },
+          r3: {
+            blue: r3_blocks[0],
+            green: r3_blocks[1],
+            red: r3_blocks[2],
+            yellow: r3_blocks[3],
+          },
+          r4: {
+            blue: r4_blocks[0],
+            green: r4_blocks[1],
+            red: r4_blocks[2],
+            yellow: r4_blocks[3],
+          },
+          y1: {
+            blue: y1_blocks[0],
+            green: y1_blocks[1],
+            red: y1_blocks[2],
+            yellow: y1_blocks[3],
+          },
+          y2: {
+            blue: y2_blocks[0],
+            green: y2_blocks[1],
+            red: y2_blocks[2],
+            yellow: y2_blocks[3],
+          },
+          y3: {
+            blue: y3_blocks[0],
+            green: y3_blocks[1],
+            red: y3_blocks[2],
+            yellow: y3_blocks[3],
+          },
+          y4: {
+            blue: y4_blocks[0],
+            green: y4_blocks[1],
+            red: y4_blocks[2],
+            yellow: y4_blocks[3],
+          },
+        });
         console.log("loaded");
         setImagesLoading(false);
       } catch (error) {
@@ -161,6 +377,7 @@ export const AssetsContextProvider = ({ children }) => {
         redEffect,
         greenEffect,
         blockImageMapping,
+        blockImageVariationsMapping,
       }}
     >
       {children}

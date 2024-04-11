@@ -72,23 +72,16 @@ const Box = (props)  => {
       }
       else {
         setBoxColor(color)
-        setBoxBlock(selectedBlock)
-        console.log(color)
-        console.log(colorMap(color))
         setH(1)
         deleteBlockPart(boxBlock, [...props.position])
+        setBoxBlock(selectedBlock)
         addBlockPart(selectedBlock, [...props.position])
         console.log(validBlocks)
       }
 
 
-    }, [color, opacity, boxBlock]);
+    }, [color, opacity, boxBlock, selectedBlock]);
 
-    const onHold = useCallback((e) => {
-      e.stopPropagation()
-      setBoxColor(color)
-      setOpacity(0.8)
-    }, [color]);
 
     return opacity && !(!visibleTop && props.position[1])
       ? ( 
