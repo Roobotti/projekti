@@ -5,19 +5,17 @@ import { getPuzzle } from '../services/puzzle';
 
 import Text from '../components/Text';
 
-import { Hint} from '../components/Matrix';
-import {DevBlockRenderer, DevBlockRenderer4colors}  from './devBlocks'
+import { DevBlockRenderer4colors}  from './devBlocks'
 import { Loading } from '../components/Loading';
-import { debounce } from 'lodash';
+
 
 
 import * as Animatable from 'react-native-animatable';
-import { Matrix3D, DevSolution } from './devMatrix';
+import { Matrix3D } from './devMatrix';
 import { useContext } from 'react';
-import { GameContext } from '../contexts/GameContext';
+
 import { Game3dContext } from '../contexts/Game3dContext';
 
-import {Outlines, Edges, OrbitControls} from '@react-three/drei'
 
 
 
@@ -26,12 +24,9 @@ const Build3dTest = () => {
   const [ puzzle, setPuzzle ] = useState({})
 
   const [isLoading, setIsLoading] = useState(false);
-  const [hintText, setHintText] = useState('Hint availabe') 
-  const [hintTimer, setHintTimer] = useState(0)
-  const [solution, setSolution] = useState(0)
 
-  const {visibleTop, setVisibleTop} = useContext(Game3dContext)
-  const {setBlocks} = useContext(Game3dContext)
+
+  const {visibleTop, setVisibleTop, setBlocks, setSolution} = useContext(Game3dContext)
 
   useEffect( () => {
     getData()
@@ -41,21 +36,13 @@ const Build3dTest = () => {
     if (puzzle?.blocks) {
        setBlocks(puzzle.blocks)
     }
+    if (puzzle?.solutions) {
+       setSolution(puzzle.solutions[0])
+    }
 
   },[puzzle])
 
-  useEffect( () => {
-    setHintText(hintTimer?`   Next in ${hintTimer} s   `:'Hint available')
-    if ( hintTimer > 0) {
-      const interval = setInterval( () => {
-        setHintTimer( c => c - 1)
-      }, 1000);
-      return () => {
-        clearInterval(interval);
-      };
-  }
 
-  }, [hintTimer])
 
   const getData = async () => {
     try {
@@ -70,15 +57,7 @@ const Build3dTest = () => {
     }
   };
 
-  const handleNextSolution = (n) => {
-    puzzle.solutions.length - solution ? setSolution(solution + n) : setSolution(0)
-  }
 
-  const handleTouchStart = () => {
-    setHintTimer(5)
-    debounceSetTimer()
-  }
-  const debounceSetTimer = debounce(() => { setHintTimer(5)}, 1000); 
 
   return (
     <View style={{flex: 1}}>
@@ -105,25 +84,6 @@ const Build3dTest = () => {
 
         }
       </View>
-
-      {puzzle && <Animatable.View 
-        animation={'fadeIn'}
-        duration={3000}
-        style={{
-          position:'absolute',
-          top: 70,
-          right: 10,
-          transform: [{rotate: '30deg'}],
-          alignSelf: 'center',
-          alignSelf:'stretch', 
-          padding:10, 
-          backgroundColor:'rgba(121, 217, 80, 0.3)',
-          borderRadius: 6,
-        }}
-        >
-        <Text style={{alignSelf: 'center'}}>{hintText}</Text>
-      </Animatable.View>
-      }
 
     </View>
   );

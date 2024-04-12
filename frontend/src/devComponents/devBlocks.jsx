@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { AssetsContext } from '../contexts/AssetsContext';
@@ -43,22 +43,34 @@ const TouchableBlock = ({id}) => {
 }
 
 const TouchableVariationBlock = ({id, color}) => {
+  const myRef = useRef(null)
   const {blockImageVariationsMapping} = useContext(AssetsContext)
-  const {setColor, setSelectedBlock} = useContext(Game3dContext)
-  
+  const {setColor, setSelectedBlock, setPressed} = useContext(Game3dContext)
+
+  handleViewRef = ref => myRef.view = ref
+
   const handleClick = () => {
     setColor(color)
     setSelectedBlock(id)
   }
 
-  const handlePress = () => {
-    setColor(color)
-    setSelectedBlock(id)
+  const handleClickIn = () => {
+    myRef.view.flash(500)
+  }
+
+  const handleClickOut = () => {
+    myRef.view.pulse(400)
+  }
+
+  const handleLongPress = () => {
+    setPressed(id)
+    myRef.view.shake(500)
   }
 
   return (
-    <TouchableOpacity onPress={() => handleClick()}>
+    <TouchableOpacity onPressIn={handleClickIn}  onPressOut={handleClickOut} onPress={handleClick} onLongPress={handleLongPress}>
       <Animatable.Image
+        ref={this.handleViewRef}
         animation={'bounceInLeft'} 
         duration={1000}
         source={blockImageVariationsMapping[id][color]}
@@ -82,7 +94,8 @@ export const DevBlockRenderer = ({ blocks }) => {
 };
 
 export const DevBlockRenderer4colors = ({ blocks }) => {
-  colors = ["red", "green", "blue", "yellow"]
+
+  const colors = ["red", "green", "blue", "yellow"]
   return (
       <ScrollView horizontal>
             {blocks.map((id, i) => (
@@ -112,6 +125,8 @@ const styles = StyleSheet.create({
   blockImage: {
     width: 100,
     height: 100,
-    resizeMode: 'center'
+    resizeMode: 'center',
+
+
   },
 });

@@ -14,13 +14,14 @@ export const Game3dContextProvider = ({ children }) => {
   const [color, setColor] = useState("red");
 
   const [selectedBlock, setSelectedBlock] = useState(null);
+  const [pressed, setPressed] = useState(null);
   const [visibleTop, setVisibleTop] = useState(true);
   const [blockParts, setBlockParts] = useState([[], [], [], []]);
   const [blocks, setBlocks] = useState([]);
-  const [blocksSize, setBlockSize] = useState([5, 5, 5, 5]);
-  const [fullBlocks, setFullBlocks] = useState(0);
   const [validBlocks, setValidBlocks] = useState([]);
   const [reValidate, setReValidate] = useState(false);
+  const [solution, setSolution] = useState(null);
+  const [blockColorMap, setBlockColorMap] = useState({});
 
   const block_size = {
     r1: 5,
@@ -42,12 +43,24 @@ export const Game3dContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    setBlockParts([[], [], [], []]);
-    setBlockSize([...blocks.map((b) => block_size[b])]);
+    if (pressed) {
+      const i = blocks.indexOf(pressed);
+      const newBlockParts = [...blockParts];
+      newBlockParts[i] = [];
+      setBlockParts(newBlockParts);
+      setValidBlocks((a) => a.filter((b) => b !== pressed));
+    }
+  }, [pressed]);
+
+  useEffect(() => {
+    if (blocks.length) {
+      setBlockParts([[], [], [], []]);
+      setSelectedBlock(blocks[0]);
+    }
   }, [blocks]);
 
   useEffect(() => {
-    if (true) {
+    if (reValidate) {
       setReValidate(false);
       for (let i = 0; i < 4; i++) {
         if (blocks?.length && blockParts[i].length) {
@@ -67,8 +80,6 @@ export const Game3dContextProvider = ({ children }) => {
     newBlockParts[i] = [...blockParts[i], position];
     setBlockParts(newBlockParts);
     if (newBlockParts[i].length >= block_size[block]) setReValidate(true);
-    console.log("new blocks: " + newBlockParts[i]);
-    console.log(newBlockParts[i]);
   };
 
   const deleteBlockPart = (block, position) => {
@@ -84,26 +95,30 @@ export const Game3dContextProvider = ({ children }) => {
       newBlockParts[i].length === block_size[block] - 1
     )
       setReValidate(true);
-
-    console.log("deleted blocks: " + newBlockParts[i]);
-    console.log(newBlockParts[i]);
   };
 
   return (
     <Game3dContext.Provider
       value={{
         color,
+        blocks,
         selectedBlock,
         visibleTop,
         validBlocks,
         reValidate,
+        pressed,
+        solution,
+        blockColorMap,
 
+        setBlockColorMap,
+        setSolution,
         setColor,
         setSelectedBlock,
         setVisibleTop,
         setBlocks,
         addBlockPart,
         deleteBlockPart,
+        setPressed,
       }}
     >
       {children}

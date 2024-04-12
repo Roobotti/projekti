@@ -31,10 +31,10 @@ const colorMap = (key) => {
       return { color: red, opacity: opacity };
     case "green":
       return { color: green, opacity: opacity };
-    case "yellow":
-      return { color: yellow, opacity: opacity };
     case "blue":
       return { color: blue, opacity: opacity };
+    case "yellow":
+      return { color: yellow, opacity: opacity };
     default:
       return { color: 'rgb(0,200,200)', opacity: 0};
   }
@@ -48,11 +48,21 @@ const Box = (props)  => {
     const [opacity, setOpacity] = useState(props.opacity);
     const [pos, setPos] = useState([props.position[0], props.position[1], props.position[2]])
     const [h, setH] = useState(0.1);
-    const {color, selectedBlock, visibleTop, addBlockPart, deleteBlockPart, validBlocks, reValidate} = useContext(Game3dContext)
+    const {color, selectedBlock, visibleTop, pressed, setPressed, addBlockPart, deleteBlockPart, validBlocks, reValidate} = useContext(Game3dContext)
     
+    useEffect(() => {
+      if (pressed === boxBlock){
+        setPressed(null)
+        setBoxColor("gray")
+        setBoxBlock(null)
+        setH(0.05)
+      }
+    }, [pressed]);
+
     useEffect(() => {
       setPos([pos[0], (h<1) ? props.position[1]-0.5 : props.position[1], pos[2]])
     }, [h]);
+
 
     useEffect(() => {
       if (validBlocks.length) {
@@ -62,6 +72,7 @@ const Box = (props)  => {
 
     const onClick = useCallback((e) => {
       e.stopPropagation()
+
       if (selectedBlock === boxBlock) {
         setBoxColor("gray")
         setBoxBlock(null)
@@ -76,7 +87,6 @@ const Box = (props)  => {
         deleteBlockPart(boxBlock, [...props.position])
         setBoxBlock(selectedBlock)
         addBlockPart(selectedBlock, [...props.position])
-        console.log(validBlocks)
       }
 
 
@@ -154,12 +164,12 @@ export const Matrix3D = ({matrix}) => {
         <group position={[offset*1.2, 0, 0]} scale={1.2}>
           {matrix.map((row, rowIndex) =>
             row.map((value, colIndex) => (
-                <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 0, colIndex]} {...colorMap(value)} />
+                <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 0, colIndex]} {...colorMap(value)}  />
             ))
           )}
           {matrix.map((row, rowIndex) =>
             row.map((value, colIndex) => (
-              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 1, colIndex]} {...colorMap(value)} />
+              <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 1, colIndex]} {...colorMap( value)} />
             ))
           )}
         </group>

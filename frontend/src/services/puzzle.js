@@ -9,6 +9,6 @@ const baseUrl = `${Constants.expoConfig.extra.uri}/api/puzzle`;
 export const getPuzzle = async () => {
   const response = await fetch(`${baseUrl}`);
   const json = await response.json();
-  console.log("res", json);
+  console.log("resu", json);
   return json;
 };
