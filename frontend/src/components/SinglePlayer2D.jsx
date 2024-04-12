@@ -13,7 +13,7 @@ import { debounce } from 'lodash';
 import * as Animatable from 'react-native-animatable';
 
 
-const Board = () => {
+const SinglePlayer2D = () => {
 
   const [ puzzle, setPuzzle ] = useState({})
 
@@ -96,4 +96,4 @@ const Board = () => {
   );
 };
 
-export default Board;
+export default SinglePlayer2D;

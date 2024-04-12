@@ -3,6 +3,9 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { AssetsContext } from '../contexts/AssetsContext';
 
+
+
+
 export const BlockRendererLarge = ({ blocks }) => {
   const {blockImageMapping} = useContext(AssetsContext)
   const rows = Math.ceil(blocks.length / 2); // Calculate the number of rows needed
@@ -25,7 +28,6 @@ export const BlockRendererLarge = ({ blocks }) => {
   );
 };
 
-
 const BlockRenderer = ({ blocks }) => {
   const {blockImageMapping} = useContext(AssetsContext)
   return (
@@ -44,6 +46,8 @@ const BlockRenderer = ({ blocks }) => {
 
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {

@@ -67,7 +67,7 @@ const Menu = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       
-        <TouchableOpacity onPress={() => navigate("/singlePlayer", { replace: true })} style={styles.option}>
+        <TouchableOpacity onPress={() => navigate("/SinglePlayerMenu", { replace: true })} style={styles.option}>
           <ImageBackground source={paint_3} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.optionText}>Single Player</Text>
           </ImageBackground>

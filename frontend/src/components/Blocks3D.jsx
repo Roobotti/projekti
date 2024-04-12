@@ -44,7 +44,7 @@ const TouchableVariationBlock = ({id, color}) => {
 }
 
 
-export const DevBlockRenderer4colors = ({ blocks }) => {
+const Blocks3D = ({ blocks }) => {
 
   const colors = ["red", "green", "blue", "yellow"]
   return (
@@ -57,6 +57,7 @@ export const DevBlockRenderer4colors = ({ blocks }) => {
   );
 };
 
+export default Blocks3D
 
 const styles = StyleSheet.create({
   container: {

@@ -5,16 +5,13 @@ import { getPuzzle } from '../services/puzzle';
 
 import Text from '../components/Text';
 
-import { DevBlockRenderer4colors}  from './devBlocks'
+import Blocks3D from './Blocks3D';
 import { Loading } from '../components/Loading';
 
-
-import { Matrix3D } from './devMatrix';
+import Matrix3D from './Matrix3D';
 import { useContext } from 'react';
 
 import { Game3dContext } from '../contexts/Game3dContext';
-
-
 
 
 const Build3dTest = () => {
@@ -78,7 +75,7 @@ const Build3dTest = () => {
       <View style={{position:'absolute', bottom:5}}>
         {isLoading 
           ? ( <Loading /> )
-          : ( puzzle?.blocks && <DevBlockRenderer4colors blocks={puzzle.blocks}/> )
+          : ( puzzle?.blocks && <Blocks3D blocks={puzzle.blocks}/> )
 
         }
       </View>

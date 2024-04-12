@@ -114,7 +114,7 @@ const Box = (props)  => {
       
   }
 
-export const Matrix3D = ({matrix}) => {
+const Matrix3D = ({matrix}) => {
   const offset = matrix.length/(-2)+0.5
   const [OrbitControls, events] = useControls()
   return (
@@ -141,5 +141,5 @@ export const Matrix3D = ({matrix}) => {
       </View>
   );
 };
-
+export default Matrix3D
 

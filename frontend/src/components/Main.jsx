@@ -2,7 +2,9 @@ import { StyleSheet, ImageBackground } from 'react-native';
 import { Route, Routes, Navigate } from 'react-router-native';
 import AppBar from './AppBar';
 import { SignUp, SignIn, SignOut } from './Sign';
-import Board from './SinglePlayer';
+import SinglePlayerMenu from './SinglePlayerMenu';
+import SinglePlayer2D from './SinglePlayer2D';
+import SinglePlayer3D from './SinglePlayer3D';
 import Menu from './Menu';
 import DevTest from '../devComponents/SolutionTest';
 import DevMenu from '../devComponents/DevMenu';
@@ -45,7 +47,9 @@ const Main = () => {
             <Route path="/SolutionTest" element={<DevTest />} exact />
             <Route path="/DevMenu" element={<DevMenu />} exact />
             <Route path="/3DbuildTest" element={<Build3dTest />} exact />
-            <Route path="/singlePlayer" element={<Board />} exact />
+            <Route path="/SinglePlayerMenu" element={<SinglePlayerMenu />} exact />
+            <Route path="/SinglePlayer2D" element={<SinglePlayer2D />} exact />
+            <Route path="/SinglePlayer3D" element={<SinglePlayer3D />} exact />
             <Route path="/Lobby" element={<LobbyCollap />} exact />
             <Route path="/SignIn" element={<SignIn />} exact />
             <Route path="/SignUp" element={<SignUp />} exact />
