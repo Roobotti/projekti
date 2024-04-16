@@ -37,6 +37,8 @@ class Friend(BaseModel):
     avatar: str
     wins: list[str]
     loses: list[str]
+    level: int
+    xp: int
 
     def to_dict(self):
         return self.dict()
@@ -52,6 +54,9 @@ class User(BaseModel):
     lobby: str
     avatar: str
     disabled: bool | None = None
+    level: int
+    xp: int
+    streak: int
 
     def json(self, *args, **kwargs):
         return super().json(*args, **kwargs, exclude_none=True, by_alias=True)
