@@ -14,6 +14,7 @@ import { useContext } from 'react';
 import { Game3dContext } from '../contexts/Game3dContext';
 
 import * as Animatable from 'react-native-animatable';
+import { delay } from 'lodash';
 
 
 const Score = () => {
@@ -161,6 +162,7 @@ const Score = () => {
 const SinglePlayer3D = () => {
 
   const [ puzzle, setPuzzle ] = useState({})
+  const [ score, setScore ] = useState(false)
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -178,8 +180,18 @@ const SinglePlayer3D = () => {
 
   },[puzzle])
 
+  gameRef = useRef(null)
+
+  useEffect(() => {
+    if (gameRef.current && allValid){
+      gameRef.current.animate('fadeOut').then( () => setTimeout( () => { setScore(true) }, 10))
+      
+    }
+  }, [allValid])
+
   const getData = async () => {
     try {
+      if (score) setScore(false)
       setPuzzle({})
       setIsLoading(true)
       const response = await getPuzzle()
@@ -212,8 +224,7 @@ const SinglePlayer3D = () => {
 
   const Game = () => {
     return (
-      <View style={{flex: 1}}>
-        <NewBoard/>
+      <View style={{flex:1}} >
       <View style={{flexDirection: 'row', justifyContent:'space-evenly'}}>
           <TouchableOpacity onPress={() => setVisibleTop(!visibleTop)} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
               <Text style={{alignSelf: 'center'}}>
@@ -237,12 +248,26 @@ const SinglePlayer3D = () => {
     )
   }
 
+
   const GameState = useMemo(() => {
-    console.log("allValid", allValid)
-    return allValid 
-    ? <Solved /> 
-    : <Game />;
-  }, [isLoading, allValid]);
+  //animation={'zoomOut'} delay={3000} onAnimationEnd={() => setScore(true)
+    return(
+      <View style={{flex:1}}>
+        <NewBoard/>
+        {!score && 
+        <Animatable.View ref={gameRef} delay={100} style={{flex:1}} >
+          <Game />
+        </Animatable.View>}
+        
+        {score && 
+          <Animatable.View animation={'bounceIn'} delay={100} style={{flex:1}} >
+            <Score />
+          </Animatable.View>}
+      </View>
+    )
+    
+
+  }, [isLoading, score]);
 
   return GameState;
     
