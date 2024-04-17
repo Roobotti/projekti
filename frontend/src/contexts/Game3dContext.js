@@ -7,11 +7,24 @@ import React, {
 } from "react";
 import { padBlock } from "../tools/PadBlock";
 import { blockIsValid } from "../tools/BlockRotations";
+import { floor, max, min } from "lodash";
+
+import { UserContext } from "./UserContext";
 
 export const Game3dContext = createContext();
 
 export const Game3dContextProvider = ({ children }) => {
+  const { xp, level, streak, addScore } = useContext(UserContext);
+
   const [color, setColor] = useState("red");
+
+  const [timeStart, setTimeStart] = useState(0);
+  const [score, setScore] = useState({
+    time: 0,
+    base: 100,
+    speed: 0,
+    total: 0,
+  });
 
   const [selectedBlock, setSelectedBlock] = useState(null);
   const [pressed, setPressed] = useState(null);
@@ -20,8 +33,13 @@ export const Game3dContextProvider = ({ children }) => {
   const [blocks, setBlocks] = useState([]);
   const [validBlocks, setValidBlocks] = useState([]);
   const [reValidate, setReValidate] = useState(false);
-  const [solution, setSolution] = useState(null);
+  const [allValid, setAllValid] = useState(false);
   const [blockColorMap, setBlockColorMap] = useState({});
+
+  const [xp3D, setXp] = useState(xp);
+  const [level3D, setLevel] = useState(level);
+  const [streak3D, setStreak] = useState(streak);
+  const [newLevel, setNewLevel] = useState(level);
 
   const block_size = {
     r1: 5,
@@ -42,6 +60,7 @@ export const Game3dContextProvider = ({ children }) => {
     b4: 3,
   };
 
+  //Clear all blocks of pressed
   useEffect(() => {
     if (pressed) {
       const i = blocks.indexOf(pressed);
@@ -52,13 +71,18 @@ export const Game3dContextProvider = ({ children }) => {
     }
   }, [pressed]);
 
+  //Clear all blockparts
   useEffect(() => {
     if (blocks.length) {
       setBlockParts([[], [], [], []]);
+      setValidBlocks([]);
       setSelectedBlock(blocks[0]);
     }
+    if (allValid) setAllValid(false);
+    setTimeStart(Date.now());
   }, [blocks]);
 
+  //Set all valid blocks
   useEffect(() => {
     if (reValidate) {
       setReValidate(false);
@@ -66,13 +90,42 @@ export const Game3dContextProvider = ({ children }) => {
         if (blocks?.length && blockParts[i].length) {
           setValidBlocks((b) => {
             if (blockIsValid(padBlock(blockParts[i]), blocks[i]))
-              return [...b, blocks[i]];
+              return validBlocks.includes(blocks[i]) ? b : [...b, blocks[i]];
             else return [...b.filter((a) => a !== blocks[i])];
           });
         }
       }
     }
   }, [reValidate, blockParts]);
+
+  //Check if all are valid
+  useEffect(() => {
+    if (validBlocks.length === 4) {
+      setAllValid(true);
+
+      const time = floor((Date.now() - timeStart) / 1000);
+      const base = 100;
+      const speed = time <= 180 ? 1000 - time * 5 : max([1, 100 - time * 1]);
+      const total = (base + speed) * (streak + 1);
+
+      setScore({ time, base, speed, total });
+      setXp(xp);
+      setLevel(level);
+      setStreak(min([5, streak + 1]));
+
+      let i = level;
+      while (50 * i ** 2 + 2000 * i + 500 <= xp + total) {
+        i++;
+      }
+
+      setTimeStart(Date.now());
+      console.log(total);
+      console.log("level: ", i);
+
+      setNewLevel(i);
+      addScore(xp + total, i, min([5, streak + 1]));
+    }
+  }, [validBlocks]);
 
   const addBlockPart = (block, position) => {
     const i = blocks.indexOf(block);
@@ -107,11 +160,19 @@ export const Game3dContextProvider = ({ children }) => {
         validBlocks,
         reValidate,
         pressed,
-        solution,
         blockColorMap,
+        allValid,
+        score,
+        xp3D,
+        level3D,
+        streak3D,
+        newLevel,
 
+        setXp,
+        setLevel,
+        setStreak,
+        setAllValid,
         setBlockColorMap,
-        setSolution,
         setColor,
         setSelectedBlock,
         setVisibleTop,
@@ -119,6 +180,7 @@ export const Game3dContextProvider = ({ children }) => {
         addBlockPart,
         deleteBlockPart,
         setPressed,
+        setValidBlocks,
       }}
     >
       {children}

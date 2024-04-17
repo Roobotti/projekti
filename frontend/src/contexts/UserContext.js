@@ -1,10 +1,11 @@
 import { createContext, useEffect, useState } from "react";
-import { readUsersMe } from "../services/users";
+import { readUsersMe, updateScore } from "../services/users";
 import { useAuthStorage } from "../hooks/useStorageContext";
 
 import { loadFriendData } from "../services/users";
 
 import { socket } from "../services/socket";
+import { update } from "lodash";
 
 export const UserContext = createContext();
 
@@ -22,6 +23,10 @@ export const UserContextProvider = ({ children }) => {
   const [invites, setInvites] = useState([]);
   const [sentInvite, setSentInvite] = useState(null);
   const [avatar, setAvatar] = useState(null);
+  const [xp, setXp] = useState(0);
+  const [level, setLevel] = useState(0);
+  const [streak, setStreak] = useState(0);
+
   const [reFresh, setReFresh] = useState(false);
   const [loading, setLoading] = useState();
 
@@ -91,8 +96,12 @@ export const UserContextProvider = ({ children }) => {
         const loses = result ? result.loses : [];
         const avatar = result ? result.avatar : null;
         const sentRequests = result ? result.sentRequests : [];
+        const xp = result ? result.xp : 0;
+        const level = result ? result.level : 0;
+        const streak = result ? result.streak : 0;
 
         console.log("user:", user);
+        console.log("xp: ", xp, " level: ", level, " streak: ", streak);
         setUser(user);
         setFriends(await friends);
         setRequests(requests);
@@ -100,6 +109,9 @@ export const UserContextProvider = ({ children }) => {
         setWins(wins);
         setLoses(loses);
         setAvatar(avatar);
+        setXp(xp);
+        setLevel(level);
+        setStreak(streak);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching da user data:", error);
@@ -128,6 +140,13 @@ export const UserContextProvider = ({ children }) => {
     setToken(null);
   };
 
+  const addScore = (newXp, newLevel, newStreak) => {
+    setXp(newXp);
+    setLevel(newLevel);
+    setStreak(newStreak);
+    updateScore(token, xp, level, streak);
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -143,10 +162,14 @@ export const UserContextProvider = ({ children }) => {
         invites,
         sentInvite,
         avatar,
+        xp,
+        level,
+        streak,
         loading,
         setFriend,
         login,
         logout,
+        addScore,
         setSentRequests,
         setRequests,
         setReFresh,
@@ -155,6 +178,9 @@ export const UserContextProvider = ({ children }) => {
         setSentInvite,
         setRoom,
         setAvatar,
+        setXp,
+        setLevel,
+        setStreak,
       }}
     >
       {children}

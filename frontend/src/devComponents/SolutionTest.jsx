@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, TouchableOpacity, StyleSheet, PanResponder, Animated } from 'react-native';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { View, TouchableOpacity, StyleSheet, PanResponder, Animated, ImageBackground } from 'react-native';
 
 import { getPuzzle } from '../services/puzzle';
 
@@ -9,17 +9,22 @@ import { Hint } from '../components/Matrix';
 import { DevSolution } from './devMatrix';
 import BlockRenderer from '../components/Blocks';
 import { Loading } from '../components/Loading';
-import { debounce } from 'lodash';
+import { debounce, min, pad } from 'lodash';
 
 import * as Animatable from 'react-native-animatable';
 import { GLView } from 'expo-gl';
 import {  Canvas, Box } from '@react-three/fiber/native';
 
 import useControls from "r3f-native-orbitcontrols"
+import { useContext } from 'react';
+
+import { UserContext } from '../contexts/UserContext';
+import { Game3dContext } from '../contexts/Game3dContext';
+import { AssetsContext } from '../contexts/AssetsContext';
 
 const DEG45 = Math.PI / 4;
 
-const DevTest2 = () => {
+const DevTest1 = () => {
 
   const [ puzzle, setPuzzle ] = useState({})
 
@@ -127,7 +132,7 @@ const DevTest2 = () => {
   );
 };
 
-const DevTest = () => {
+const DevTest2 = () => {
   const [OrbitControls, events] = useControls()
 	return (
     <View style={{flex: 1}} {...events}>
@@ -142,4 +147,168 @@ const DevTest = () => {
       </View>
 	);
 }
+
+const DevTest = () => {
+    const {xp3D, level3D, streak3D, score, setValidBlocks} = useContext(Game3dContext)
+
+    progressBarRef = useRef(null)
+    rr = useRef(null)
+    totalRef = useRef(null)
+
+    const [animation, setAnimation] = useState(xp3D ? 0 : 1)
+    const [level, setLevel] = useState(level3D)
+    const [streak, setStreak] = useState(1)
+    const [next, setNext] = useState(false)
+    const [total, setTotal] = useState(0)
+
+    const [width, setWidth] = useState(0)
+
+    const [start, setStart] = useState(0)
+    
+    const nextLevelXp = (level) => level >= 0 ? 50*level**2+2000*level+500 : 0
+    const nextXp = (level) => nextLevelXp(level) - nextLevelXp(level-1)
+
+    const totalXp =  xp3D + total
+    
+    useEffect( () => {
+      setLevel(level3D)
+    }, [level3D])
+
+
+    // set the streak + 1
+    useEffect( () => {
+      if (animation > 2 && streak < streak3D){
+        setStreak( s => s + 1)
+        setTimeout( () => { setTotal(n => n + Math.floor(score.total/streak3D)) }, 10)
+      }
+
+    },[animation])
+
+    useEffect( () => {
+      if (next) {
+        setValidBlocks([1])
+        setTotal(0)
+        setStreak(1)
+        setLevel(level3D)
+        setWidth(0)
+        setStart(0)
+        setAnimation(xp3D ? 0 : 1)
+      }
+      else {
+        setValidBlocks([])
+      }
+    }, [next])
+
+
+    useEffect(() => {
+      if (progressBarRef.current) {
+        const w = (nextLevelXp(level) > totalXp) ? (192 / nextXp(level)) * (totalXp - nextLevelXp(level-1)) : 192
+        progressBarRef.current.animate({
+          from: { width: start },
+          to: { width: w },
+          duration: 100,
+          easing: "ease-in",
+          useNativeDriver: true
+          
+      } ).then( () => {
+         if (nextLevelXp(level) <= totalXp) {
+          setStart(0)
+          nextLevelXp(level) < totalXp ? setWidth(192) : setWidth(0)
+          setLevel(n => n + 1) 
+          rr.current.animate("bounce")
+         }
+         else {
+          setAnimation(a => a + 1)
+          setWidth(w)
+          setStart(w)
+         } 
+        })
+        
+        
+    }
+    }, [totalXp, level]);
+
+    useEffect(() => {
+      if (totalRef.current) {
+         totalRef.current.animate('pulse')
+    }
+    }, [total]);
+
+    const LevelUp = () => {
+        return (
+          <View>
+            <Animatable.View ref={rr} style={{alignSelf: 'center'}}>
+              <Text style={{fontSize: 20}}>Level: {level}</Text>
+            </Animatable.View>
+            <TouchableOpacity onPress={() => setLevel(0)} style={{borderColor:'black', borderWidth:4, borderRadius:10 ,height:55, width:200, backgroundColor:'rgba(0,0,0,0.5)'}}>
+              <Animatable.View 
+                ref={progressBarRef}
+                style={{ flex:1, borderRadius:6, backgroundColor:'rgba(255,225,50,0.5)', width:width}}>
+ 
+              </Animatable.View>
+            
+            </TouchableOpacity>
+            <Animatable.View style={{alignSelf: 'center'}}> 
+              <Text style={{fontSize: 20}}>{min([(totalXp - nextLevelXp(level-1)), nextXp(level)])} xp / {nextXp(level)} xp</Text>
+            </Animatable.View>
+          </View>
+        )
+    }
+    
+    return (
+        <View style={{flex: 1, display:'flex'}}>
+          <TouchableOpacity onPress={() => setNext(n => !n) } style={{alignSelf:'center', backgroundColor:'rgba(0,0,0,0.1)', margin:10}}>
+              <Text style={{margin:10}}>NEXT</Text>
+          </TouchableOpacity>
+          { next &&
+            <Animatable.View animation={'bounceIn'} style={{flex: 1, display:'flex', alignItems:'center', justifyContent:'space-around', margin:10}}>
+            
+            <Text style={{fontSize: 20 }}>Solve time: {score.time} s</Text>
+
+            <View style={{flex: 0.5, display:'flex', alignItems:'center', justifyContent:'flex-start'}}>
+              
+              <Animatable.View ref={totalRef}>
+                <Text style={{fontSize: 60}}>
+                  {total} xp
+                </Text>
+              </Animatable.View>
+
+              {(animation > 0) && 
+                <Animatable.View 
+                  animation={'tada'}
+                  onAnimationBegin={() => setTotal(n => n + score.base)} 
+                  delay={500}
+                  style={{}}>
+                    <Text style={{fontSize: 20}}>Base: {score.base} xp</Text>         
+                </Animatable.View>
+              }
+              {(animation > 1) && 
+              <Animatable.View 
+                animation={'tada'}
+                onAnimationBegin={() => setTimeout( () => {setTotal(n => n + score.speed)}, 50)} 
+                delay={0}
+                style={{}}>
+                  <Text style={{fontSize: 20}}>Time: {score.speed} xp</Text>
+              </Animatable.View>
+              }
+              
+              {(animation > 2) && 
+              <Animatable.View 
+                  animation={'tada'}
+                  onAnimationBegin={() => setStreak(1)}
+                  style={{}}>
+                    <Text style={{fontSize: 20}}>Streak: {streak} X </Text>      
+                </Animatable.View>
+                }
+              
+            </View>
+
+            <LevelUp />
+            
+
+        </Animatable.View>
+        }
+      </View>
+    )
+  }
 export default DevTest;

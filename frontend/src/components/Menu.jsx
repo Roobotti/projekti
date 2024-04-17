@@ -10,7 +10,6 @@ import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';
 import { AssetsContext } from '../contexts/AssetsContext';
 
-import {  loadFriendData} from '../services/users';
 
 const UnSigned = ({navigate, paint_1}) => {
   return (

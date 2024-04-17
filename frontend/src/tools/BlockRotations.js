@@ -420,12 +420,6 @@ const blockRotations = {
 };
 
 export const blockIsValid = (matrix, block) => {
-  console.log("testing if block is valid...");
-  console.log(block);
-  console.log(blockRotations[block].includes(matrix.flat(2).join("")));
-  if (Object.keys(blockRotations).includes(block)) {
-    console.log(blockRotations[block].includes(matrix.flat(2).join("")));
-  }
   return (
     Object.keys(blockRotations).includes(block) &&
     blockRotations[block].includes(matrix.flat(2).join(""))

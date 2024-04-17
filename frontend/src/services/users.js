@@ -192,6 +192,39 @@ export const newWin = async (token, friend) => {
 };
 
 /**
+ * Sends request to update xp, level and streak stats
+ *
+ * @param {Token} token
+ * @param {int} xp
+ * @param {int} level
+ * @param {int} streak
+ * @returns {Promise<UserData>} user data
+ */
+export const updateScore = async (token, xp, level, streak) => {
+  try {
+    const response = await fetch(
+      `${baseUrl}/users/me/updateScore/${xp}/${level}/${streak}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user data");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching the user data:", error);
+  }
+};
+
+/**
  * Sends request to update requests from db.
  *
  * @param {Token} token
