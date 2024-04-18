@@ -33,7 +33,6 @@ const TouchableVariationBlock = ({id, color}) => {
     <TouchableOpacity onPressIn={handleClickIn}  onPressOut={handleClickOut} onPress={handleClick} onLongPress={handleLongPress}>
       <Animatable.Image
         ref={this.handleViewRef}
-        animation={'bounceInLeft'} 
         duration={1000}
         source={blockImageVariationsMapping[id][color]}
         style={styles.blockImage}

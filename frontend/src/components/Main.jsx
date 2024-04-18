@@ -1,6 +1,6 @@
 import { StyleSheet, ImageBackground } from 'react-native';
 import { Route, Routes, Navigate } from 'react-router-native';
-import AppBar from './AppBar';
+import {AppBar, StatusBar} from './AppBar';
 import { SignUp, SignIn, SignOut } from './Sign';
 import SinglePlayerMenu from './SinglePlayerMenu';
 import SinglePlayer2D from './SinglePlayer2D';
@@ -41,7 +41,12 @@ const Main = () => {
         resizeMode='stretch'
         style={styles.container}
       >
-          <AppBar />
+          
+          <Routes>
+            <Route path="/SinglePlayer3D" element={<StatusBar/>}   exact />
+            <Route path="*" element={<AppBar />} />
+          </Routes>
+
           <Routes>
             <Route path="/" element={<Menu />} exact />
             <Route path="/SolutionTest" element={<DevTest />} exact />
@@ -49,7 +54,7 @@ const Main = () => {
             <Route path="/3DbuildTest" element={<Build3dTest />} exact />
             <Route path="/SinglePlayerMenu" element={<SinglePlayerMenu />} exact />
             <Route path="/SinglePlayer2D" element={<SinglePlayer2D />} exact />
-            <Route path="/SinglePlayer3D" element={<SinglePlayer3D />} exact />
+            <Route path="/SinglePlayer3D" element={<SinglePlayer3D />}   exact />
             <Route path="/Lobby" element={<LobbyCollap />} exact />
             <Route path="/SignIn" element={<SignIn />} exact />
             <Route path="/SignUp" element={<SignUp />} exact />
@@ -58,6 +63,8 @@ const Main = () => {
             <Route path="/profile" element={<Profile />} exact />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+
+
     </ImageBackground>
   );
 };

@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 
 import { getPuzzle } from '../services/puzzle';
 
 import Text from '../components/Text';
 
 import Blocks3D from './Blocks3D';
-import { Loading } from '../components/Loading';
+import { Loading, LoadingSmall } from '../components/Loading';
 
 import Matrix3D from './Matrix3D';
 import { useContext } from 'react';
@@ -14,7 +14,7 @@ import { useContext } from 'react';
 import { Game3dContext } from '../contexts/Game3dContext';
 
 import * as Animatable from 'react-native-animatable';
-import { delay } from 'lodash';
+import { useNavigate } from 'react-router-native';
 
 
 const Score = () => {
@@ -102,7 +102,7 @@ const Score = () => {
             
             </TouchableOpacity>
             <Animatable.View style={{alignSelf: 'center'}}> 
-              <Text style={{fontSize: 20}}>{Math.min([(totalXp - nextLevelXp(level-1)), nextXp(level)])} xp / {nextXp(level)} xp</Text>
+              <Text style={{fontSize: 20}}>{Math.min(...[(totalXp - nextLevelXp(level-1)), nextXp(level)])} xp / {nextXp(level)} xp</Text>
             </Animatable.View>
           </View>
         )
@@ -158,7 +158,6 @@ const Score = () => {
     )
   }
 
-
 const SinglePlayer3D = () => {
 
   const [ puzzle, setPuzzle ] = useState({})
@@ -166,8 +165,11 @@ const SinglePlayer3D = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [menu, setMenu] = useState(false)
+  const [next, setNext] = useState(false)
 
-  const { allValid, validTime, visibleTop, setVisibleTop, setBlocks} = useContext(Game3dContext)
+  const navigate = useNavigate()
+  const { allValid, visibleTop, setVisibleTop, setBlocks} = useContext(Game3dContext)
 
   useEffect( () => {
     getData()
@@ -205,42 +207,52 @@ const SinglePlayer3D = () => {
 
   const NewBoard = () => {
     return(
-      <View>
-        <TouchableOpacity onPress={getData} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
-          <Text style={{alignSelf: 'center'}}>New board</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={() => setNext(true)} style={styles.newBoard}>
+        <Text style={styles.text}>New board</Text>
+      </TouchableOpacity>
     )
   }
 
-  const Solved = () => {
+  const Menu = () => {
+
     return(
-      <View style={{flex: 1}}>
-        <NewBoard />
-        <Score />
-      </View>
+      <TouchableOpacity onPress={() => setMenu(true)} style={styles.menu}>
+        <Text style={styles.text}>Menu</Text>
+      </TouchableOpacity>
     )
   }
 
   const Game = () => {
-    return (
-      <View style={{flex:1}} >
-      <View style={{flexDirection: 'row', justifyContent:'space-evenly'}}>
-          <TouchableOpacity onPress={() => setVisibleTop(!visibleTop)} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
-              <Text style={{alignSelf: 'center'}}>
-                {visibleTop ? "Hide top layer" : "Show top layer"}
-              </Text>
+    const [layer, setLayer] = useState(visibleTop ? " Hide " : "Show")
+
+    const TopLayer = () => {
+      return (
+          <TouchableOpacity onPress={() => {setVisibleTop(t => !t); setLayer(l => l == " Hide " ? "Show" : " Hide ")}} style={{...styles.topLayer, backgroundColor: (layer==" Hide " ? 'rgba(217, 121, 80, 0.5)' : 'rgba(217, 121, 80, 0.3)')}} >
+            <Text style={styles.text}>
+              {layer}
+            </Text>
           </TouchableOpacity>
-        </View>
+      )
+    }
 
-        <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
+    return (
+      <View style={styles.gameContainer} >
+
+        <Animatable.View animation={'zoomInUp'} style={{flex: 1, display:'flex', justifyContent:'center', zIndex:2}}>
           {puzzle?.solutions && <Matrix3D matrix={puzzle.solutions[0]}/>} 
-        </View>
+        </Animatable.View>
 
-        <View style={{position:'absolute', bottom:5}}>
-          {false 
-            ? ( <Loading /> )
-            : (puzzle?.blocks && <Blocks3D blocks={puzzle.blocks}/>) 
+        <View style={{}}>
+          {puzzle?.blocks && 
+              <View>
+                <Animatable.View animation={'bounceIn'} delay={1500} style={styles.topLayerContainer}>
+                  <TopLayer />
+                </Animatable.View>
+                <Animatable.View animation={'fadeInUpBig'} delay={300} style={styles.blocksContainer}>
+                  <Blocks3D blocks={puzzle.blocks}/>
+                </Animatable.View>
+              </View>
+            
           }
         </View>
 
@@ -248,12 +260,67 @@ const SinglePlayer3D = () => {
     )
   }
 
+  const MyModal = ()  => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={(next || menu)}
+        onRequestClose={() => {setMenu(false); setNext(false)}}
+        >
+          <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.text}>Are you sure?</Text>
+            <Text style={styles.text}>You will lose your streak!</Text>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonContinue]}
+              onPress={() => {
+                setMenu(false); 
+                setNext(false)
+              }}>
+              <Text style={styles.text}>Keep going</Text>
+            </TouchableOpacity>
+            {menu && (
+              <TouchableOpacity
+                style={[styles.button, styles.buttonCancel]}
+                onPress={() => {
+                  setMenu(false)
+                  navigate("/", { replace: true })
+                }
+                }>
+                <Text style={styles.text}>Menu</Text>
+              </TouchableOpacity>
+            )
+            }{next && (
+              <TouchableOpacity
+                style={[styles.button, styles.buttonCancel]}
+                onPress={() => {
+                  setNext(false)
+                  //setStreak(0)
+                  getData()
+                }}>
+                <Text style={styles.text}>Next</Text>
+              </TouchableOpacity>
+            )
+            }
+            
+          </View>
+        </View>
+      </Modal>
+    )
+  }
 
   const GameState = useMemo(() => {
   //animation={'zoomOut'} delay={3000} onAnimationEnd={() => setScore(true)
     return(
       <View style={{flex:1}}>
-        <NewBoard/>
+        <View style={{height:60}} >
+          <View style={styles.navigationBar}>
+            <Menu/>
+            <NewBoard/>
+          </View>
+        </View>
+        
         {!score && 
         <Animatable.View ref={gameRef} delay={100} style={{flex:1}} >
           <Game />
@@ -269,8 +336,141 @@ const SinglePlayer3D = () => {
 
   }, [isLoading, score]);
 
-  return GameState;
+  const GameAndModal = useMemo(() => {
+    return (
+      <View style={{flex:1}}>
+        <MyModal/>
+        {GameState}
+      </View>
+    )
+  }, [isLoading, score, next, menu])
+
+  return GameAndModal
     
 };
 
 export default SinglePlayer3D;
+
+const styles = StyleSheet.create({
+  topLayerContainer: {
+    position: 'absolute',
+    left: 0,
+    right:0,
+    margin:'auto',
+    bottom: 130,
+    zIndex:0,
+
+  },
+  topLayer: {
+    alignSelf:'center', 
+    alignContent: 'center',
+    //backgroundColor:'rgba(217, 121, 80, 0.6)', 
+    borderWidth:4,
+    borderColor:'rgba(0, 0, 0, 0.7)',
+    borderRadius:100,
+    padding:19,
+    paddingHorizontal: 8,
+    marginBottom: 8,
+  },
+
+  navigationBar: {
+    flex: 1,
+    paddingHorizontal: 10,
+    gap: 10,
+    flexDirection: "row", 
+    alignContent:'space-around',
+    backgroundColor:"rgba(0,0,0, 0.5)", 
+    paddingBottom:8,
+    borderBottomWidth:4,
+},
+
+  newBoard : {
+    flex: 1,
+
+    alignItems:'center',
+    paddingVertical:7,
+    backgroundColor:'rgba(217, 121, 80, 0.6)',
+    borderWidth:1.5, 
+    borderBottomWidth:4, 
+    borderLeftWidth:2,
+    borderColor:'rgba(0, 0, 0, 0.7)', 
+    borderRadius: 8,
+
+  },
+
+  menu : {
+    flex:0.7,
+
+    alignItems:'center',
+    paddingVertical:7,
+    backgroundColor:'rgba(217, 121, 80, 0.6)',
+    borderWidth:1.5, 
+    borderBottomWidth:4,
+    borderRightWidth:2,
+    borderColor:'rgba(0, 0, 0, 0.7)', 
+    borderRadius: 8,
+
+  },
+
+  gameContainer: {
+    flex:1, 
+    justifyContent:'space-between',
+  },
+
+  blocksContainer: {
+    backgroundColor: "rgba(0,0,0, 0.6)", 
+    padding:8,
+    borderTopWidth:4,
+   },
+
+   text: {fontSize:20},
+
+
+
+   modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0, 0.8)",
+  },
+  modalView: {
+    margin: 10,
+    backgroundColor: 'rgba(255,225,50,0.9)',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+
+
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    margin: 10,
+    elevation: 4,
+  },
+  buttonCancel: {
+    alignItems:'center',
+    paddingVertical:7,
+    backgroundColor:'rgba(217, 121, 80, 0.8)',
+    borderWidth:1.5, 
+    borderBottomWidth:4,
+    borderColor:'rgba(0, 0, 0, 0.7)', 
+    borderRadius: 8,
+  },
+  buttonContinue: {
+    alignItems:'center',
+    paddingVertical:10,
+    marginTop: 30,
+    backgroundColor:'rgba(123, 168, 50, 0.8)',
+    borderWidth:1.5, 
+    borderBottomWidth:4,
+    borderColor:'rgba(0, 0, 0, 0.7)', 
+    borderRadius: 8,
+
+  },
+
+
+
+
+
+});

@@ -132,6 +132,8 @@ const DevTest1 = () => {
   );
 };
 
+
+//orbit control
 const DevTest2 = () => {
   const [OrbitControls, events] = useControls()
 	return (
@@ -148,6 +150,7 @@ const DevTest2 = () => {
 	);
 }
 
+// sp 3d score
 const DevTest = () => {
     const {xp3D, level3D, streak3D, score, setValidBlocks} = useContext(Game3dContext)
 
@@ -257,7 +260,7 @@ const DevTest = () => {
     
     return (
         <View style={{flex: 1, display:'flex'}}>
-          <TouchableOpacity onPress={() => setNext(n => !n) } style={{alignSelf:'center', backgroundColor:'rgba(0,0,0,0.1)', margin:10}}>
+          <TouchableOpacity onPress={() => setNext(n => !n) } style={{alignSelf:'center', backgroundColor:'rgba(0,0,0,0.08)', borderWidth:4, borderColor:'black', borderRadius:8, margin:10}}>
               <Text style={{margin:10}}>NEXT</Text>
           </TouchableOpacity>
           { next &&
@@ -311,4 +314,10 @@ const DevTest = () => {
       </View>
     )
   }
+
+
+const DevTest4 = () => {
+  
+}
+
 export default DevTest;

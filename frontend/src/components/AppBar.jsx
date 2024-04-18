@@ -5,13 +5,20 @@ import Constants from 'expo-constants';
 import theme from '../theme';
 
 
-
 const styles = StyleSheet.create({
   container: {
     alignSelf: 'stretch',
     paddingTop: Constants.statusBarHeight,
     backgroundColor: theme.colors.appBar,
-    // ...
+    paddingBottom: 10,
+
+
+  },
+  statusbar: {
+    alignSelf: 'stretch',
+    paddingTop: Constants.statusBarHeight + 5,
+    backgroundColor: "rgba(0,0,0, 0.5)",
+
   },
   tab: {
     alignSelf:'flex-start',
@@ -24,13 +31,12 @@ const styles = StyleSheet.create({
 const Tab = ({ text, to, ...props }) => {
   return (
     <Link to={to} {...props}>
-      <Text fontSize="subheading" style={{paddingBottom: 15, color: 'white'}}>{text}</Text>
+      <Text fontSize="subheading" style={{color: 'white'}}>{text}</Text>
     </Link>
   )
 }
 
-const AppBar = () => {
-
+export const AppBar = () => {
   return (
       <View horizontal style={styles.container}>
         <View style={{...styles.tab, gap: 100}}>
@@ -42,4 +48,10 @@ const AppBar = () => {
   )
 };
 
-export default AppBar;
+export const StatusBar = () => {
+  return (
+      <View horizontal style={styles.statusbar}>
+      </View>
+
+  )
+};

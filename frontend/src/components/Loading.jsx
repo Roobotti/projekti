@@ -14,11 +14,23 @@ export const Loading = () => {
   )
 }
 
+export const LoadingSmall = () => {
+  return (
+    <View style={styles.loadingSmallContainer}>
+      <ActivityIndicator size="large" color="red" />
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
   loadingContainer: {
-    position: "absolute", top:200, alignSelf:'center', alignItems: "center"
+    position: "absolute", top:300, alignSelf:'center', alignItems: "center"
+  },
+  loadingSmallContainer: {
+    marginBottom: 15
   },
   loadingText: {
     margin: 110,
+    fontSize: 30,
   },
 });
