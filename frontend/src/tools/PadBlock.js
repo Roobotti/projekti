@@ -1,15 +1,10 @@
 //pads block coords to 2x3x3 matrix so that it can be evaluated
-
-import { Vector3 } from "three";
-
 export const padBlock = (blockCoords) => {
   const minX = Math.min(...blockCoords.map((p) => p[0]));
   const maxX = Math.max(...blockCoords.map((p) => p[0]));
 
   const minZ = Math.min(...blockCoords.map((p) => p[2]));
   const maxZ = Math.max(...blockCoords.map((p) => p[2]));
-  console.log("bc -");
-  console.log(blockCoords);
   const matrix = [
     [
       [0, 0, 0],
@@ -31,6 +26,5 @@ export const padBlock = (blockCoords) => {
         );
       }
   }
-  console.log(matrix);
   return matrix;
 };

@@ -5,6 +5,7 @@ import { Edges} from '@react-three/drei'
 
 import { Game3dContext } from '../contexts/Game3dContext';
 import useControls from "r3f-native-orbitcontrols"
+import { Vector3 } from 'three';
 
 
 const opacity = 0.6
@@ -86,7 +87,7 @@ const Box = (props)  => {
       ? ( 
           <>
             <mesh
-              position = {pos}
+              position = {[ pos[0], pos[1] + 2, pos[2] ]}
               ref={mesh}
               scale={[1, h, 1]}
               onClick={onClick}
@@ -122,11 +123,16 @@ const Matrix3D = ({matrix}) => {
     <View style={{flex: 1}} {...events}>
       <Canvas 
         camera={{ position: [0, 6, 6]}}>
-        <OrbitControls />
+        <OrbitControls 
+          maxPolarAngle={Math.PI/2}
+          dampingFactor={0.04}
+          rotateSpeed={1.5}
+        
+        />
         <ambientLight intensity={0.6} />
         <spotLight position={[0, 10, 10]} angle={0.30} penumbra={1} />
         <pointLight position={[-10, -10, -10]} />
-        <group position={[offset*1.2, 0, 0]} scale={1.2}>
+        <group position={[offset, 0, 0]} scale={1}>
           {matrix.map((row, rowIndex) =>
             row.map((value, colIndex) => (
                 <Box key={`${rowIndex}-${colIndex}`} position={[rowIndex, 0, colIndex]} {...colorMap(value)}  />

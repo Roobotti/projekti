@@ -6,7 +6,6 @@ import { getPuzzle } from '../services/puzzle';
 import Text from '../components/Text';
 
 import Blocks3D from './Blocks3D';
-import { Loading, LoadingSmall } from '../components/Loading';
 
 import Matrix3D from './Matrix3D';
 import { useContext } from 'react';
@@ -14,6 +13,7 @@ import { useContext } from 'react';
 import { Game3dContext } from '../contexts/Game3dContext';
 
 import * as Animatable from 'react-native-animatable';
+import { zoomInUpBig } from './Animations';
 import { useNavigate } from 'react-router-native';
 
 
@@ -238,16 +238,14 @@ const SinglePlayer3D = () => {
     return (
       <View style={styles.gameContainer} >
 
-        <Animatable.View animation={'zoomInUp'} style={{flex: 1, display:'flex', justifyContent:'center', zIndex:2}}>
+        <Animatable.View animation={zoomInUpBig} style={{flex: 1, display:'flex', justifyContent:'center', zIndex:2}}>
           {puzzle?.solutions && <Matrix3D matrix={puzzle.solutions[0]}/>} 
         </Animatable.View>
 
         <View style={{}}>
           {puzzle?.blocks && 
               <View>
-                <Animatable.View animation={'bounceIn'} delay={1500} style={styles.topLayerContainer}>
-                  <TopLayer />
-                </Animatable.View>
+                <TopLayer />
                 <Animatable.View animation={'fadeInUpBig'} delay={300} style={styles.blocksContainer}>
                   <Blocks3D blocks={puzzle.blocks}/>
                 </Animatable.View>
@@ -352,25 +350,29 @@ const SinglePlayer3D = () => {
 export default SinglePlayer3D;
 
 const styles = StyleSheet.create({
-  topLayerContainer: {
-    position: 'absolute',
-    left: 0,
-    right:0,
+  topLayerBuf: {
+    backgroundColor:'red',
+    height:100,
     margin:'auto',
     bottom: 130,
-    zIndex:0,
+    zIndex:1,
 
   },
   topLayer: {
-    alignSelf:'center', 
-    alignContent: 'center',
+    position: 'absolute',
+    alignSelf:'center',
+    flexDirection: 'row',
+    justifyContent:'center',
+    alignItems:'center',
+    width:75,
+    height:75,
+
+    bottom: 130,
     //backgroundColor:'rgba(217, 121, 80, 0.6)', 
     borderWidth:4,
     borderColor:'rgba(0, 0, 0, 0.7)',
-    borderRadius:100,
-    padding:19,
-    paddingHorizontal: 8,
-    marginBottom: 8,
+    borderRadius:80,
+    zIndex:3,
   },
 
   navigationBar: {
@@ -414,7 +416,7 @@ const styles = StyleSheet.create({
 
   gameContainer: {
     flex:1, 
-    justifyContent:'space-between',
+    justifyContent:'flex-start',
   },
 
   blocksContainer: {
