@@ -33,12 +33,6 @@ export const AssetsContextProvider = ({ children }) => {
       await Font.loadAsync({
         FreckleFace: require("../../assets/fonts/FreckleFace-Regular.ttf"),
       });
-      await Font.loadAsync({
-        Kablammo: require("../../assets/fonts/Kablammo-Regular.ttf"),
-      });
-      await Font.loadAsync({
-        Flavors: require("../../assets/fonts/Flavors-Regular.ttf"),
-      });
       setFontsLoading(false);
     };
     load();
@@ -366,6 +360,7 @@ export const AssetsContextProvider = ({ children }) => {
     <AssetsContext.Provider
       value={{
         assetsLoading,
+        fontsLoading,
         paint_1,
         paint_3,
         paint_delete,
