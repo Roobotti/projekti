@@ -73,7 +73,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
 
 def convert_user_to_friend(user: User) -> Friend:
     friend = Friend(
-        username=user.username, avatar=user.avatar, wins=user.wins, loses=user.loses
+        username=user.username,
+        avatar=user.avatar,
+        wins=user.wins,
+        loses=user.loses,
+        level=user.level,
+        xp=user.xp,
     )
     return friend
 
