@@ -116,7 +116,6 @@ export const GameContextProvider = ({ children }) => {
     setWin(true);
     setGameOver(true);
   };
-
   /**
    * submits the prove and updates winner
    */
@@ -131,7 +130,6 @@ export const GameContextProvider = ({ children }) => {
     setContestTimer(0);
     setWin(result);
   };
-
   /**
    * emits contest for opponent
    */

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useContext, useState } from 'react';
 
-import { Dimensions } from 'react-native';
+import { Dimensions, Modal } from 'react-native';
 
 import {
   SafeAreaView,
@@ -33,6 +33,8 @@ import { loadFriend, loadFriendData, sendDeleteFriend, sendDeleteRequest, sendDe
 import { socket } from '../services/socket';
 import FriendProfile from './Friend';
 import { Loading } from './Loading';
+import MultiPlayer3D from './MultiPlayer3D';
+import { useNavigate } from 'react-router-native';
 
 
 const { width } = Dimensions.get('window');
@@ -42,7 +44,7 @@ const windowWidth = width;
 export const LobbyCollap = () => {
   const { user, friends, requests, token, sentRequests, wins, invites, setFriend, setSentInvite, setReFresh, setFriends, setRequests, setInvites, setSentRequests } = useContext(UserContext);
   const [newFriend, setNewFriend] = useState("");
-  const [game, setGame] = useState(null)
+  const [profile, setProfile] = useState(null)
   const [refreshing, setRefreshing] = useState(false);
     // Ddefault active selector
   const [activeSections, setActiveSections] = useState([]);
@@ -50,6 +52,10 @@ export const LobbyCollap = () => {
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
+
+  const [modal, setModal] = useState("")
+
+  const navigate = useNavigate()
 
   
   //message timeout
@@ -100,7 +106,7 @@ export const LobbyCollap = () => {
                     </TouchableOpacity>
                   ) 
                   :(
-                    <TouchableOpacity style={styles.add} onPress={() => handleInvite(friend.username)} >
+                    <TouchableOpacity style={styles.add} onPress={() => setModal(friend.username)} >
                       <Text>Host</Text>
                     </TouchableOpacity>
                   )
@@ -154,21 +160,72 @@ export const LobbyCollap = () => {
     socket.emit("invite", {"user":user, "friend":friend});
     setSentInvite(friend)
     setFriend(friend)
-    setGame(<MultiPlayer/>)
+    //setGame(<MultiPlayer/>)
   };
+
+  const MyModal = ()  => {
+    return (
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modal !== ""}
+        onRequestClose={() => setModal("")}
+        on
+        >
+          <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.text}>Host:</Text>
+            <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonContinue]}
+                onPress={() => {
+                  handleInvite(modal)
+                  setModal("")
+                  navigate("/MultiPlayer3D", { replace: true })
+                }}>
+                <Text style={styles.text}>3D</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.button, styles.buttonContinue]}
+                onPress={() => {
+                  handleInvite(modal)
+                  setModal("")
+                  navigate("/MultiPlayer", { replace: true })
+                }
+                }>
+                <Text style={styles.text}>classic</Text>
+              </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonCancel]}
+                onPress={() => {
+                  setModal("")
+                }
+                }>
+                <Text style={styles.text}>cancel</Text>
+              </TouchableOpacity>
+            
+          </View>
+        </View>
+      </Modal>
+    )
+  }
 
   const handleJoin = (friend) => {
     console.log("join")
     setFriend(friend)
-    setGame(<MultiPlayer/>)
+    
+    //setGame(<MultiPlayer/>)
+    navigate("/MultiPlayer3D", { replace: true })
   };
 
   const handleProfile = (friend) => {
     console.log("to friend profile", friend)
-    setGame(<FriendProfile friend={friend} onDelete={() => { 
+    setProfile(<FriendProfile friend={friend} onDelete={() => { 
       handleDeleteFriend(friend) 
-      setGame(null)
-    }} onBack={(v) => setGame(v)}/>)
+      setProfile(null)
+    }} onBack={(v) => setProfile(v)}/>)
   }
 
   const handleAccept = async (friend) => {
@@ -224,8 +281,7 @@ export const LobbyCollap = () => {
     sendDeleteRequest(token, friend)
   }
 
-
-  if (game) return game
+  if (profile) return profile
 
   const setSections = (sections) => {
     //setting up a active section state
@@ -261,10 +317,8 @@ export const LobbyCollap = () => {
   };
 
   return (
-    <SafeAreaView 
-      style={{ flex: 1 }}
-      >
       <View style={styles.container}>
+        <MyModal />
         <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
           <TextInput
             style={styles.input}
@@ -297,7 +351,7 @@ export const LobbyCollap = () => {
           />
         </ScrollView>
       </View>
-    </SafeAreaView>
+
   );
 };
 
@@ -404,5 +458,51 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#f9c2ff',
     textAlign: 'center'
-  }
+  },
+  text: {fontSize:20, alignSelf:'center'},
+
+   modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0, 0.8)",
+  },
+  modalView: {
+    margin: 10,
+    backgroundColor: 'rgba(255,225,50,0.9)',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+
+
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    margin: 10,
+    elevation: 4,
+  },
+  buttonCancel: {
+    marginTop: 30,
+    alignItems:'center',
+    paddingVertical:7,
+    backgroundColor:'rgba(217, 121, 80, 0.8)',
+    borderWidth:1.5, 
+    borderBottomWidth:4,
+    borderColor:'rgba(0, 0, 0, 0.7)', 
+    borderRadius: 8,
+  },
+
+  buttonContinue: {
+    alignItems:'center',
+    paddingVertical:10,
+    marginTop: 30,
+    backgroundColor:'rgba(123, 168, 50, 0.8)',
+    borderWidth:1.5, 
+    borderBottomWidth:4,
+    borderColor:'rgba(0, 0, 0, 0.7)', 
+    borderRadius: 8,
+    width: 100,
+  },
+
 });

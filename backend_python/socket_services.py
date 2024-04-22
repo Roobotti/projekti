@@ -18,7 +18,7 @@ class Board:
 
 
 def make_room_id(user: Player, friend: Player):
-    return "".join(sorted([user, friend]))
+    return "-".join(sorted([user, friend]))
 
 
 # Promise function to make sure room id is unique
@@ -38,7 +38,7 @@ def join_room(user: Player, room: str):
     current_room["players"].append(user)
 
 
-# Remove the latest player joined from a room's player list
+# Remove the  player from a room's player list
 def leave(user: Player, room: str):
     current_room = rooms[room]
     current_room["players"].remove(user)

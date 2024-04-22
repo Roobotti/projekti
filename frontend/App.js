@@ -11,6 +11,7 @@ import { UserContextProvider } from "./src/contexts/UserContext";
 import { GameContextProvider } from "./src/contexts/GameContext";
 import { Game3dContextProvider } from "./src/contexts/Game3dContext";
 import { AssetsContextProvider } from "./src/contexts/AssetsContext";
+import { Online3DContextProvider } from "./src/contexts/Online3DContext";
 
 const authStorage = new AuthStorage();
 const queryClient = new QueryClient();
@@ -26,7 +27,9 @@ const App = () => {
             <UserContextProvider>
               <GameContextProvider>
                 <Game3dContextProvider>
-                  <Main />
+                  <Online3DContextProvider>
+                    <Main />
+                  </Online3DContextProvider>
                 </Game3dContextProvider>
               </GameContextProvider>
             </UserContextProvider>

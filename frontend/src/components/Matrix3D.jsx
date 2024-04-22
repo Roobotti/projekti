@@ -5,8 +5,6 @@ import { Edges} from '@react-three/drei'
 
 import { Game3dContext } from '../contexts/Game3dContext';
 import useControls from "r3f-native-orbitcontrols"
-import { Vector3 } from 'three';
-
 
 const opacity = 0.6
 const red     = 'rgb(240, 160, 182)'
@@ -125,8 +123,8 @@ const Matrix3D = ({matrix}) => {
         camera={{ position: [0, 6, 6]}}>
         <OrbitControls 
           maxPolarAngle={Math.PI/2}
-          dampingFactor={0.04}
-          rotateSpeed={1.5}
+          dampingFactor={0.03}
+          rotateSpeed={1.3}
         
         />
         <ambientLight intensity={0.6} />

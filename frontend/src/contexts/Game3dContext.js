@@ -41,6 +41,8 @@ export const Game3dContextProvider = ({ children }) => {
   const [streak3D, setStreak] = useState(streak);
   const [newLevel, setNewLevel] = useState(level);
 
+  const [online, setOnline] = useState(false);
+
   const block_size = {
     r1: 5,
     r2: 5,
@@ -100,30 +102,50 @@ export const Game3dContextProvider = ({ children }) => {
 
   //Check if all are valid
   useEffect(() => {
-    if (validBlocks.length === 4) {
+    if (validBlocks.length === 2) {
       setAllValid(true);
+      if (online) {
+        const time = floor((Date.now() - timeStart) / 1000);
+        const base = 1000;
+        const speed = time <= 180 ? 1000 - time * 5 : max([1, 100 - time * 1]);
+        const total = base + speed;
 
-      const time = floor((Date.now() - timeStart) / 1000);
-      const base = 100;
-      const speed = time <= 180 ? 1000 - time * 5 : max([1, 100 - time * 1]);
-      const total = (base + speed) * (streak + 1);
+        setScore({ time, base, speed, total });
+        setXp(xp);
+        setLevel(level);
 
-      setScore({ time, base, speed, total });
-      setXp(xp);
-      setLevel(level);
-      setStreak(min([5, streak + 1]));
+        let i = level;
+        while (50 * i ** 2 + 2000 * i + 500 <= xp + total) {
+          i++;
+        }
 
-      let i = level;
-      while (50 * i ** 2 + 2000 * i + 500 <= xp + total) {
-        i++;
+        setTimeStart(Date.now());
+        setNewLevel(i);
+        addScore(xp + total, i, 0);
+      } else {
+        const time = floor((Date.now() - timeStart) / 1000);
+        const base = 100;
+        const speed = time <= 180 ? 1000 - time * 5 : max([1, 100 - time * 1]);
+        const total = (base + speed) * (streak + 1);
+
+        setScore({ time, base, speed, total });
+        setXp(xp);
+        setLevel(level);
+        setStreak(min([5, streak + 1]));
+
+        let i = level;
+        while (50 * i ** 2 + 2000 * i + 500 <= xp + total) {
+          i++;
+        }
+
+        setTimeStart(Date.now());
+        console.log(total);
+        console.log("level: ", i);
+
+        setNewLevel(i);
+        addScore(xp + total, i, min([5, streak + 1]));
       }
-
-      setTimeStart(Date.now());
-      console.log(total);
-      console.log("level: ", i);
-
-      setNewLevel(i);
-      addScore(xp + total, i, min([5, streak + 1]));
+      setValidBlocks([]);
     }
   }, [validBlocks]);
 
@@ -167,6 +189,7 @@ export const Game3dContextProvider = ({ children }) => {
         level3D,
         streak3D,
         newLevel,
+        online,
 
         setXp,
         setLevel,
@@ -181,6 +204,7 @@ export const Game3dContextProvider = ({ children }) => {
         deleteBlockPart,
         setPressed,
         setValidBlocks,
+        setOnline,
       }}
     >
       {children}

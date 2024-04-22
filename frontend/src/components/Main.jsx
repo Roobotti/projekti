@@ -17,6 +17,8 @@ import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { AssetsContext } from '../contexts/AssetsContext';
 import { View } from 'react-native-animatable';
+import MultiPlayer3D from './MultiPlayer3D';
+import MultiPlayer from './MultiPlayer';
 
 
 const styles = StyleSheet.create({
@@ -34,7 +36,7 @@ const Main = () => {
           <Loading/>
         </View>
     )
-
+    //<Route path="/Lobby" element={<LobbyCollap />} exact />
    return (
     <ImageBackground 
         source={caveWall}
@@ -44,6 +46,8 @@ const Main = () => {
           
           <Routes>
             <Route path="/SinglePlayer3D" element={<StatusBar/>}   exact />
+            <Route path="/MultiPlayer3D" element={<StatusBar/>}   exact />
+            <Route path="/" element={<StatusBar/>}   exact />
             <Route path="*" element={<AppBar />} />
           </Routes>
 
@@ -55,6 +59,8 @@ const Main = () => {
             <Route path="/SinglePlayerMenu" element={<SinglePlayerMenu />} exact />
             <Route path="/SinglePlayer2D" element={<SinglePlayer2D />} exact />
             <Route path="/SinglePlayer3D" element={<SinglePlayer3D />}   exact />
+            <Route path="/MultiPlayer3D" element={<MultiPlayer3D />}   exact />
+            <Route path="/MultiPlayer" element={<MultiPlayer />}   exact />
             <Route path="/Lobby" element={<LobbyCollap />} exact />
             <Route path="/SignIn" element={<SignIn />} exact />
             <Route path="/SignUp" element={<SignUp />} exact />
