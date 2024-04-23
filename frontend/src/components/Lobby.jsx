@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useMemo } from 'react';
 
 import { Dimensions, Modal } from 'react-native';
 
@@ -27,13 +27,12 @@ import { UserContext } from '../contexts/UserContext';
 import Text from './Text';
 
 
-import MultiPlayer from './MultiPlayer';
 import { loadFriend, loadFriendData, sendDeleteFriend, sendDeleteRequest, sendDeleteSentRequest, sendRequest } from '../services/users';
 
 import { socket } from '../services/socket';
 import FriendProfile from './Friend';
-import { Loading } from './Loading';
-import MultiPlayer3D from './MultiPlayer3D';
+import { Loading, LoadingSmall } from './Loading';
+
 import { useNavigate } from 'react-router-native';
 
 
@@ -48,7 +47,6 @@ export const LobbyCollap = () => {
   const [refreshing, setRefreshing] = useState(false);
     // Ddefault active selector
   const [activeSections, setActiveSections] = useState([]);
-
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
@@ -71,8 +69,9 @@ export const LobbyCollap = () => {
     }, 500);
   }, []);
 
-  const CONTENT = [
-      {
+  const CONTENT =  [
+    //invites
+    {
       empty: invites.length,
       title: `Invites (${invites.length})`,
       content:
@@ -88,6 +87,8 @@ export const LobbyCollap = () => {
             ))}
         </View>
     },
+    
+    //friends
     {
       empty: friends.length,
       title: `Friends (${friends.length})`,
@@ -115,6 +116,8 @@ export const LobbyCollap = () => {
           ))}
         </View>
     },
+
+    //friend requests
     {
       empty: requests.length,
       title: `Friend requests (${requests.length})`,
@@ -135,6 +138,8 @@ export const LobbyCollap = () => {
         </View>
       )
     },
+
+    //Sent requests
     {
       empty: sentRequests.length,
       title: `Sent requests (${sentRequests.length})`,
@@ -153,7 +158,9 @@ export const LobbyCollap = () => {
         </View>
       )
     },
-  ];
+  ]
+
+
 
   const handleInvite = async (friend) => {
     console.log("invite", user, friend)
@@ -273,6 +280,8 @@ export const LobbyCollap = () => {
     console.log("Deleted")
     setSentRequests(sentRequests.filter((f) => f.username !== friend))
     sendDeleteSentRequest(token, friend)
+    //setActiveSections([])
+
   }
 
   const handleDeleteRequest = (friend) => {
@@ -285,33 +294,31 @@ export const LobbyCollap = () => {
 
   const setSections = (sections) => {
     //setting up a active section state
-    setActiveSections(sections.includes(undefined) ? [] : sections);
+    setActiveSections(sections);
+  };
+
+
+  const renderContent = (section) => {
+    return (
+      <Animatable.View style={styles.content}>
+        {section.content}
+      </Animatable.View>
+    );
   };
 
   const renderHeader = (section, _, isActive) => {
     //Accordion Header view
     if (!section.empty) return <></>
+    
     return (
-      <Animatable.View
-        duration={400}
-        style={[styles.header, isActive ? styles.active : styles.inactive]}
-        transition="backgroundColor">
-        <Text style={styles.headerText}>{section.title}</Text>
-      </Animatable.View>
-    );
-  };
-
-  const renderContent = (section, _, isActive) => {
-    return (
-      <Animatable.View
-        duration={400}
-        style={[styles.content, isActive ? styles.active : styles.inactive]}
-        transition='backgroundColor'>
-        <Animatable.Text
-          animation={isActive ? 'bounceIn' : undefined}
-          style={{ flex: 1, alignSelf:'stretch', justifyContent: 'space-between', textAlign: 'center', display:'flex', }}>
-          {section.content}
-        </Animatable.Text>
+      <Animatable.View>
+        <Animatable.View
+          duration={400}
+          style={[styles.header, isActive ? styles.active : styles.inactive]}
+          transition="backgroundColor">
+          <Text style={styles.headerText}>{section.title}</Text>
+        </Animatable.View>
+        {isActive && renderContent(section, isActive)}
       </Animatable.View>
     );
   };
@@ -328,13 +335,14 @@ export const LobbyCollap = () => {
             returnKeyType="done" 
             onSubmitEditing={() => handleAddFriend()}
           />
-          {loading && <Loading/>}
+          {loading && <LoadingSmall/>}
           {message && <Text style={styles.message}> {message} </Text>}
 
-          {/*Code for Accordion/Expandable List starts here*/}
+          
           <Accordion
-            activeSections={activeSections}
             sections={CONTENT}
+            activeSections={activeSections}
+            
             //title and content of accordion
             touchableComponent={TouchableOpacity}
 
@@ -342,12 +350,13 @@ export const LobbyCollap = () => {
 
             renderHeader={renderHeader}
             //Header Component(View) to render
-            renderContent={renderContent}
+            renderContent={() => <></>}
             //Content Component(View) to render
             duration={400}
             //Duration for Collapse and expand
             onChange={setSections}
             //setting the state of active sections
+          
           />
         </ScrollView>
       </View>
@@ -366,58 +375,54 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '300',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   header: {
-    flex:1,
+    alignSelf:'center',
     backgroundColor: 'transparent',
-    padding: 10,
+    //marginVertical:15,
   },
   headerText: {
     textAlign: 'center',
     fontSize: 24,
-    fontWeight: '500',
+    padding:10,
+    paddingHorizontal:20,
+    paddingTop:15,
+
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    borderColor: 'black',
+    borderWidth: 4,
+    borderRadius: 10,
+
+    marginVertical:10,
   },
   content: {
     flex: 1,
-    margin: 10,
     padding: 10,
     textAlign: 'center',
-    borderColor: 'black',
-    borderWidth: 2,
-    borderRadius: 10,
     
   },
   active: {
+    alignSelf:'stretch',
     backgroundColor: 'transparent',
+    marginHorizontal:10,
   },
   inactive: {
+    alignSelf:'stretch',
     backgroundColor: 'transparent',
-  },
-  selectors: {
-    marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  selector: {
-    backgroundColor: '#F5FCFF',
-    padding: 10,
-  },
-  activeSelector: {
-    fontWeight: 'bold',
-  },
-  selectTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    padding: 10,
-    textAlign: 'center',
+    
+    marginHorizontal:40
+
   },
   input: {
-    borderWidth: 1,
+    fontFamily:"FreckleFace",
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    borderWidth: 5,
     borderColor: "rgba(0, 0, 0, 0.8)",
-    borderRadius: 5,
+    borderRadius: 10,
     padding: 10,
-    margin: 20,
+    marginBottom: 20,
+    marginHorizontal: 40,
   },
   avatar: {
     width: 80,
@@ -425,17 +430,29 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   user_container: {
+    flex:1,
     flexDirection: 'row',
     textAlignVertical: 'center',
     justifyContent: 'space-evenly',
+    padding:10,
 
+    backgroundColor: 'rgba(0,0,0,0.1)',
+    borderWidth: 5,
+    borderColor: "rgba(0, 0, 0, 0.8)",
+    borderRadius: 10,
+    
+
+    //backgroundColor:'blue',
     
   },
   map_container: {
     display: 'flex',
+    flex: 1,
+    //backgroundColor:'red',
+    
     width: windowWidth-20,
     gap: 20,
-    alignSelf: 'center',
+    
     padding: 10,
   },
 
