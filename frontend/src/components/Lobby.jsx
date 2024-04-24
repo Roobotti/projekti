@@ -33,7 +33,7 @@ import { socket } from '../services/socket';
 import FriendProfile from './Friend';
 import { Loading, LoadingSmall } from './Loading';
 
-import { useNavigate } from 'react-router-native';
+import { useLocation, useNavigate } from 'react-router-native';
 
 
 const { width } = Dimensions.get('window');
@@ -54,6 +54,7 @@ export const LobbyCollap = () => {
   const [modal, setModal] = useState("")
 
   const navigate = useNavigate()
+  const location = useLocation()
 
   
   //message timeout
@@ -75,7 +76,7 @@ export const LobbyCollap = () => {
       empty: invites.length,
       title: `Invites (${invites.length})`,
       content:
-        <View  style={styles.map_container}>
+        <TouchableOpacity style={styles.map_container} activeOpacity={1} onPress={() => null}>
             {invites && invites.map((i) => (
               <View key={i.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${i.avatar}` }} style={styles.avatar}/>
@@ -85,7 +86,7 @@ export const LobbyCollap = () => {
                 </TouchableOpacity>
               </View>
             ))}
-        </View>
+        </TouchableOpacity>
     },
     
     //friends
@@ -93,10 +94,12 @@ export const LobbyCollap = () => {
       empty: friends.length,
       title: `Friends (${friends.length})`,
       content:
-          <View  style={styles.map_container}>
+          <TouchableOpacity style={styles.map_container} activeOpacity={1} onPress={() => null}>
           {friends && friends.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
-                <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
+                <TouchableOpacity onPress={() => handleProfile(friend.username)}>
+                  <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }}  style={styles.avatar}/>
+                </TouchableOpacity>
                 <TouchableOpacity style={{...styles.add, backgroundColor:'rgba(64, 223, 255, 0.6)'}} onPress={() => handleProfile(friend.username)} >
                   <Text>{friend.username}</Text>
                 </TouchableOpacity>
@@ -114,7 +117,7 @@ export const LobbyCollap = () => {
                 }
             </View>
           ))}
-        </View>
+        </TouchableOpacity>
     },
 
     //friend requests
@@ -122,7 +125,7 @@ export const LobbyCollap = () => {
       empty: requests.length,
       title: `Friend requests (${requests.length})`,
       content:(
-        <View  style={styles.map_container}>
+        <TouchableOpacity style={styles.map_container} activeOpacity={1} onPress={() => null}>
           {requests && requests.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
@@ -135,7 +138,7 @@ export const LobbyCollap = () => {
                 </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </TouchableOpacity>
       )
     },
 
@@ -145,7 +148,7 @@ export const LobbyCollap = () => {
       title: `Sent requests (${sentRequests.length})`,
       content:
         (
-        <View style={styles.map_container}>
+        <TouchableOpacity style={styles.map_container} activeOpacity={1} onPress={() => null}>
           {sentRequests && sentRequests.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
               <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
@@ -155,7 +158,7 @@ export const LobbyCollap = () => {
               </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </TouchableOpacity>
       )
     },
   ]
@@ -228,7 +231,8 @@ export const LobbyCollap = () => {
   };
 
   const handleProfile = (friend) => {
-    console.log("to friend profile", friend)
+    navigate("/Friend", { replace: true , state: {friend}})
+
     setProfile(<FriendProfile friend={friend} onDelete={() => { 
       handleDeleteFriend(friend) 
       setProfile(null)
@@ -270,11 +274,7 @@ export const LobbyCollap = () => {
 
   }
 
-  const handleDeleteFriend = (friend) => {
-    console.log("Deleted")
-    setFriends(friends.filter((f) => f.username !== friend))
-    sendDeleteFriend(token, friend)
-  }
+
 
   const handleDeleteSentRequest = (friend) => {
     console.log("Deleted")
@@ -290,13 +290,10 @@ export const LobbyCollap = () => {
     sendDeleteRequest(token, friend)
   }
 
-  if (profile) return profile
-
   const setSections = (sections) => {
     //setting up a active section state
     setActiveSections(sections);
   };
-
 
   const renderContent = (section) => {
     return (
@@ -323,9 +320,12 @@ export const LobbyCollap = () => {
     );
   };
 
+
+
   return (
       <View style={styles.container}>
         <MyModal />
+
         <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
           <TextInput
             style={styles.input}
@@ -334,6 +334,7 @@ export const LobbyCollap = () => {
             placeholder="Add new friend"
             returnKeyType="done" 
             onSubmitEditing={() => handleAddFriend()}
+            cursorColor={'black'}
           />
           {loading && <LoadingSmall/>}
           {message && <Text style={styles.message}> {message} </Text>}
@@ -421,6 +422,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(0, 0, 0, 0.8)",
     borderRadius: 10,
     padding: 10,
+    paddingLeft: 20,
     marginBottom: 20,
     marginHorizontal: 40,
   },

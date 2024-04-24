@@ -59,7 +59,7 @@ const UserAvatar = ({source, onChange}) => {
 
 export const Profile = () => {
   const {paint_wins, paint_loses, paint_delete, paint_X} = useContext(AssetsContext)
-  const {avatar, token, user, wins, loses, setAvatar, setReFresh} = useContext(UserContext)
+  const {avatar, token, user, wins, loses, setAvatar, setReFresh, level} = useContext(UserContext)
   const navigate = useNavigate();
 
   useEffect( () => {
@@ -72,15 +72,16 @@ export const Profile = () => {
     // upload image to server here 
   };
   return (
-    <View style={{flex:1, justifyContent:'space-between'}}>
-      <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
 
-        <Text style={styles.text} >{user}</Text>
+        <Text style={styles.name} >{user}</Text>
 
         <UserAvatar
           onChange={onAvatarChange}
           source={avatar}
         />
+        
+        <Text style={styles.name}>Level:{level}</Text>
 
         <View style={styles.deleteButton}>
           <ImageBackground source={paint_wins} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
@@ -110,15 +111,15 @@ export const Profile = () => {
           </ImageBackground>
         </TouchableOpacity>
       
-      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-
+    flex:1,
+    padding: 10,  
+    justifyContent:'space-evenly',
     alignItems: 'center',
   },
   userRow: {
@@ -134,12 +135,14 @@ const styles = StyleSheet.create({
     fontFamily: 'FreckleFace',
     color: 'white',
     opacity: 0.8,
-    marginBottom: 10
+  },
+  name: {
+    fontSize: 30
   },
   avatar: {
     width: 200,
     height: 200,
-    marginBottom: 20,
+
     borderRadius: 100,
     borderWidth: 3,
     borderColor: 'rgba(1,1,1,0.3)',
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderBottomWidth: 4,
     borderLeftWidth: 3,
-    marginBottom: 20,
+
     borderRadius: 80
   },
   deleteButton: {
@@ -161,7 +164,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
   },
   
   deleteButtonText: {

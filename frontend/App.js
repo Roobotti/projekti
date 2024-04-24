@@ -1,5 +1,6 @@
 import React from "react";
 import { NativeRouter } from "react-router-native";
+
 import { QueryClient, QueryClientProvider } from "react-query";
 import Constants from "expo-constants";
 
@@ -12,6 +13,7 @@ import { GameContextProvider } from "./src/contexts/GameContext";
 import { Game3dContextProvider } from "./src/contexts/Game3dContext";
 import { AssetsContextProvider } from "./src/contexts/AssetsContext";
 import { Online3DContextProvider } from "./src/contexts/Online3DContext";
+import { HistoryContextProvider } from "./src/contexts/HistoryContext";
 
 const authStorage = new AuthStorage();
 const queryClient = new QueryClient();
@@ -20,23 +22,25 @@ const App = () => {
   console.log("app", Constants.expoConfig);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <NativeRouter>
-        <AuthStorageContext.Provider value={authStorage}>
-          <AssetsContextProvider>
-            <UserContextProvider>
-              <GameContextProvider>
-                <Game3dContextProvider>
-                  <Online3DContextProvider>
-                    <Main />
-                  </Online3DContextProvider>
-                </Game3dContextProvider>
-              </GameContextProvider>
-            </UserContextProvider>
-          </AssetsContextProvider>
-        </AuthStorageContext.Provider>
-      </NativeRouter>
-    </QueryClientProvider>
+    <NativeRouter>
+      <HistoryContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthStorageContext.Provider value={authStorage}>
+            <AssetsContextProvider>
+              <UserContextProvider>
+                <GameContextProvider>
+                  <Game3dContextProvider>
+                    <Online3DContextProvider>
+                      <Main />
+                    </Online3DContextProvider>
+                  </Game3dContextProvider>
+                </GameContextProvider>
+              </UserContextProvider>
+            </AssetsContextProvider>
+          </AuthStorageContext.Provider>
+        </QueryClientProvider>
+      </HistoryContextProvider>
+    </NativeRouter>
   );
 };
 

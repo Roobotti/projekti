@@ -14,7 +14,7 @@ import { UserContext } from "./UserContext";
 export const Game3dContext = createContext();
 
 export const Game3dContextProvider = ({ children }) => {
-  const { xp, level, streak, addScore } = useContext(UserContext);
+  const { xp, level, addScore } = useContext(UserContext);
 
   const [color, setColor] = useState("red");
 
@@ -38,7 +38,7 @@ export const Game3dContextProvider = ({ children }) => {
 
   const [xp3D, setXp] = useState(xp);
   const [level3D, setLevel] = useState(level);
-  const [streak3D, setStreak] = useState(streak);
+  const [streak3D, setStreak] = useState(0);
   const [newLevel, setNewLevel] = useState(level);
 
   const [online, setOnline] = useState(false);
@@ -79,6 +79,7 @@ export const Game3dContextProvider = ({ children }) => {
       setBlockParts([[], [], [], []]);
       setValidBlocks([]);
       setSelectedBlock(blocks[0]);
+      setScore({ ...score, time: 0, total: 0 });
     }
     if (allValid) setAllValid(false);
     setTimeStart(Date.now());
@@ -102,7 +103,7 @@ export const Game3dContextProvider = ({ children }) => {
 
   //Check if all are valid
   useEffect(() => {
-    if (validBlocks.length === 2) {
+    if (validBlocks.length === 4) {
       setAllValid(true);
       if (online) {
         const time = floor((Date.now() - timeStart) / 1000);
@@ -126,12 +127,12 @@ export const Game3dContextProvider = ({ children }) => {
         const time = floor((Date.now() - timeStart) / 1000);
         const base = 100;
         const speed = time <= 180 ? 1000 - time * 5 : max([1, 100 - time * 1]);
-        const total = (base + speed) * (streak + 1);
+        const total = (base + speed) * (streak3D + 1);
 
         setScore({ time, base, speed, total });
         setXp(xp);
         setLevel(level);
-        setStreak(min([5, streak + 1]));
+        setStreak((s) => min([5, s + 1]));
 
         let i = level;
         while (50 * i ** 2 + 2000 * i + 500 <= xp + total) {
@@ -143,7 +144,7 @@ export const Game3dContextProvider = ({ children }) => {
         console.log("level: ", i);
 
         setNewLevel(i);
-        addScore(xp + total, i, min([5, streak + 1]));
+        addScore(xp + total, i, min([5, streak3D + 1]));
       }
       setValidBlocks([]);
     }

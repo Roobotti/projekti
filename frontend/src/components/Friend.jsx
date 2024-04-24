@@ -7,35 +7,19 @@ import { Loading } from './Loading';
 
 import Text from './Text';
 import { AssetsContext } from '../contexts/AssetsContext';
+import { sendDeleteFriend } from '../services/users';
+import { useLocation, useNavigate } from 'react-router-native';
 
-const showAlert = (onDelete) =>
-  Alert.alert(
-    'Delete friend',
-    'Are you sure?',
-    [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        onPress: () => onDelete(),
-        style: 'default'
-      }
-    ],
-    {
-      cancelable: true,
-    },
-  );
+
+
+
+
 
 const VsText = ({wins, loses}) => {
-  const textStyles = [
-    styles.text,
-    wins > loses ? styles.losing : styles.winning,
-    wins===loses && styles.tied
-  ];
+  const colors = {losing: 'rgba(255,0,0,0.1)', winning:'rgba(0,255,0,0.1)', tied:'rgba(100,100,100,0.1)'}
+  const backgroundColor = (wins === loses) ? colors.tied : (wins > loses) ? colors.losing : colors.winning
 
-  return <Text style={textStyles}>{loses} - {wins}</Text>;
+  return <View style={{...styles.vsTextContainer, backgroundColor}}><Text style={styles.vsText}>{loses} - {wins}</Text></View>
 };
 
 const VsStatus = (wins, loses) => {
@@ -43,12 +27,40 @@ const VsStatus = (wins, loses) => {
   return wins > loses ? 'losing' : 'winning'
 }
 
-const FriendProfile = ({ friend, onDelete, onBack }) => {
+const FriendProfile = () => {
   const {paint_delete, paint_X} = useContext(AssetsContext)
+  const {user, token, friends, setFriends} = useContext(UserContext)
   const [friendData, setFriendData] = useState(null);
-  const {user} = useContext(UserContext)
   const [friendWins, setFriendWins] = useState(0)
   const [friendLoses, setFriendLoses] = useState(0)
+
+  const friend = useLocation().state.friend
+  const navigate = useNavigate()
+
+  const handleDeleteFriend = () => {
+    console.log("Deleted")
+    setFriends(friends.filter((f) => f.username !== friend))
+    sendDeleteFriend(token, friend)
+  }
+  const showAlert = () =>
+    Alert.alert(
+      'Delete friend',
+      'Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => handleDeleteFriend(),
+          style: 'default'
+        }
+      ],
+      {
+        cancelable: true,
+      },
+    );
 
   useEffect(() => {
     loadFriendData();
@@ -61,7 +73,6 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
       setFriendData(json);
       setFriendWins(json.wins ? json.wins.filter(w => w === user).length : 0)
       setFriendLoses(json.loses ? json.loses.filter(w => w === user).length : 0)
-      console.log("ss", json.loses.filter(w => w === user).length)
     } catch (error) {
       console.error('Error loading friend data:', error);
     }
@@ -70,25 +81,28 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
   if (!friendData) return <Loading/>
 
   return (
-    <View style={{flex:1, justifyContent:'space-between'}}>
+    <View style={{flex:1, justifyContent:'space-around', alignItems:'center'}}>
+      {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
+      <Text style={styles.name}>{friend}</Text>
+
       <View style={styles.container}>
-        {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
+        
+        <Text style={styles.name}>{`Level: ${friendData.level}`}</Text>
 
-        <Text style={styles.name}>{friend}</Text>
         <Text style={styles.wins}>{`Total wins: ${friendData.wins ? friendData.wins.length : 0}`}</Text>
-
         <Text style={styles.wins}>You're {VsStatus(friendWins, friendLoses)}</Text>
         <VsText wins={friendWins} loses={friendLoses} />
 
-        <TouchableOpacity onPress={() => showAlert(onDelete)} style={{...styles.deleteButton,width: 180}}>
+        
+
+      </View>
+      <TouchableOpacity onPress={() => showAlert()} style={{...styles.deleteButton,width: 180}}>
           <ImageBackground source={paint_delete} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.deleteButtonText}>Delete Friend</Text>
           </ImageBackground>
         </TouchableOpacity>
-
-      </View>
-      <TouchableOpacity onPress={() => onBack(null)} style={styles.deleteButton}>
-          <ImageBackground source={paint_X} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+      <TouchableOpacity onPress={() => navigate("/Lobby", { replace: true })} style={styles.deleteButton}>
+          <ImageBackground source={paint_X} resizeMode='stretch' style={styles.leave}>
           </ImageBackground>
       </TouchableOpacity>
     </View>
@@ -97,40 +111,38 @@ const FriendProfile = ({ friend, onDelete, onBack }) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex:0.5,
     alignItems: 'center',
-    padding: 20,
+    justifyContent:'space-around',
   },
   avatar: {
     width: 200,
     height: 200,
-    marginBottom: 20,
     borderRadius: 100,
     borderWidth: 3,
     borderColor: 'rgba(1,1,1,0.3)',
     alignSelf: 'center',
   },
   name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 10,
+    fontSize: 28,
   },
   wins: {
     fontSize: 18,
-    marginTop: 5,
   },
   text: {
     fontSize: 20,
 
   },
-  winning: {
-    color: 'green',
+  vsTextContainer: {
+    borderWidth: 3,
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 6,
   },
-  losing: {
-    color: 'red',
+  vsText:{
+    fontSize: 20,
   },
-  tied: {
-    color: 'black',
-  },
+
   deleteButtonText: {
     fontSize: 18,
     alignSelf: 'center',
@@ -144,8 +156,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 30,
   },
+  leave: {
+    flex: 1, 
+    alignSelf: 'stretch', 
+  }
   
 });
 

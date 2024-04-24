@@ -82,21 +82,23 @@ const MultiPlayer3D = () => {
 
   const WhoReady = () => {
     return(
-      <View >
-        { (!userReady && puzzle.blocks) 
-          ? (
-            <TouchableOpacity  onPress={sendRedy} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(235, 164, 33, 0.4)'}}>
-              <Text style={{alignSelf: 'center'}}>Redy</Text>
-            </TouchableOpacity>
-            )
-          : ( !friendReady && (<View>
-              <LottieLoad
-              />
-              <Text style={styles.text} >Waiting for {friend}</Text>
-            
-            </View>) )
-        }
-        
+      <View>
+        <View style={styles.readyContainer}>
+          {(!userReady && puzzle.blocks) 
+            ? (
+              <TouchableOpacity  onPress={sendRedy} style={styles.ready}>
+                <Text style={styles.text}>Redy?</Text>
+              </TouchableOpacity>
+              )
+             
+            : (!friendReady && (<View>
+                <LottieLoad
+                />
+                <Text style={styles.text} >Waiting for {friend}</Text>
+              
+              </View>) 
+            )}
+        </View>
       </View>
     )
   }
@@ -422,7 +424,7 @@ const styles = StyleSheet.create({
   },
 
   menu : {
-    flex:0.7,
+    flex:1,
 
     alignItems:'center',
     paddingVertical:7,
@@ -433,6 +435,27 @@ const styles = StyleSheet.create({
     borderColor:'rgba(0, 0, 0, 0.7)', 
     borderRadius: 8,
 
+  },
+
+  readyContainer : {
+    position:'absolute',
+    top:200,
+    right:0,
+    left:0,
+    margin:'auto'
+    
+  },
+  ready : {
+    alignSelf:'center',
+    alignItems:'center',
+    padding:40,
+    paddingVertical:20,
+    backgroundColor:'rgba(123, 168, 50, 0.5)',
+    borderWidth:2.5, 
+    borderBottomWidth:6,
+    borderRightWidth:4,
+    borderColor:'rgba(0, 0, 0, 0.7)', 
+    borderRadius: 8,
   },
 
   gameContainer: {
@@ -460,7 +483,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-
 
   },
   button: {
