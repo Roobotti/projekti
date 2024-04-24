@@ -11,12 +11,12 @@ import { Game3dContext } from '../contexts/Game3dContext';
 import * as Animatable from 'react-native-animatable';
 
 export const ScoreOnline = () => {
-    const {xp3D, level3D, streak3D, score} = useContext(Game3dContext)
+    const {xp3D, level3D, score} = useContext(Game3dContext)
 
     progressBarRef = useRef(null)
     levelRef = useRef(null)
     totalRef = useRef(null)
- 
+
     const [level, setLevel] = useState(level3D)
     const [total, setTotal] = useState(score.total)
 

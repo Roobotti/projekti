@@ -16,14 +16,22 @@ const SinglePlayerMenu = () => {
     <ScrollView contentContainerStyle={styles.container}>
       
         <TouchableOpacity onPress={() => navigate("/SinglePlayer3D", { replace: true })} style={styles.option}>
-          <ImageBackground source={paint_3} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_1} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.optionText}>PLAY 3D</Text>
           </ImageBackground>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigate("/SinglePlayer2D", { replace: true })} style={styles.option}>
-          <ImageBackground source={paint_3} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+          <ImageBackground source={paint_1} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.optionText}>Classic</Text>
+          </ImageBackground>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigate("/", { replace: true })} style={styles.option}>
+          <ImageBackground source={paint_3} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
+            <Text style={styles.optionText}>
+               Menu
+            </Text>
           </ImageBackground>
         </TouchableOpacity>
       

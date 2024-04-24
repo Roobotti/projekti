@@ -29,23 +29,28 @@ const MyModal = ({Title, Info, ContinueText, GoBackText, to, isVisible=true}) =>
         <View style={styles.modalView}>
           <Text style={styles.text}>{Title}</Text>
           <Text style={styles.text}>{Info}</Text>
+
           <TouchableOpacity
-            style={[styles.button, styles.buttonContinue]}
+            style={[styles.button, styles.buttonCancel]}
             onPress={() => {
               setVisible(false)
               navigate(to, { replace: true });
             }}
           >
-            <Text style={styles.text}>{ContinueText}</Text>
+            <Text style={styles.text}>{GoBackText}</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-                style={[styles.button, styles.buttonCancel]}
+                style={[styles.button, styles.buttonContinue]}
                 onPress={() => {
                   setVisible(false)
                 }}
               >
-              <Text style={styles.text}>{GoBackText}</Text>
+              <Text style={styles.text}>{ContinueText}</Text>
           </TouchableOpacity>
+
+          
+          
           
         </View>
       </View>
@@ -62,10 +67,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0, 0.8)",
+    backgroundColor: "rgba(0,0,0, 0.6)",
   },
   modalView: {
-    margin: 10,
     backgroundColor: "rgba(255,225,50,0.9)",
     borderRadius: 20,
     padding: 35,
@@ -75,6 +79,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     margin: 10,
+    marginTop: 30,
     elevation: 4,
   },
   buttonCancel: {
@@ -89,7 +94,6 @@ const styles = StyleSheet.create({
   buttonContinue: {
     alignItems: "center",
     paddingVertical: 10,
-    marginTop: 30,
     backgroundColor: "rgba(123, 168, 50, 0.8)",
     borderWidth: 1.5,
     borderBottomWidth: 4,

@@ -11,6 +11,7 @@ import { Loading } from './Loading';
 import { debounce } from 'lodash';
 
 import * as Animatable from 'react-native-animatable';
+import SpNavi from './SinglePlayerNavigationBar';
 
 
 const SinglePlayer2D = () => {
@@ -59,9 +60,8 @@ const SinglePlayer2D = () => {
 
   return (
     <View style={{flex: 1}}>
-      <TouchableOpacity onPress={getData} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(217, 121, 80, 0.5)'}}>
-        <Text style={{alignSelf: 'center'}}>New board</Text>
-      </TouchableOpacity>
+      <SpNavi getData={getData}/>
+  
       <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
         <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={handleTouchStart}>{puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}</View>
       </View>
@@ -78,7 +78,7 @@ const SinglePlayer2D = () => {
         duration={3000}
         style={{
           position:'absolute',
-          top: 70,
+          top: 90,
           right: 10,
           transform: [{rotate: '30deg'}],
           alignSelf: 'center',

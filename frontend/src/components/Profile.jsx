@@ -59,12 +59,8 @@ const UserAvatar = ({source, onChange}) => {
 
 export const Profile = () => {
   const {paint_wins, paint_loses, paint_delete, paint_X} = useContext(AssetsContext)
-  const {avatar, token, user, wins, loses, setAvatar, setReFresh, level} = useContext(UserContext)
+  const {avatar, token, user, wins, loses, setAvatar, level} = useContext(UserContext)
   const navigate = useNavigate();
-
-  useEffect( () => {
-    setReFresh(Math.random())
-  }, [])
 
   const onAvatarChange = async (image) => {
     setAvatar(image)

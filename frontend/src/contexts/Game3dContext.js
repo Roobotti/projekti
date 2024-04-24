@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useEffect,
-  useContext,
-  useState,
-  useCallback,
-} from "react";
+import React, { createContext, useEffect, useContext, useState } from "react";
 import { padBlock } from "../tools/PadBlock";
 import { blockIsValid } from "../tools/BlockRotations";
 import { floor, max, min } from "lodash";
@@ -14,7 +8,7 @@ import { UserContext } from "./UserContext";
 export const Game3dContext = createContext();
 
 export const Game3dContextProvider = ({ children }) => {
-  const { xp, level, addScore } = useContext(UserContext);
+  const { xp, level, user, addScore } = useContext(UserContext);
 
   const [color, setColor] = useState("red");
 
@@ -75,13 +69,14 @@ export const Game3dContextProvider = ({ children }) => {
 
   //Clear all blockparts
   useEffect(() => {
+    if (allValid) setAllValid(false);
+    else setStreak(0);
     if (blocks.length) {
       setBlockParts([[], [], [], []]);
       setValidBlocks([]);
       setSelectedBlock(blocks[0]);
       setScore({ ...score, time: 0, total: 0 });
     }
-    if (allValid) setAllValid(false);
     setTimeStart(Date.now());
   }, [blocks]);
 
@@ -103,7 +98,7 @@ export const Game3dContextProvider = ({ children }) => {
 
   //Check if all are valid
   useEffect(() => {
-    if (validBlocks.length === 4) {
+    if (validBlocks.length === 1) {
       setAllValid(true);
       if (online) {
         const time = floor((Date.now() - timeStart) / 1000);
@@ -140,11 +135,9 @@ export const Game3dContextProvider = ({ children }) => {
         }
 
         setTimeStart(Date.now());
-        console.log(total);
-        console.log("level: ", i);
 
         setNewLevel(i);
-        addScore(xp + total, i, min([5, streak3D + 1]));
+        if (user) addScore(xp + total, i, min([5, streak3D + 1]));
       }
       setValidBlocks([]);
     }

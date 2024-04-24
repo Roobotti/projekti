@@ -17,7 +17,9 @@ import { Game3dContext } from '../contexts/Game3dContext';
 
 import * as Animatable from 'react-native-animatable';
 import { zoomInUpBig } from './Animations';
-import { useNavigate } from 'react-router-native';
+import { useLocation, useNavigate } from 'react-router-native';
+import { HistoryContext } from '../contexts/HistoryContext';
+import SpNavi from './SinglePlayerNavigationBar';
 
 
 
@@ -27,14 +29,14 @@ const SinglePlayer3D = () => {
   const [ score, setScore ] = useState(false)
 
   const [isLoading, setIsLoading] = useState(false);
-
-  const [menu, setMenu] = useState(false)
-  const [next, setNext] = useState(false)
-
-  const navigate = useNavigate()
+  const [initial, setInitial] = useState(true)
+  
   const { allValid, visibleTop, setVisibleTop, setBlocks} = useContext(Game3dContext)
+  const { streak3D, setStreak} = useContext(Game3dContext)
 
   useEffect( () => {
+    setStreak(0)
+    setInitial(true)
     getData()
   },[])
   
@@ -48,7 +50,8 @@ const SinglePlayer3D = () => {
   gameRef = useRef(null)
 
   useEffect(() => {
-    if (gameRef.current && allValid){
+    if (initial) setInitial(false)
+    else if (gameRef.current && allValid){
       gameRef.current.animate('fadeOut').then( () => setTimeout( () => { setScore(true) }, 10))
       
     }
@@ -68,22 +71,6 @@ const SinglePlayer3D = () => {
     }
   };
 
-  const NewBoard = () => {
-    return(
-      <TouchableOpacity onPress={() => setNext(true)} style={styles.newBoard}>
-        <Text style={styles.text}>New board</Text>
-      </TouchableOpacity>
-    )
-  }
-
-  const Menu = () => {
-
-    return(
-      <TouchableOpacity onPress={() => setMenu(true)} style={styles.menu}>
-        <Text style={styles.text}>Menu</Text>
-      </TouchableOpacity>
-    )
-  }
 
   const Game = () => {
     const [layer, setLayer] = useState(visibleTop ? " Hide " : "Show")
@@ -122,65 +109,10 @@ const SinglePlayer3D = () => {
     )
   }
 
-  const MyModal = ()  => {
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={(next || menu)}
-        onRequestClose={() => {setMenu(false); setNext(false)}}
-        >
-          <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.text}>Are you sure?</Text>
-            <Text style={styles.text}>You will lose your streak!</Text>
-            <TouchableOpacity
-              style={[styles.button, styles.buttonContinue]}
-              onPress={() => {
-                setMenu(false); 
-                setNext(false)
-              }}>
-              <Text style={styles.text}>Keep going</Text>
-            </TouchableOpacity>
-            {menu && (
-              <TouchableOpacity
-                style={[styles.button, styles.buttonCancel]}
-                onPress={() => {
-                  setMenu(false)
-                  navigate("/", { replace: true })
-                }
-                }>
-                <Text style={styles.text}>Menu</Text>
-              </TouchableOpacity>
-            )
-            }{next && (
-              <TouchableOpacity
-                style={[styles.button, styles.buttonCancel]}
-                onPress={() => {
-                  setNext(false)
-                  //setStreak(0)
-                  getData()
-                }}>
-                <Text style={styles.text}>Next</Text>
-              </TouchableOpacity>
-            )
-            }
-            
-          </View>
-        </View>
-      </Modal>
-    )
-  }
 
   const GameState = useMemo(() => {
     return(
       <View style={{flex:1}}>
-        <View style={{height:60}} >
-          <View style={styles.navigationBar}>
-            <Menu/>
-            <NewBoard/>
-          </View>
-        </View>
         
         {!score && 
         <Animatable.View ref={gameRef} delay={100} style={{flex:1}} >
@@ -200,11 +132,11 @@ const SinglePlayer3D = () => {
   const GameAndModal = useMemo(() => {
     return (
       <View style={{flex:1}}>
-        <MyModal/>
+        <SpNavi getData={getData} score={score} streak3D={streak3D}/>
         {GameState}
       </View>
     )
-  }, [isLoading, score, next, menu])
+  }, [isLoading, score])
 
   return GameAndModal
     
@@ -311,6 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     margin: 10,
+    marginTop: 30,
     elevation: 4,
   },
   buttonCancel: {
@@ -325,7 +258,7 @@ const styles = StyleSheet.create({
   buttonContinue: {
     alignItems:'center',
     paddingVertical:10,
-    marginTop: 30,
+    
     backgroundColor:'rgba(123, 168, 50, 0.8)',
     borderWidth:1.5, 
     borderBottomWidth:4,

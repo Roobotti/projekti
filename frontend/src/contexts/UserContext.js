@@ -74,7 +74,6 @@ export const UserContextProvider = ({ children }) => {
   useEffect(() => {
     const f = async () => {
       const t = await authStorage.getAccessToken();
-      console.log("token:", t);
       setToken(t);
     };
     f();

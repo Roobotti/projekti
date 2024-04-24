@@ -23,7 +23,7 @@ export const HistoryContextProvider = ({ children }) => {
         setMyModal(
           <MyModal
             Title="Hold on!"
-            Info="Are you sure you want to exit?"
+            Info="Do you want to exit?"
             ContinueText="YES"
             GoBackText="Cancel"
             to="/"
@@ -35,7 +35,7 @@ export const HistoryContextProvider = ({ children }) => {
         setMyModal(
           <MyModal
             Title="Hold on!"
-            Info="Are you sure you want to exit?"
+            Info="Do you want to exit?"
             ContinueText="YES"
             GoBackText="Cancel"
             to="/Lobby"
@@ -47,9 +47,9 @@ export const HistoryContextProvider = ({ children }) => {
         setMyModal(
           <MyModal
             Title="Hold on!"
-            Info="Are you sure you want to exit?"
-            ContinueText="YES"
-            GoBackText="Cancel"
+            Info="Do you want to exit?"
+            ContinueText="Keep Going"
+            GoBackText="EXIT"
             to="/SinglePlayerMenu"
           />
         );
