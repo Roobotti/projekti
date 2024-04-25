@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, ImageBackground, Modal } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
 
 
 import {ColorBlocks, Hint, PuzzleProve} from './Matrix';
@@ -23,17 +23,18 @@ import { useNavigate } from 'react-router-native';
 import Matrix3D from './Matrix3D';
 import { zoomInUpBig } from './Animations';
 import { Score, ScoreOnline } from './Score';
+import MyModal from './MyModal';
 
 const colors = ["red", "green", "blue", "yellow"]
 
 const MultiPlayer3D = () => {
   const {redEffect, greenEffect} = useContext(AssetsContext)
   const {friend, avatar} = useContext(UserContext)
-  const { sendRedy, newGame, sendUbongo, initialize, isLoading, userReady, friendReady, gameOver, win, friendData, setUserReady, puzzle } = useContext(Online3DContext)
+  const { sendRedy, newGame, sendUbongo, giveUp, isLoading, userReady, friendReady, gameOver, win, friendData, puzzle, friendGaveUp } = useContext(Online3DContext)
   
   const [menu, setMenu] = useState(false)
-  const [giveUp, setGiveUp] = useState(false)
-  const navigate = useNavigate()
+  const [giveUpModal, setGiveUpModal] = useState(false)
+  const [userGaveUp, setUserGaveUp] = useState(false)
 
   const [ score, setScore ] = useState(false)
   
@@ -142,53 +143,6 @@ const MultiPlayer3D = () => {
     )
   }
 
-  const MyModal = ()  => {
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={(giveUp || menu)}
-        onRequestClose={() => {setMenu(false); setGiveUp(false)}}
-        >
-          <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.text}>Are you sure?</Text>
-            <TouchableOpacity
-              style={[styles.button, styles.buttonContinue]}
-              onPress={() => {
-                setMenu(false); 
-                setGiveUp(false)
-              }}>
-              <Text style={styles.text}>Keep going</Text>
-            </TouchableOpacity>
-            {menu && (
-              <TouchableOpacity
-                style={[styles.button, styles.buttonCancel]}
-                onPress={() => {
-                  setMenu(false)
-                  navigate("/", { replace: true })
-                }
-                }>
-                <Text style={styles.text}>Menu</Text>
-              </TouchableOpacity>
-            )
-            }{giveUp && (
-              <TouchableOpacity
-                style={[styles.button, styles.buttonCancel]}
-                onPress={() => {
-                  setGiveUp(false)
-                  //setStreak(0)
-                }}>
-                <Text style={styles.text}>Give up</Text>
-              </TouchableOpacity>
-            )
-            }
-            
-          </View>
-        </View>
-      </Modal>
-    )
-  }
 
   const Game = () => {
     const [layer, setLayer] = useState(visibleTop ? " Hide " : "Show")
@@ -300,7 +254,8 @@ const MultiPlayer3D = () => {
   const GameAndModal = useMemo(() => {
       return (
         <View style={{flex:1}}>
-          <MyModal />
+          {giveUpModal && <MyModal Info={`New game will start ${friendGaveUp && `if ${friend} gives up too`} `} ContinueText="Give up" CancelText="Keep going" ContinueTask={giveUp} SetHide={setGiveUpModal}/>}
+          {menu && <MyModal To='/Lobby' SetHide={setMenu}/>}
           <NavigationBar />
           {gameOver
             ? GameOverView 

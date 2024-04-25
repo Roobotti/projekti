@@ -134,7 +134,7 @@ export const SignOut = () => {
       await authStorage.removeAccessToken()
       await userContext.logout()
       navigate("/", { replace: true });
-    } catch (error) { console.log(error) }
+    } catch (error) { navigate("/", { replace: true }) }
   };
 
   s()

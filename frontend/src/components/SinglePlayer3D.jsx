@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { View, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { getPuzzle } from '../services/puzzle';
 

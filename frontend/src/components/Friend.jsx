@@ -9,6 +9,7 @@ import Text from './Text';
 import { AssetsContext } from '../contexts/AssetsContext';
 import { sendDeleteFriend } from '../services/users';
 import { useLocation, useNavigate } from 'react-router-native';
+import MyModal from './MyModal';
 
 
 
@@ -33,6 +34,7 @@ const FriendProfile = () => {
   const [friendData, setFriendData] = useState(null);
   const [friendWins, setFriendWins] = useState(0)
   const [friendLoses, setFriendLoses] = useState(0)
+  const [dModal, setDModal] = useState(false)
 
   const friend = useLocation().state.friend
   const navigate = useNavigate()
@@ -42,25 +44,7 @@ const FriendProfile = () => {
     setFriends(friends.filter((f) => f.username !== friend))
     sendDeleteFriend(token, friend)
   }
-  const showAlert = () =>
-    Alert.alert(
-      'Delete friend',
-      'Are you sure?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: () => handleDeleteFriend(),
-          style: 'default'
-        }
-      ],
-      {
-        cancelable: true,
-      },
-    );
+
 
   useEffect(() => {
     loadFriendData();
@@ -82,6 +66,7 @@ const FriendProfile = () => {
 
   return (
     <View style={{flex:1, justifyContent:'space-around', alignItems:'center'}}>
+      {dModal && <MyModal Title="Delete friend" Info="Are you sure?" ContinueText="Delete" CancelText="Cancel" ContinueTask={handleDeleteFriend} To="/Lobby" SetHide={setDModal} />}
       {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}
       <Text style={styles.name}>{friend}</Text>
 
@@ -96,7 +81,7 @@ const FriendProfile = () => {
         
 
       </View>
-      <TouchableOpacity onPress={() => showAlert()} style={{...styles.deleteButton,width: 180}}>
+      <TouchableOpacity onPress={() => setDModal(true)} style={{...styles.deleteButton,width: 180}}>
           <ImageBackground source={paint_delete} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.deleteButtonText}>Delete Friend</Text>
           </ImageBackground>

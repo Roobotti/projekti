@@ -24,6 +24,9 @@ export const Online3DContextProvider = ({ children }) => {
   const [left, setLeft] = useState(null);
   const [host, setHost] = useState(false);
 
+  const [friendGaveUp, setFriendGaveUp] = useState(false);
+  const [userGaveUp, setUserGaveUp] = useState(false);
+
   const [friendData, setFriendData] = useState(null);
 
   const [puzzle, setPuzzle] = useState([]);
@@ -46,7 +49,8 @@ export const Online3DContextProvider = ({ children }) => {
     setFriendReady(false);
     setGameOver(false);
     setWin(false);
-
+    setFriendGaveUp(false);
+    setUserGaveUp(false);
     if (host) {
       getData();
     }
@@ -84,6 +88,14 @@ export const Online3DContextProvider = ({ children }) => {
     newWin(token, friend);
     setWin(true);
     setGameOver(true);
+  };
+
+  const giveUp = () => {
+    if (friendGaveUp) {
+      newGame();
+    }
+    setUserGaveUp(true);
+    socket.emit("giveUp", { room: room, user: user });
   };
 
   //handles friend lefting
@@ -127,6 +139,12 @@ export const Online3DContextProvider = ({ children }) => {
       socket.on("ubongo", () => {
         setGameOver(true);
       });
+      socket.on("giveUp", () => {
+        if (userGaveUp) {
+          newGame();
+        }
+        setFriendGaveUp(true);
+      });
 
       socket.on("left", handleLeft);
     }
@@ -139,6 +157,7 @@ export const Online3DContextProvider = ({ children }) => {
         newGame,
         sendUbongo,
         initialize,
+        giveUp,
         isLoading,
         userReady,
         friendReady,
@@ -147,6 +166,7 @@ export const Online3DContextProvider = ({ children }) => {
         friendData,
         setUserReady,
         puzzle,
+        friendGaveUp,
       }}
     >
       {children}

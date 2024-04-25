@@ -7,27 +7,9 @@ import { uploadAvatar } from '../services/users';
 
 import Text from './Text';
 import { AssetsContext } from '../contexts/AssetsContext';
+import MyModal from './MyModal';
 
 
-const showAlert = (navigate) =>
-  Alert.alert(
-    'Log out',
-    'Are you sure?',
-    [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Log out',
-        onPress: () => navigate("/SignOut", { replace: true }),
-        style: 'default'
-      }
-    ],
-    {
-      cancelable: true,
-    },
-  );
 
 const UserAvatar = ({source, onChange}) => {
   const [image, setImage] = useState(source);
@@ -60,6 +42,7 @@ const UserAvatar = ({source, onChange}) => {
 export const Profile = () => {
   const {paint_wins, paint_loses, paint_delete, paint_X} = useContext(AssetsContext)
   const {avatar, token, user, wins, loses, setAvatar, level} = useContext(UserContext)
+  const [signOut, setSignOut] = useState(false)
   const navigate = useNavigate();
 
   const onAvatarChange = async (image) => {
@@ -69,6 +52,7 @@ export const Profile = () => {
   };
   return (
     <View style={styles.container}>
+        {signOut && <MyModal Title='Sign out' Info='Are you sure?' ContinueText='Sign out' To='/SignOut' SetHide={setSignOut}/>}
 
         <Text style={styles.name} >{user}</Text>
 
@@ -95,7 +79,7 @@ export const Profile = () => {
           </ImageBackground>
         </View>
 
-        <TouchableOpacity onPress={() => showAlert(navigate)} style={styles.deleteButton}>
+        <TouchableOpacity onPress={() => setSignOut(true)} style={styles.deleteButton}>
           <ImageBackground source={paint_delete} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.deleteButtonText}>Sign Out</Text>
           </ImageBackground>

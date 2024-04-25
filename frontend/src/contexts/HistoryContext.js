@@ -25,8 +25,8 @@ export const HistoryContextProvider = ({ children }) => {
             Title="Hold on!"
             Info="Do you want to exit?"
             ContinueText="YES"
-            GoBackText="Cancel"
-            to="/"
+            CancelText="Cancel"
+            ContinueTask={() => BackHandler.exitApp()}
           />
         );
         break;
@@ -35,10 +35,10 @@ export const HistoryContextProvider = ({ children }) => {
         setMyModal(
           <MyModal
             Title="Hold on!"
-            Info="Do you want to exit?"
+            Info="Do you want to leave?"
             ContinueText="YES"
-            GoBackText="Cancel"
-            to="/Lobby"
+            CancelText="Cancel"
+            To="/Lobby"
           />
         );
         break;
@@ -49,8 +49,8 @@ export const HistoryContextProvider = ({ children }) => {
             Title="Hold on!"
             Info="Do you want to exit?"
             ContinueText="Keep Going"
-            GoBackText="EXIT"
-            to="/SinglePlayerMenu"
+            CancelText="EXIT"
+            To="/SinglePlayerMenu"
           />
         );
         break;

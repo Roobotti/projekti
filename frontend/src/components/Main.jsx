@@ -49,7 +49,7 @@ const Main = () => {
           {myModal}
           <StatusBar />
           <Routes>
-            <Route backAction={console.log("jei")} path="/" element={<Menu />} exact />
+            <Route path="/" element={<Menu />} exact />
             <Route path="/SolutionTest" element={<DevTest />} exact />
             <Route path="/DevMenu" element={<DevMenu />} exact />
             <Route path="/3DbuildTest" element={<Build3dTest />} exact />

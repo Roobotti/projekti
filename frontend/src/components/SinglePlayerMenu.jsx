@@ -30,7 +30,7 @@ const SinglePlayerMenu = () => {
         <TouchableOpacity onPress={() => navigate("/", { replace: true })} style={styles.option}>
           <ImageBackground source={paint_3} resizeMode='stretch' style={{flex: 1, alignSelf: 'stretch', justifyContent:'center'}}>
             <Text style={styles.optionText}>
-               Menu
+               {'<- '}Menu
             </Text>
           </ImageBackground>
         </TouchableOpacity>
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     paddingVertical: 50,
   },
   option: {

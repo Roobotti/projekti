@@ -49,12 +49,12 @@ export const LobbyCollap = () => {
   const [activeSections, setActiveSections] = useState([]);
 
   const [loading, setLoading] = useState(false)
+  const [loadingFriend, setLoadingFriend] = useState(false)
   const [message, setMessage] = useState(null)
 
   const [modal, setModal] = useState("")
 
   const navigate = useNavigate()
-  const location = useLocation()
 
   
   //message timeout
@@ -73,14 +73,14 @@ export const LobbyCollap = () => {
   const CONTENT =  [
     //invites
     {
-      empty: invites.length,
+      empty: !invites.length,
       title: `Invites (${invites.length})`,
       content:
         <TouchableOpacity style={styles.map_container} activeOpacity={1} onPress={() => null}>
             {invites && invites.map((i) => (
               <View key={i.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${i.avatar}` }} style={styles.avatar}/>
-                <Text styles={{textAlign: 'center'}}>{i.username}</Text>
+                <View style={{flex:1,alignItems:'flex-end'}}><Text>{i.username}</Text></View>
                 <TouchableOpacity style={styles.add} onPress={() => handleJoin(i.username)} >
                   <Text>Join</Text>
                 </TouchableOpacity>
@@ -91,7 +91,7 @@ export const LobbyCollap = () => {
     
     //friends
     {
-      empty: friends.length,
+      empty: !friends.length,
       title: `Friends (${friends.length})`,
       content:
           <TouchableOpacity style={styles.map_container} activeOpacity={1} onPress={() => null}>
@@ -117,25 +117,37 @@ export const LobbyCollap = () => {
                 }
             </View>
           ))}
+          {loadingFriend && 
+            <View style={styles.user_container}>
+              <LoadingSmall />
+            </View>
+          }
         </TouchableOpacity>
     },
 
     //friend requests
     {
-      empty: requests.length,
+      empty: !requests.length,
       title: `Friend requests (${requests.length})`,
       content:(
         <TouchableOpacity style={styles.map_container} activeOpacity={1} onPress={() => null}>
           {requests && requests.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
-                <Text style={{alignSelf:'center'}}>{friend.username}</Text>
-                <TouchableOpacity style={styles.add} onPress={() => handleAccept(friend.username)} >
-                  <Text>Add</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.delete} onPress={() => handleDeleteRequest(friend.username)} >
-                  <Text>Delete</Text>
-                </TouchableOpacity>
+                
+                <View style={{ flex:1}}>
+                <Text style={styles.text}>{friend.username}</Text>
+                
+                  <View style={{flexDirection:'row', gap:4}}>
+                    <TouchableOpacity style={styles.add} onPress={() => handleAccept(friend.username)} >
+                      <Text style={styles.text}>Add</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.delete} onPress={() => handleDeleteRequest(friend.username)} >
+                      <Text style={styles.text}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
             </View>
           ))}
         </TouchableOpacity>
@@ -144,7 +156,7 @@ export const LobbyCollap = () => {
 
     //Sent requests
     {
-      empty: sentRequests.length,
+      empty: !sentRequests.length,
       title: `Sent requests (${sentRequests.length})`,
       content:
         (
@@ -152,15 +164,20 @@ export const LobbyCollap = () => {
           {sentRequests && sentRequests.map((friend) => (
             <View key={friend.username} style={styles.user_container}>
               <Image source={{ uri: `data:image/*;base64,${friend.avatar}` }} style={styles.avatar}/>
-              <Text style={{alignSelf:'center'}}>{friend.username}</Text>
-              <TouchableOpacity style={styles.delete} onPress={() => handleDeleteSentRequest(friend.username)} >
-                <Text>Delete</Text>
-              </TouchableOpacity>
+              <View style={{flex:1}}>
+                <Text style={styles.text}>{friend.username}</Text>
+                <View style={{flex:0.5, flexDirection:'row'}}>
+                  <TouchableOpacity style={{...styles.delete, marginHorizontal:40}} onPress={() => handleDeleteSentRequest(friend.username)} >
+                    <Text style={styles.text}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
           ))}
         </TouchableOpacity>
       )
     },
+
   ]
 
 
@@ -173,7 +190,7 @@ export const LobbyCollap = () => {
     //setGame(<MultiPlayer/>)
   };
 
-  const MyModal = ()  => {
+  const HostModal = ()  => {
     return (
       <Modal
         animationType="fade"
@@ -240,29 +257,54 @@ export const LobbyCollap = () => {
   }
 
   const handleAccept = async (friend) => {
-    sendRequest(token, friend)
-    setRequests(requests.filter((f) => f.username !== friend))
-    socket.emit('accept', {"user":user, "friend":friend});
-    const data = await loadFriend(friend)
-    const json = await data.json()
-    console.log("Accept")
-    setFriends([...friends, await json])
+    setLoadingFriend(true)
+    try {
+      sendRequest(token, friend)
+      setRequests(requests.filter((f) => f.username !== friend))
+      socket.emit('accept', {"user":user, "friend":friend});
+      const data = await loadFriend(friend)
+      const json = await data.json()
+      console.log("Accept")
+      await setFriends([...friends, await json])
+      setLoadingFriend(false)
+      }
+      
+    catch (error) {
+      setMessage(`There is no user: "${friend}"`)
+      setLoadingFriend(false)
+    }
   };
 
   const handleAddFriend = async () => {
-    console.log("tok:", token)
     setLoading(true)
-    if (friends.map((f) => f.username).includes(newFriend) || sentRequests.map((f) => f.username).includes(newFriend) || newFriend === user) {
+
+    if (newFriend === user) {
+      setMessage(`You can't add yourself`)
+      setLoading(false)
+      return null
+    }
+    if (sentRequests.map((f) => f.username).includes(newFriend)) {
       setMessage(`You have alredy sent request to: "${newFriend}"`)
       setLoading(false)
       return null
     }
-    if (requests.map((f) => f.username).includes(newFriend)) return handleAccept(newFriend)
+    if (friends.map((f) => f.username).includes(newFriend)) {
+      setMessage(`User "${newFriend}" is allready your friend`)
+      setLoading(false)
+      return null
+    }
+
+    if (requests.map((f) => f.username).includes(newFriend)){
+      setMessage(`Added "${newFriend}" from friend requests`)
+      handleAccept(newFriend)
+      return  null
+    }
 
     try {
       socket.emit('request', {"user":user, "friend": newFriend})
       const data = await loadFriend(newFriend)
       const friend = data.json()
+      setMessage(`Friend request sended to "${newFriend}"`)
       await setSentRequests([...sentRequests, await friend])
       await sendRequest(token, newFriend)
       setLoading(false)
@@ -273,8 +315,6 @@ export const LobbyCollap = () => {
     }
 
   }
-
-
 
   const handleDeleteSentRequest = (friend) => {
     console.log("Deleted")
@@ -297,7 +337,7 @@ export const LobbyCollap = () => {
 
   const renderContent = (section) => {
     return (
-      <Animatable.View style={styles.content}>
+      <Animatable.View animation={"fadeIn"} style={styles.content}>
         {section.content}
       </Animatable.View>
     );
@@ -305,37 +345,47 @@ export const LobbyCollap = () => {
 
   const renderHeader = (section, _, isActive) => {
     //Accordion Header view
-    if (!section.empty) return <></>
-    
+    if (section.empty) return <></>
     return (
-      <Animatable.View>
+      <View >
         <Animatable.View
           duration={400}
-          style={[styles.header, isActive ? styles.active : styles.inactive]}
-          transition="backgroundColor">
+          style={ isActive ? styles.active : styles.inactive}
+          transition="marginHorizontal">
           <Text style={styles.headerText}>{section.title}</Text>
         </Animatable.View>
         {isActive && renderContent(section, isActive)}
-      </Animatable.View>
+      </View>
     );
   };
 
-
+  const Menu = () => {
+    return (
+      <View style={styles.downBar}>
+          <TouchableOpacity style={styles.menu} onPress={() => {navigate("/", { replace: true })}} >
+              <Text style={styles.text}>Menu</Text>
+          </TouchableOpacity>
+      </View>
+    )
+  }
 
   return (
       <View style={styles.container}>
-        <MyModal />
+        <HostModal />
+        <View style={styles.upBar}>
+            <TextInput
+              style={styles.input}
+              value={newFriend}
+              onChangeText={(text) => setNewFriend(text)}
+              placeholder="Add new friend"
+              returnKeyType="done" 
+              onSubmitEditing={() => handleAddFriend()}
+              cursorColor={'black'}
+            />
+        </View>
 
-        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
-          <TextInput
-            style={styles.input}
-            value={newFriend}
-            onChangeText={(text) => setNewFriend(text)}
-            placeholder="Add new friend"
-            returnKeyType="done" 
-            onSubmitEditing={() => handleAddFriend()}
-            cursorColor={'black'}
-          />
+        <ScrollView ove refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
+          
           {loading && <LoadingSmall/>}
           {message && <Text style={styles.message}> {message} </Text>}
 
@@ -357,20 +407,24 @@ export const LobbyCollap = () => {
             //Duration for Collapse and expand
             onChange={setSections}
             //setting the state of active sections
+            
           
           />
         </ScrollView>
+
+        <Menu />
       </View>
 
   );
 };
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: 'transparent',
     alignItems: 'stretch',
-    paddingTop: 30,
+
   },
   title: {
     textAlign: 'center',
@@ -378,11 +432,7 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     marginBottom: 30,
   },
-  header: {
-    alignSelf:'center',
-    backgroundColor: 'transparent',
-    //marginVertical:15,
-  },
+
   headerText: {
     textAlign: 'center',
     fontSize: 24,
@@ -390,7 +440,7 @@ const styles = StyleSheet.create({
     paddingHorizontal:20,
     paddingTop:15,
 
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor:'rgba(217, 121, 80, 0.2)',
     borderColor: 'black',
     borderWidth: 4,
     borderRadius: 10,
@@ -411,34 +461,67 @@ const styles = StyleSheet.create({
   inactive: {
     alignSelf:'stretch',
     backgroundColor: 'transparent',
-    
     marginHorizontal:40
 
   },
+  
+
+  upBar: {
+    height:60,
+    flexDirection: "row", 
+    backgroundColor:"rgba(0,0,0, 0.4)", 
+    paddingBottom:8,
+    borderBottomWidth:4,
+  },
+  downBar:{
+    height:70,
+    flexDirection: "row", 
+    backgroundColor:"rgba(0,0,0, 0.4)", 
+    paddingVertical:8,
+
+    borderTopWidth:4,
+  },
+
   input: {
+    flex: 1,
     fontFamily:"FreckleFace",
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(217, 121, 80, 0.4)',
     borderWidth: 5,
     borderColor: "rgba(0, 0, 0, 0.8)",
     borderRadius: 10,
     padding: 10,
     paddingLeft: 20,
-    marginBottom: 20,
-    marginHorizontal: 40,
+    marginHorizontal:40
   },
+
+  menu: {
+    flex:1,
+    alignItems:'center',
+    fontFamily:"FreckleFace",
+    backgroundColor: 'rgba(217, 121, 80, 0.3)',
+    borderWidth: 5,
+    borderColor: "rgba(0, 0, 0, 0.8)",
+    borderRadius: 10,
+    padding:4,
+    marginHorizontal:40
+  },
+
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 50,
+    borderColor:'black',
+    borderWidth:2,
+
   },
   user_container: {
     flex:1,
     flexDirection: 'row',
     textAlignVertical: 'center',
-    justifyContent: 'space-evenly',
+    alignItems:'center',
     padding:10,
 
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(217, 121, 80, 0.1)',
     borderWidth: 5,
     borderColor: "rgba(0, 0, 0, 0.8)",
     borderRadius: 10,
@@ -459,24 +542,32 @@ const styles = StyleSheet.create({
   },
 
   add: {
-    alignSelf: 'center',
-    backgroundColor: 'rgba(50, 199, 0, 0.6 )',
-    padding: 15,
+    marginLeft:20,
+    flex:1,
+    backgroundColor: 'rgba(0, 255, 0, 0.2 )',
+    borderWidth:3,
+    padding: 5,
     borderRadius: 20,
+    alignItems: 'center',
+    justifyContent:'center',
   },
   delete: {
-    alignSelf: 'center',
-    backgroundColor: 'rgba(250, 0, 0, 0.6)',
-    padding: 15,
+    flex:1,
+    width:50,
+    height:50,
+    backgroundColor: 'rgba(255,0,0,0.2)',
+    borderWidth:3,
+    padding:5,
     borderRadius: 20,
   },
   message: {
     padding: 10,
     borderRadius: 10,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#f9c2ff',
-    textAlign: 'center'
+    borderWidth: 3,
+
+    textAlign: 'center',
+    margin: 5,
+    marginHorizontal:10,
   },
   text: {fontSize:20, alignSelf:'center'},
 
