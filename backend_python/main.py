@@ -134,6 +134,12 @@ async def handle_contest(sid, args):
     await app.sio.emit("contestResult", {"result": result}, room=room, skip_sid=sid)
 
 
+@app.sio.on("userGiveUp")
+async def handle_contest(sid, args):
+    room = args["room"]
+    await app.sio.emit("friendGaveUp", {}, room=room, skip_sid=sid)
+
+
 @app.sio.on("invite")
 async def handle_invite(sid, args):
     await app.sio.emit(
