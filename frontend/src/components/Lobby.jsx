@@ -81,8 +81,8 @@ export const LobbyCollap = () => {
               <View key={i.username} style={styles.user_container}>
                 <Image source={{ uri: `data:image/*;base64,${i.avatar}` }} style={styles.avatar}/>
                 <View style={{flex:1,alignItems:'flex-end'}}><Text>{i.username}</Text></View>
-                <TouchableOpacity style={styles.add} onPress={() => handleJoin(i.username)} >
-                  <Text>Join</Text>
+                <TouchableOpacity style={styles.add} onPress={() => handleJoin(i.username, i.mode)} >
+                  <Text>Join {i.mode}</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -103,10 +103,10 @@ export const LobbyCollap = () => {
                 <TouchableOpacity style={{...styles.add, backgroundColor:'rgba(64, 223, 255, 0.6)'}} onPress={() => handleProfile(friend.username)} >
                   <Text>{friend.username}</Text>
                 </TouchableOpacity>
-                {(invites && invites.map((i) => i.username).includes(friend.username))
+                {(invites && invites.find((i) => i.username === friend.username))
                   ? (
-                    <TouchableOpacity style={styles.add} onPress={() => handleJoin(friend.username)} >
-                      <Text>Join</Text>
+                    <TouchableOpacity style={styles.add} onPress={() => handleJoin(friend.username, invites.find((i) => i.username === friend.username).mode)} >
+                      <Text>Join {invites.find((i) => i.username === friend.username).mode}</Text>
                     </TouchableOpacity>
                   ) 
                   :(
@@ -177,17 +177,14 @@ export const LobbyCollap = () => {
         </TouchableOpacity>
       )
     },
-
   ]
 
-
-
-  const handleInvite = async (friend) => {
-    console.log("invite", user, friend)
-    socket.emit("invite", {"user":user, "friend":friend});
+  const handleInvite = async (friend, mode) => {
+    socket.emit("invite", {"user":user, "friend":friend, "mode":mode});
     setSentInvite(friend)
     setFriend(friend)
-    //setGame(<MultiPlayer/>)
+    console.log("mode:", mode)
+    console.log("friend:", friend)
   };
 
   const HostModal = ()  => {
@@ -197,7 +194,6 @@ export const LobbyCollap = () => {
         transparent={true}
         visible={modal !== ""}
         onRequestClose={() => setModal("")}
-        on
         >
           <View style={styles.modalContainer}>
           <View style={styles.modalView}>
@@ -206,7 +202,7 @@ export const LobbyCollap = () => {
               <TouchableOpacity
                 style={[styles.button, styles.buttonContinue]}
                 onPress={() => {
-                  handleInvite(modal)
+                  handleInvite(modal, "3D")
                   setModal("")
                   navigate("/MultiPlayer3D", { replace: true })
                 }}>
@@ -216,7 +212,7 @@ export const LobbyCollap = () => {
               <TouchableOpacity
                 style={[styles.button, styles.buttonContinue]}
                 onPress={() => {
-                  handleInvite(modal)
+                  handleInvite(modal, "2D")
                   setModal("")
                   navigate("/MultiPlayer", { replace: true })
                 }
@@ -237,14 +233,12 @@ export const LobbyCollap = () => {
         </View>
       </Modal>
     )
-  }
+  };
 
-  const handleJoin = (friend) => {
-    console.log("join")
+  const handleJoin = (friend, mode) => {
     setFriend(friend)
-    
-    //setGame(<MultiPlayer/>)
-    navigate("/MultiPlayer3D", { replace: true })
+    console.log("mode is: ", mode)
+    navigate((mode === "3D") ? "/MultiPlayer3D" : "/MultiPlayer", { replace: true })
   };
 
   const handleProfile = (friend) => {
@@ -264,7 +258,6 @@ export const LobbyCollap = () => {
       socket.emit('accept', {"user":user, "friend":friend});
       const data = await loadFriend(friend)
       const json = await data.json()
-      console.log("Accept")
       await setFriends([...friends, await json])
       setLoadingFriend(false)
       }
@@ -317,7 +310,6 @@ export const LobbyCollap = () => {
   }
 
   const handleDeleteSentRequest = (friend) => {
-    console.log("Deleted")
     setSentRequests(sentRequests.filter((f) => f.username !== friend))
     sendDeleteSentRequest(token, friend)
     //setActiveSections([])
@@ -325,7 +317,6 @@ export const LobbyCollap = () => {
   }
 
   const handleDeleteRequest = (friend) => {
-    console.log("Deleted")
     setRequests(requests.filter((f) => f.username !== friend))
     sendDeleteRequest(token, friend)
   }
@@ -547,18 +538,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 255, 0, 0.2 )',
     borderWidth:3,
     padding: 5,
-    borderRadius: 20,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent:'center',
   },
   delete: {
     flex:1,
-    width:50,
-    height:50,
     backgroundColor: 'rgba(255,0,0,0.2)',
     borderWidth:3,
     padding:5,
-    borderRadius: 20,
+    borderRadius: 10,
   },
   message: {
     padding: 10,

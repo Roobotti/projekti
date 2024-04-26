@@ -51,15 +51,6 @@ const Menu = () => {
   const { user, room, friends, invites, sentInvite, loading, setSentInvite, setFriend, setInvites, setFriends} = useContext(UserContext);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (sentInvite) {
-      socket.emit("cancel_invites", {"friend":sentInvite, "user":user})
-      setSentInvite(null)
-    }
-    if (room) socket.emit("leave", {"user":user, "room":room})
-    setFriend(null)
-
-  })
   
   if (assetsLoading || loading) return <Loading/>
 

@@ -37,8 +37,12 @@ export const UserContextProvider = ({ children }) => {
       const friend = await loadFriendData(data.user);
       switch (data.type) {
         case "invite":
+          console.log("data: ", data);
           if (!invites.map((f) => f.username).includes(data.user)) {
-            setInvites((prevInvites) => [...prevInvites, friend]);
+            setInvites((prevInvites) => [
+              ...prevInvites,
+              { ...friend, mode: data.mode },
+            ]);
           }
           break;
         case "cancel_invite":
@@ -99,8 +103,6 @@ export const UserContextProvider = ({ children }) => {
         const level = result ? result.level : 0;
         const streak = result ? result.streak : 0;
 
-        console.log("user:", user);
-        console.log("xp: ", xp, " level: ", level, " streak: ", streak);
         setUser(user);
         setFriends(await friends);
         setRequests(requests);

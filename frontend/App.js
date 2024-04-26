@@ -14,6 +14,7 @@ import { Game3dContextProvider } from "./src/contexts/Game3dContext";
 import { AssetsContextProvider } from "./src/contexts/AssetsContext";
 import { Online3DContextProvider } from "./src/contexts/Online3DContext";
 import { HistoryContextProvider } from "./src/contexts/HistoryContext";
+import { SocketContextProvider } from "./src/contexts/SocketContext";
 
 const authStorage = new AuthStorage();
 const queryClient = new QueryClient();
@@ -31,7 +32,9 @@ const App = () => {
                 <GameContextProvider>
                   <Game3dContextProvider>
                     <Online3DContextProvider>
-                      <Main />
+                      <SocketContextProvider>
+                        <Main />
+                      </SocketContextProvider>
                     </Online3DContextProvider>
                   </Game3dContextProvider>
                 </GameContextProvider>

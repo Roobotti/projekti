@@ -17,8 +17,6 @@ import { Game3dContext } from '../contexts/Game3dContext';
 
 import * as Animatable from 'react-native-animatable';
 import { zoomInUpBig } from './Animations';
-import { useLocation, useNavigate } from 'react-router-native';
-import { HistoryContext } from '../contexts/HistoryContext';
 import SpNavi from './SinglePlayerNavigationBar';
 
 
@@ -31,10 +29,10 @@ const SinglePlayer3D = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [initial, setInitial] = useState(true)
   
-  const { allValid, visibleTop, setVisibleTop, setBlocks} = useContext(Game3dContext)
-  const { streak3D, setStreak} = useContext(Game3dContext)
+  const { allValid, visibleTop, setVisibleTop, setBlocks, streak3D, setStreak, setOnline} = useContext(Game3dContext)
 
   useEffect( () => {
+    setOnline(false)
     setStreak(0)
     setInitial(true)
     getData()

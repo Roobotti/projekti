@@ -40,7 +40,6 @@ const FriendProfile = () => {
   const navigate = useNavigate()
 
   const handleDeleteFriend = () => {
-    console.log("Deleted")
     setFriends(friends.filter((f) => f.username !== friend))
     sendDeleteFriend(token, friend)
   }

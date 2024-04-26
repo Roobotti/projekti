@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, ImageBackground, BackHandler } from 'react-native';
 
 
-import {ColorBlocks, Hint, PuzzleProve} from './Matrix';
-import BlockRenderer, { BlockRendererLarge } from './Blocks';
+
 import { Loading } from './Loading';
 
 import { UserContext } from '../contexts/UserContext';
@@ -11,18 +10,15 @@ import { UserContext } from '../contexts/UserContext';
 import * as Animatable from 'react-native-animatable';
 
 import Text from './Text';
-import { debounce } from 'lodash';
 
-import { HourGlassTimer, LottieLoad } from '../lotties/Timers';
-import { GameContext } from '../contexts/GameContext';
+import { LottieLoad } from '../lotties/Timers';
 import { AssetsContext } from '../contexts/AssetsContext';
 import Blocks3D from './Blocks3D';
 import { Online3DContext } from '../contexts/Online3DContext';
 import { Game3dContext } from '../contexts/Game3dContext';
-import { useNavigate } from 'react-router-native';
 import Matrix3D from './Matrix3D';
 import { zoomInUpBig } from './Animations';
-import { Score, ScoreOnline } from './Score';
+import { ScoreOnline } from './Score';
 import MyModal from './MyModal';
 
 const colors = ["red", "green", "blue", "yellow"]
@@ -30,30 +26,29 @@ const colors = ["red", "green", "blue", "yellow"]
 const MultiPlayer3D = () => {
   const {redEffect, greenEffect} = useContext(AssetsContext)
   const {friend, avatar} = useContext(UserContext)
-  const { sendRedy, newGame, sendUbongo, giveUp, isLoading, userReady, friendReady, gameOver, win, friendData, puzzle, friendGaveUp } = useContext(Online3DContext)
+  const { sendRedy, newGame, sendUbongo, giveUp, isLoading, userReady, friendReady, gameOver, win, friendData, puzzle, friendGaveUp, userGaveUp } = useContext(Online3DContext)
   
   const [menu, setMenu] = useState(false)
   const [giveUpModal, setGiveUpModal] = useState(false)
-  const [userGaveUp, setUserGaveUp] = useState(false)
+
+  const [clicks, setClicks] = useState(0)
 
   const [ score, setScore ] = useState(false)
   
-  const [countdown, setCountdown] = useState(6)
-
-
-  const { allValid, visibleTop, setVisibleTop, setBlocks, setOnline} = useContext(Game3dContext)
+  const { allValid, visibleTop, setVisibleTop, setBlocks, setOnline } = useContext(Game3dContext)
     
   gameRef = useRef(null)
 
   useEffect( () => {
     setOnline(true)
     setScore(false)
-    setCountdown(6)
+    setClicks(0)
   },[])
   
   useEffect( () => {
     if (puzzle?.blocks) {
       setBlocks(puzzle.blocks)
+      setClicks(0)
     }
   },[puzzle])
 
@@ -68,17 +63,6 @@ const MultiPlayer3D = () => {
     }
   }, [gameOver])
   
-
-  useEffect(() => {
-    if (friendReady && countdown > 0) {
-      const interval = setInterval(() => {
-        setCountdown((c) => c - 1);
-      }, 1000);
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [friendReady, countdown]);
 
 
   const WhoReady = () => {
@@ -105,10 +89,10 @@ const MultiPlayer3D = () => {
   }
 
   const NavigationBar = () => {
-    const GiveUp = () => {
+    const GiveUp =() => {
       return(
-        <TouchableOpacity onPress={() => setGiveUp(true)} style={styles.newBoard}>
-          <Text style={styles.text}>Give up</Text>
+        <TouchableOpacity onPress={() => userGaveUp ? setClicks(c => c+1) : setGiveUpModal(true) } style={{...styles.newBoard, backgroundColor:((friendGaveUp) ? 'rgba(0, 255, 0, 0.4)' : (userGaveUp ? `rgba(${255-clicks*2}, 0, 0, 0.4)` : 'rgba(217, 121, 80, 0.6)'))}}>
+          <Text style={styles.text}>{clicks < 100 ? (clicks ? ("Give up " + clicks + "X") :"Give up") : ((clicks<113) ? ["Stop.", "Stop it!", "):", "Just try", "Not this", "The puzzle", "Ok", "Happy?", "Stop.", "Stop it!", "Are you..", "Never mind", "I help u"][clicks-100] : BackHandler.exitApp() ? "113 clicks just" : "WHY?")}</Text>
         </TouchableOpacity>
       )
     }
@@ -237,7 +221,7 @@ const MultiPlayer3D = () => {
       <View style={{flex:1}}>
 
         <Animatable.View style= {{flex:1}}>
-          { puzzle?.blocks && friendReady && GameState}
+          { friendReady && puzzle?.blocks && GameState}
           
           {isLoading 
             ? ( <Loading /> )
@@ -251,21 +235,31 @@ const MultiPlayer3D = () => {
 
     },[puzzle, userReady, friendReady, isLoading])
   
+  
   const GameAndModal = useMemo(() => {
       return (
         <View style={{flex:1}}>
-          {giveUpModal && <MyModal Info={`New game will start ${friendGaveUp && `if ${friend} gives up too`} `} ContinueText="Give up" CancelText="Keep going" ContinueTask={giveUp} SetHide={setGiveUpModal}/>}
+          {giveUpModal && <MyModal Info={`New game will start${friendGaveUp ? '!' : ` if ${friend} gives up too`} `} ContinueText="Give up" CancelText="Keep going" ContinueTask={() => giveUp()} SetHide={setGiveUpModal}/>}
           {menu && <MyModal To='/Lobby' SetHide={setMenu}/>}
-          <NavigationBar />
+          
           {gameOver
             ? GameOverView 
             : GameView
           }
         </View>
       )
-    }, [isLoading, score, giveUp, menu, gameOver, userReady, friendReady, puzzle])
+    }, [isLoading, score, menu, gameOver, userReady, friendReady, puzzle, giveUpModal])
 
-  return GameAndModal
+  const final = useMemo(() => {{
+    return(
+      <View style={{flex:1}}>
+        <NavigationBar/>
+        {GameAndModal}
+      </View>
+    )
+
+  }}, [isLoading, score, menu, gameOver, userReady, friendReady, puzzle, giveUpModal, friendGaveUp, userGaveUp, clicks])
+  return final
 };
 
 export default MultiPlayer3D;

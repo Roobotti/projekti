@@ -42,7 +42,6 @@ function rotateMatrixCounterClockwise(matrix) {
   const handleSubmit = () => {
     const matri = rotateMatrixCounterClockwise(matrix)
     const mat = []
-    console.log("--")
     for (let i = 0; i < matri.length; i++) {
       const row = matri[i];
       for (let j = 0; j < row.length; j++) {
@@ -50,7 +49,6 @@ function rotateMatrixCounterClockwise(matrix) {
       }
     }
     setNewMatrix([...newMatrix, mat])
-    console.log(newMatrix)
     setMatrix(Array.from({ length: 6 }, () => Array(4).fill(0)))
   }
 

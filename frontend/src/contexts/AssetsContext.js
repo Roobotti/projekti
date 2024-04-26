@@ -42,7 +42,6 @@ export const AssetsContextProvider = ({ children }) => {
   useEffect(() => {
     const loadImages = async () => {
       try {
-        console.log("loading");
         const [
           img1,
           img3,
@@ -346,7 +345,6 @@ export const AssetsContextProvider = ({ children }) => {
             yellow: y4_blocks[3],
           },
         });
-        console.log("loaded");
         setImagesLoading(false);
       } catch (error) {
         console.error("Error loading images:", error);

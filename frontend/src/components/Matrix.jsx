@@ -70,7 +70,6 @@ export const PuzzleProve = ({matrix, color='black', setColored}) => {
                   delayPressOut={0}
                   onPressIn={() => {
                     setRipplers({...ripplers, [`${colIndex},${rowIndex}`] : "color"})
-                    console.log("r: ", rowIndex, "c: ", colIndex,  "color: from", value, "to ", color )
                     matrix[rowIndex][colIndex] = color
                     setColored(matrix)
                     }}

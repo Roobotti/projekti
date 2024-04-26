@@ -98,7 +98,7 @@ export const Game3dContextProvider = ({ children }) => {
 
   //Check if all are valid
   useEffect(() => {
-    if (validBlocks.length === 1) {
+    if (validBlocks.length === 4) {
       setAllValid(true);
       if (online) {
         const time = floor((Date.now() - timeStart) / 1000);

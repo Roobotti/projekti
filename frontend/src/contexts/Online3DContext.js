@@ -44,7 +44,6 @@ export const Online3DContextProvider = ({ children }) => {
   };
 
   const newGame = async () => {
-    console.log("new game");
     setUserReady(false);
     setFriendReady(false);
     setGameOver(false);
@@ -55,15 +54,6 @@ export const Online3DContextProvider = ({ children }) => {
       getData();
     }
   };
-
-  const handleLeft = useCallback(() => {
-    if (friend) {
-      socket.emit("host", { user: user, friend: friend, userReady: userReady });
-      setLeft(friend);
-      setHost(true);
-      console.log(friend, "left");
-    }
-  });
 
   const getData = async () => {
     try {
@@ -91,11 +81,8 @@ export const Online3DContextProvider = ({ children }) => {
   };
 
   const giveUp = () => {
-    if (friendGaveUp) {
-      newGame();
-    }
     setUserGaveUp(true);
-    socket.emit("giveUp", { room: room, user: user });
+    socket.emit("userGiveUp", { room: room, user: user });
   };
 
   //handles friend lefting
@@ -111,44 +98,11 @@ export const Online3DContextProvider = ({ children }) => {
         };
         getFriend();
         if (host) {
-          console.log("newGame");
           newGame();
         }
       }
     }
   }, [host, friend]);
-
-  //handles the sockets
-  useEffect(() => {
-    initialize();
-    if (friend) {
-      socket.emit("join", { user: user, friend: friend });
-      socket.on("room", ({ room, host, blocks, solutions }) => {
-        setRoom(room);
-        setHost(host === user);
-        setPuzzle({ blocks, solutions });
-        console.log("join");
-      });
-      socket.on("redy", () => {
-        setFriendReady(true);
-      });
-      socket.on("game_data", ({ blocks, solutions }) => {
-        setPuzzle({ blocks, solutions });
-        setIsLoading(false);
-      });
-      socket.on("ubongo", () => {
-        setGameOver(true);
-      });
-      socket.on("giveUp", () => {
-        if (userGaveUp) {
-          newGame();
-        }
-        setFriendGaveUp(true);
-      });
-
-      socket.on("left", handleLeft);
-    }
-  }, [friend]);
 
   return (
     <Online3DContext.Provider
@@ -164,9 +118,18 @@ export const Online3DContextProvider = ({ children }) => {
         gameOver,
         win,
         friendData,
+        userGaveUp,
+        host,
         setUserReady,
         puzzle,
         friendGaveUp,
+        setLeft,
+        setHost,
+        setPuzzle,
+        setFriendReady,
+        setIsLoading,
+        setGameOver,
+        setFriendGaveUp,
       }}
     >
       {children}

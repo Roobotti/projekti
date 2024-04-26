@@ -2,7 +2,6 @@
  * Rotates the matrix to right
  */
 export const rotate = (matrix) => {
-  console.log("kala");
   matrix = matrix.filter((row) => row.some((r) => r));
 
   const arrayLength = matrix[0].length;
