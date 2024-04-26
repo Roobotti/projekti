@@ -69,10 +69,23 @@ async def handle_leave(sid, args):
     user = args["user"]
 
     if user == current_rooms[room]["host"]:
-        current_rooms[room]["host"] = ""
-        current_rooms[room]["hostRedy"] = current_rooms[room]["playerRedy"]
-        current_rooms[room]["hostGaveUp"] = current_rooms[room]["playerGaveUp"]
-        await app.sio.emit("left", {"user": user}, room=room, skip_sid=sid)
+        current_rooms[room]["host"] = current_rooms[room]["player"]
+
+        if current_rooms[room]["playerRedy"]:
+            current_rooms[room]["playerRedy"] = current_rooms[room]["hostRedy"]
+            current_rooms[room]["hostRedy"] = True
+        else:
+            current_rooms[room]["playerRedy"] = current_rooms[room]["hostRedy"]
+            current_rooms[room]["hostRedy"] = False
+
+        if current_rooms[room]["playerGaveUp"]:
+            current_rooms[room]["playerGaveUp"] = current_rooms[room]["hostGaveUp"]
+            current_rooms[room]["hostGaveUp"] = True
+        else:
+            current_rooms[room]["playerGaveUp"] = current_rooms[room]["hostGaveUp"]
+            current_rooms[room]["hostGaveUp"] = False
+
+        await app.sio.emit("hostLeft", {"user": user}, room=room, skip_sid=sid)
 
     app.sio.leave_room(sid, room)
 
@@ -148,7 +161,7 @@ async def handle_give_up(sid, args):
     else:
         current_rooms[room]["playerGaveUp"] = True
 
-    if current_rooms[room]["hostRedy"] and current_rooms[room]["playerRedy"]:
+    if current_rooms[room]["hostGaveUp"] and current_rooms[room]["playerGaveUp"]:
         current_rooms[room]["hostGaveUp"] = False
         current_rooms[room]["playerGaveUp"] = False
         current_rooms[room]["hostRedy"] = False
