@@ -42,14 +42,11 @@ async def handle_connection(self):
 async def handle_join(sid, args):
     room = make_room_id(args["user"], args["friend"])
 
-    print(room)
     current_rooms[room] = current_rooms.get(room, empty_room.copy())
 
     if not (current_rooms[room]["host"]):
         current_rooms[room] = empty_room.copy()
         current_rooms[room]["host"] = args["user"]
-
-    print(current_rooms[room])
 
     app.sio.enter_room(sid, room)
     await app.sio.emit(
@@ -69,15 +66,11 @@ async def handle_leave(sid, args):
     room = args["room"]
     user = args["user"]
 
-    print("user", user)
-    print("1", current_rooms[room])
-
     if user == current_rooms[room]["host"]:
         current_rooms[room]["host"] = ""
         current_rooms[room]["hostRedy"] = current_rooms[room]["playerRedy"]
         await app.sio.emit("left", {"user": user}, room=room, skip_sid=sid)
 
-    print("2", current_rooms[room])
     app.sio.leave_room(sid, room)
 
 
@@ -85,7 +78,6 @@ async def handle_leave(sid, args):
 async def handle_host(sid, args):
     room = make_room_id(args["user"], args["friend"])
     current_rooms[room]["host"] = args["user"]
-    print("host changed", current_rooms[room])
 
 
 @app.sio.on("userRedy")
@@ -132,7 +124,6 @@ async def handle_ubongo(sid, args):
 @app.sio.on("contest")
 async def handle_contest(sid, args):
     room = args["room"]
-    print("contested")
     await app.sio.emit("contested", {}, room=room, skip_sid=sid)
 
 
@@ -145,15 +136,15 @@ async def handle_contest(sid, args):
 
 @app.sio.on("invite")
 async def handle_invite(sid, args):
-    print("invite", args)
     await app.sio.emit(
-        f"{args['friend']}/post", {"type": "invite", "user": args["user"]}, skip_sid=sid
+        f"{args['friend']}/post",
+        {"type": "invite", "user": args["user"], "mode": args["mode"]},
+        skip_sid=sid,
     )
 
 
 @app.sio.on("cancel_invites")
 async def handle_cancel_invites(sid, args):
-    print("cancel invites")
     await app.sio.emit(
         f"{args['friend']}/post",
         {"type": "cancel_invite", "user": args["user"]},
@@ -163,7 +154,6 @@ async def handle_cancel_invites(sid, args):
 
 @app.sio.on("accept")
 async def handle_accept(sid, args):
-    print("accept", args)
     await app.sio.emit(
         f"{args['friend']}/post", {"type": "accept", "user": args["user"]}, skip_sid=sid
     )
@@ -171,7 +161,6 @@ async def handle_accept(sid, args):
 
 @app.sio.on("request")
 async def handle_request(sid, args):
-    print("request", args)
     await app.sio.emit(
         f"{args['friend']}/post",
         {"type": "request", "user": args["user"]},
