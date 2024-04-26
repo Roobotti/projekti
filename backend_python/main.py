@@ -30,6 +30,8 @@ empty_room = {
     "blocks": [],
     "hostRedy": False,
     "playerRedy": False,
+    "hostGaveUp": False,
+    "playerGaveUp": False,
 }
 
 
@@ -69,6 +71,7 @@ async def handle_leave(sid, args):
     if user == current_rooms[room]["host"]:
         current_rooms[room]["host"] = ""
         current_rooms[room]["hostRedy"] = current_rooms[room]["playerRedy"]
+        current_rooms[room]["hostGaveUp"] = current_rooms[room]["playerGaveUp"]
         await app.sio.emit("left", {"user": user}, room=room, skip_sid=sid)
 
     app.sio.leave_room(sid, room)
@@ -116,6 +119,8 @@ async def handle_ubongo(sid, args):
     room = args["room"]
     current_rooms[room]["hostRedy"] = False
     current_rooms[room]["playerRedy"] = False
+    current_rooms[room]["hostGaveUp"] = False
+    current_rooms[room]["playerGaveUp"] = False
     current_rooms[room]["solutions"] = []
     current_rooms[room]["blocks"] = []
     await app.sio.emit("ubongo", {}, room=room, skip_sid=sid)
@@ -128,16 +133,31 @@ async def handle_contest(sid, args):
 
 
 @app.sio.on("contest_result")
-async def handle_contest(sid, args):
+async def handle_result(sid, args):
     room = args["room"]
     result = args["result"]
     await app.sio.emit("contestResult", {"result": result}, room=room, skip_sid=sid)
 
 
 @app.sio.on("userGiveUp")
-async def handle_contest(sid, args):
+async def handle_give_up(sid, args):
+
     room = args["room"]
-    await app.sio.emit("friendGaveUp", {}, room=room, skip_sid=sid)
+    if args["user"] == current_rooms[room]["host"]:
+        current_rooms[room]["hostGaveUp"] = True
+    else:
+        current_rooms[room]["playerGaveUp"] = True
+
+    if current_rooms[room]["hostRedy"] and current_rooms[room]["playerRedy"]:
+        current_rooms[room]["hostGaveUp"] = False
+        current_rooms[room]["playerGaveUp"] = False
+        current_rooms[room]["hostRedy"] = False
+        current_rooms[room]["playerRedy"] = False
+        current_rooms[room]["solutions"] = []
+        current_rooms[room]["blocks"] = []
+        await app.sio.emit("bothGaveUp", {}, room=room)
+    else:
+        await app.sio.emit("friendGaveUp", {}, room=room, skip_sid=sid)
 
 
 @app.sio.on("invite")
