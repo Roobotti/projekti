@@ -26,9 +26,11 @@ export const Game3dContextProvider = ({ children }) => {
   const [blockParts, setBlockParts] = useState([[], [], [], []]);
   const [blocks, setBlocks] = useState([]);
   const [validBlocks, setValidBlocks] = useState([]);
-  const [reValidate, setReValidate] = useState(false);
+  const [reValidate, setReValidate] = useState(0);
   const [allValid, setAllValid] = useState(false);
   const [blockColorMap, setBlockColorMap] = useState({});
+
+  const [valids, setValids] = useState([false, false, false, false]);
 
   const [xp3D, setXp] = useState(xp);
   const [level3D, setLevel] = useState(level);
@@ -62,8 +64,8 @@ export const Game3dContextProvider = ({ children }) => {
       const i = blocks.indexOf(pressed);
       const newBlockParts = [...blockParts];
       newBlockParts[i] = [];
+      setValidBlocks((a) => [...a.filter((b) => b !== pressed)]);
       setBlockParts(newBlockParts);
-      setValidBlocks((a) => a.filter((b) => b !== pressed));
     }
   }, [pressed]);
 
@@ -81,9 +83,9 @@ export const Game3dContextProvider = ({ children }) => {
   }, [blocks]);
 
   //Set all valid blocks
+  /*
   useEffect(() => {
     if (reValidate) {
-      setReValidate(false);
       for (let i = 0; i < 4; i++) {
         if (blocks?.length && blockParts[i].length) {
           setValidBlocks((b) => {
@@ -93,8 +95,35 @@ export const Game3dContextProvider = ({ children }) => {
           });
         }
       }
+      if (reValidate) setReValidate((v) => v - 1);
     }
   }, [reValidate, blockParts]);
+
+
+
+  */
+
+  const validate = (blockList) => {
+    let newValids = [...validBlocks];
+    let i = 0;
+    blockList.forEach((block) => {
+      i = blocks.indexOf(block);
+      if (blockParts[i].length === block_size[block]) {
+        if (blockIsValid(padBlock(blockParts[i]), block)) {
+          console.log("was walid");
+          newValids = newValids.includes(block)
+            ? newValids
+            : [...newValids, block];
+        } else {
+          newValids = [...newValids.filter((a) => a !== block)];
+        }
+      } else {
+        newValids = [...newValids.filter((a) => a !== block)];
+      }
+    });
+    console.log(newValids);
+    setValidBlocks(newValids);
+  };
 
   //Check if all are valid
   useEffect(() => {
@@ -143,28 +172,40 @@ export const Game3dContextProvider = ({ children }) => {
     }
   }, [validBlocks]);
 
+  /*
   const addBlockPart = (block, position) => {
+    console.log(
+      "[" +
+        blockParts[0].length +
+        ", " +
+        blockParts[1].length +
+        ", " +
+        blockParts[2].length +
+        ", " +
+        blockParts[3].length +
+        "]" +
+        ": "
+    );
+
     const i = blocks.indexOf(block);
     const newBlockParts = blockParts;
-    newBlockParts[i] = [...blockParts[i], position];
+    newBlockParts[i] = Array.from(new Set([...blockParts[i], position]));
     setBlockParts(newBlockParts);
-    if (newBlockParts[i].length >= block_size[block]) setReValidate(true);
+    validate(block, i);
   };
 
   const deleteBlockPart = (block, position) => {
     if (!block) return;
+
     const i = blocks.indexOf(block);
     const newBlockParts = blockParts;
     newBlockParts[i] = [
       ...blockParts[i].filter((b) => !b.every((p, n) => position[n] === p)),
     ];
     setBlockParts(newBlockParts);
-    if (
-      newBlockParts[i].length === block_size[block] ||
-      newBlockParts[i].length === block_size[block] - 1
-    )
-      setReValidate(true);
+    validate(block, i);
   };
+  */
 
   return (
     <Game3dContext.Provider
@@ -184,6 +225,8 @@ export const Game3dContextProvider = ({ children }) => {
         streak3D,
         newLevel,
         online,
+        blockParts,
+        validate,
 
         setXp,
         setLevel,
@@ -194,8 +237,7 @@ export const Game3dContextProvider = ({ children }) => {
         setSelectedBlock,
         setVisibleTop,
         setBlocks,
-        addBlockPart,
-        deleteBlockPart,
+        setBlockParts,
         setPressed,
         setValidBlocks,
         setOnline,

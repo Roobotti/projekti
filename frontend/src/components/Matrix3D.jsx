@@ -35,7 +35,7 @@ const Box = (props)  => {
     const [opacity, setOpacity] = useState(props.opacity);
     const [pos, setPos] = useState([props.position[0], props.position[1], props.position[2]])
     const [h, setH] = useState(0.1);
-    const { color, selectedBlock, visibleTop, pressed, setPressed, addBlockPart, deleteBlockPart, validBlocks, reValidate} = useContext(Game3dContext)
+    const { color, selectedBlock, visibleTop, pressed, setPressed, blocks, blockParts, validate, validBlocks, reValidate, setBlockParts} = useContext(Game3dContext)
     
     useEffect(() => {
       if (pressed === boxBlock){
@@ -60,25 +60,38 @@ const Box = (props)  => {
 
     const onClick = useCallback((e) => {
       e.stopPropagation()
+      const iOld = blocks.indexOf(boxBlock);
+      const iNew = blocks.indexOf(selectedBlock);
 
       if (selectedBlock === boxBlock) {
         setBoxColor("gray")
+        //deleteBlockPart(selectedBlock, [...props.position])
+        const newParts = blockParts
+        newParts[iOld] = [...blockParts[iOld].filter((b) => !b.every((p, n) => [...props.position][n] === p)) ]
+        setBlockParts(newParts);
+        validate([boxBlock])
+
         setBoxBlock(null)
         setH(0.05)
-        deleteBlockPart(selectedBlock, [...props.position])
-        
         
       }
       else {
         setBoxColor(color)
         setH(1)
-        deleteBlockPart(boxBlock, [...props.position])
+        //addBlockPart(selectedBlock, [...props.position], boxBlock)
+        //deleteBlockPart(boxBlock, [...props.position])
+        const newParts = blockParts
+        if (boxBlock) { newParts[iOld] = [...blockParts[iOld].filter((b) => !b.every((p, n) => [...props.position][n] === p)) ] }
+        newParts[iNew] = [...blockParts[iNew], [...props.position]]
+        setBlockParts(newParts);
+        validate(boxBlock ? [boxBlock, selectedBlock] : [selectedBlock])
+  
+
         setBoxBlock(selectedBlock)
-        addBlockPart(selectedBlock, [...props.position])
       }
 
 
-    }, [color, opacity, boxBlock, selectedBlock]);
+    }, [color, opacity, boxBlock, selectedBlock, validBlocks]);
 
 
     return opacity && !(!visibleTop && props.position[1])
