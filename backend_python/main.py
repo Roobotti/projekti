@@ -72,9 +72,15 @@ async def handle_leave(sid, args):
     room = args["room"]
     user = args["user"]
 
+    old_hostGaveUp = current_rooms[room]["hostGaveUp"]
+
     if user == current_rooms[room]["host"]:
         current_rooms[room]["hostRedy"] = current_rooms[room]["playerRedy"]
         current_rooms[room]["playerRedy"] = False
+
+        current_rooms[room]["hostGaveUp"] = current_rooms[room]["playerGaveUp"]
+        current_rooms[room]["playerGaveUp"] = old_hostGaveUp
+
     else:
         current_rooms[room]["playerRedy"] = False
 
