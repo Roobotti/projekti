@@ -5,7 +5,6 @@ import { useAuthStorage } from "../hooks/useStorageContext";
 import { loadFriendData } from "../services/users";
 
 import { socket } from "../services/socket";
-import { update } from "lodash";
 
 export const UserContext = createContext();
 

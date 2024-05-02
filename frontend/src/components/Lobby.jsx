@@ -25,13 +25,12 @@ import { UserContext } from '../contexts/UserContext';
 import Text from './Text';
 
 
-import { loadFriend, loadFriendData, sendDeleteFriend, sendDeleteRequest, sendDeleteSentRequest, sendRequest } from '../services/users';
+import { loadFriend, sendDeleteRequest, sendDeleteSentRequest, sendRequest } from '../services/users';
 
 import { socket } from '../services/socket';
-import FriendProfile from './Friend';
-import { Loading, LoadingSmall } from './Loading';
+import { LoadingSmall } from './Loading';
 
-import { useLocation, useNavigate } from 'react-router-native';
+import { useNavigate } from 'react-router-native';
 
 
 const { width } = Dimensions.get('window');
@@ -41,7 +40,6 @@ const windowWidth = width;
 export const LobbyCollap = () => {
   const { user, friends, requests, token, sentRequests, wins, invites, setFriend, setSentInvite, setReFresh, setFriends, setRequests, setInvites, setSentRequests } = useContext(UserContext);
   const [newFriend, setNewFriend] = useState("");
-  const [profile, setProfile] = useState(null)
   const [refreshing, setRefreshing] = useState(false);
   const [activeSections, setActiveSections] = useState([]);
 
@@ -237,11 +235,6 @@ export const LobbyCollap = () => {
 
   const handleProfile = (friend) => {
     navigate("/Friend", { replace: true , state: {friend}})
-
-    setProfile(<FriendProfile friend={friend} onDelete={() => { 
-      handleDeleteFriend(friend) 
-      setProfile(null)
-    }} onBack={(v) => setProfile(v)}/>)
   }
 
   const handleAccept = async (friend) => {

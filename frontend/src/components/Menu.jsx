@@ -3,9 +3,7 @@
 import {  ScrollView, TouchableOpacity, Text, StyleSheet, ImageBackground } from 'react-native';
 import {  useNavigate } from 'react-router-native';
 
-import { socket } from '../services/socket';
-
-import { useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';
 import { AssetsContext } from '../contexts/AssetsContext';
@@ -48,7 +46,7 @@ const Signed = ({navigate, paint_1, paint_profile}) => {
 
 const Menu = () => {
   const { assetsLoading, paint_1, paint_3, paint_profile} = useContext(AssetsContext)
-  const { user, room, friends, invites, sentInvite, loading, setSentInvite, setFriend, setInvites, setFriends} = useContext(UserContext);
+  const { user, loading} = useContext(UserContext);
   const navigate = useNavigate();
 
   

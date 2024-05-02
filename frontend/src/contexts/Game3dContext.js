@@ -26,11 +26,8 @@ export const Game3dContextProvider = ({ children }) => {
   const [blockParts, setBlockParts] = useState([[], [], [], []]);
   const [blocks, setBlocks] = useState([]);
   const [validBlocks, setValidBlocks] = useState([]);
-  const [reValidate, setReValidate] = useState(0);
   const [allValid, setAllValid] = useState(false);
   const [blockColorMap, setBlockColorMap] = useState({});
-
-  const [valids, setValids] = useState([false, false, false, false]);
 
   const [xp3D, setXp] = useState(xp);
   const [level3D, setLevel] = useState(level);
@@ -81,27 +78,6 @@ export const Game3dContextProvider = ({ children }) => {
     }
     setTimeStart(Date.now());
   }, [blocks]);
-
-  //Set all valid blocks
-  /*
-  useEffect(() => {
-    if (reValidate) {
-      for (let i = 0; i < 4; i++) {
-        if (blocks?.length && blockParts[i].length) {
-          setValidBlocks((b) => {
-            if (blockIsValid(padBlock(blockParts[i]), blocks[i]))
-              return validBlocks.includes(blocks[i]) ? b : [...b, blocks[i]];
-            else return [...b.filter((a) => a !== blocks[i])];
-          });
-        }
-      }
-      if (reValidate) setReValidate((v) => v - 1);
-    }
-  }, [reValidate, blockParts]);
-
-
-
-  */
 
   const validate = (blockList) => {
     let newValids = [...validBlocks];
@@ -172,41 +148,6 @@ export const Game3dContextProvider = ({ children }) => {
     }
   }, [validBlocks]);
 
-  /*
-  const addBlockPart = (block, position) => {
-    console.log(
-      "[" +
-        blockParts[0].length +
-        ", " +
-        blockParts[1].length +
-        ", " +
-        blockParts[2].length +
-        ", " +
-        blockParts[3].length +
-        "]" +
-        ": "
-    );
-
-    const i = blocks.indexOf(block);
-    const newBlockParts = blockParts;
-    newBlockParts[i] = Array.from(new Set([...blockParts[i], position]));
-    setBlockParts(newBlockParts);
-    validate(block, i);
-  };
-
-  const deleteBlockPart = (block, position) => {
-    if (!block) return;
-
-    const i = blocks.indexOf(block);
-    const newBlockParts = blockParts;
-    newBlockParts[i] = [
-      ...blockParts[i].filter((b) => !b.every((p, n) => position[n] === p)),
-    ];
-    setBlockParts(newBlockParts);
-    validate(block, i);
-  };
-  */
-
   return (
     <Game3dContext.Provider
       value={{
@@ -215,7 +156,6 @@ export const Game3dContextProvider = ({ children }) => {
         selectedBlock,
         visibleTop,
         validBlocks,
-        reValidate,
         pressed,
         blockColorMap,
         allValid,

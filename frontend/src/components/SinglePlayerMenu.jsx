@@ -7,7 +7,7 @@ import { useContext } from 'react';
 import { AssetsContext } from '../contexts/AssetsContext';
 
 const SinglePlayerMenu = () => {
-  const { paint_1, paint_3, paint_profile} = useContext(AssetsContext)
+  const { paint_1, paint_3} = useContext(AssetsContext)
 
   const navigate = useNavigate();
   

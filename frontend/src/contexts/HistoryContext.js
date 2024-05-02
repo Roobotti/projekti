@@ -1,15 +1,10 @@
-import { BackHandler, Alert } from "react-native";
+import { BackHandler } from "react-native";
 import { useNavigate, useLocation } from "react-router-native";
 
 import { createContext, useEffect, useState } from "react";
 import MyModal from "../components/MyModal";
 
 export const HistoryContext = createContext();
-
-("Are you sure?");
-("You will lose your streak!");
-("Keep going");
-("Menu");
 
 export const HistoryContextProvider = ({ children }) => {
   const [myModal, setMyModal] = useState(<></>);

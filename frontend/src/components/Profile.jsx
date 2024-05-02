@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, Image, ScrollView, Alert, ImageBackground} from 'react-native';
+import React, { useContext, useState } from 'react';
+import { StyleSheet, View, TouchableOpacity, Image, ImageBackground} from 'react-native';
 import { useNavigate } from 'react-router-native';
 import { UserContext } from '../contexts/UserContext';
 import * as ImagePicker from 'expo-image-picker';

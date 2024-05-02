@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Image, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
+import { View, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { loadFriend } from '../services/users';
 import { UserContext } from '../contexts/UserContext';
 import { Loading } from './Loading';

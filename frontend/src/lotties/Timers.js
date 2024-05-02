@@ -1,13 +1,5 @@
-import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Animated,
-  Easing,
-} from "react-native";
-import { useState, useEffect, useContext, useRef } from "react";
+import { View, Animated, Easing } from "react-native";
+import { useState, useEffect, useRef } from "react";
 import LottieView from "lottie-react-native";
 
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView);

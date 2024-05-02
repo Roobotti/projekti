@@ -1,15 +1,9 @@
-import React, {
-  createContext,
-  useEffect,
-  useContext,
-  useState,
-  useCallback,
-} from "react";
+import React, { createContext, useEffect, useContext, useState } from "react";
 
 import { socket } from "../services/socket";
 import { UserContext } from "./UserContext";
 import { getPuzzle } from "../services/puzzle";
-import { loadFriend, newWin } from "../services/users";
+import { newWin } from "../services/users";
 
 const InitialcountDown = 5000;
 const gameDuration = 3;
@@ -20,7 +14,7 @@ const colors = ["red", "green", "blue", "yellow"];
 export const GameContext = createContext();
 
 export const GameContextProvider = ({ children }) => {
-  const { user, friend, room, token, setRoom } = useContext(UserContext);
+  const { user, friend, room, token } = useContext(UserContext);
 
   const [isLoading, setIsLoading] = useState(false);
   const [userReady, setUserReady] = useState(false);
@@ -28,7 +22,6 @@ export const GameContextProvider = ({ children }) => {
   const [countdown, setCountdown] = useState(InitialcountDown);
   const [gameOver, setGameOver] = useState(false);
   const [win, setWin] = useState(false);
-  const [left, setLeft] = useState(null);
   const [host, setHost] = useState(false);
 
   const [friendData, setFriendData] = useState(null);
@@ -51,7 +44,7 @@ export const GameContextProvider = ({ children }) => {
     setCountdown(InitialcountDown);
     setGameOver(false);
     setWin(false);
-    setLeft(null);
+
     setHost(false);
     setFriendData(null);
     setClicks(0);
@@ -245,7 +238,6 @@ export const GameContextProvider = ({ children }) => {
         setColored,
         setColor,
         color,
-        setLeft,
         setHost,
         setPuzzle,
         setFriendReady,

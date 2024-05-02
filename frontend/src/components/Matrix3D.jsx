@@ -35,7 +35,7 @@ const Box = (props)  => {
     const [opacity, setOpacity] = useState(props.opacity);
     const [pos, setPos] = useState([props.position[0], props.position[1], props.position[2]])
     const [h, setH] = useState(0.1);
-    const { color, selectedBlock, visibleTop, pressed, setPressed, blocks, blockParts, validate, validBlocks, reValidate, setBlockParts} = useContext(Game3dContext)
+    const { color, selectedBlock, visibleTop, pressed, setPressed, blocks, blockParts, validate, validBlocks, setBlockParts} = useContext(Game3dContext)
     
     useEffect(() => {
       if (pressed === boxBlock){
@@ -55,7 +55,7 @@ const Box = (props)  => {
       if (validBlocks.length) {
         setOpacity((validBlocks.includes(boxBlock)) ? 0.9 : props.opacity)
       }
-    }, [validBlocks, reValidate]);
+    }, [validBlocks]);
 
 
     const onClick = useCallback((e) => {

@@ -21,8 +21,6 @@ import { zoomInUpBig } from './Animations';
 import { ScoreOnline } from './Score';
 import MyModal from './MyModal';
 
-const colors = ["red", "green", "blue", "yellow"]
-
 const MultiPlayer3D = () => {
   const {redEffect, greenEffect} = useContext(AssetsContext)
   const {friend, avatar} = useContext(UserContext)

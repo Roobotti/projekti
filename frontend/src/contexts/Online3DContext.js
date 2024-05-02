@@ -1,27 +1,20 @@
-import React, {
-  createContext,
-  useEffect,
-  useContext,
-  useState,
-  useCallback,
-} from "react";
+import React, { createContext, useContext, useState } from "react";
 
 import { socket } from "../services/socket";
 import { UserContext } from "./UserContext";
 import { getPuzzle } from "../services/puzzle";
-import { loadFriend, newWin } from "../services/users";
+import { newWin } from "../services/users";
 
 export const Online3DContext = createContext();
 
 export const Online3DContextProvider = ({ children }) => {
-  const { user, friend, room, token, setRoom } = useContext(UserContext);
+  const { user, friend, room, token } = useContext(UserContext);
 
   const [isLoading, setIsLoading] = useState(false);
   const [userReady, setUserReady] = useState(false);
   const [friendReady, setFriendReady] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [win, setWin] = useState(false);
-  const [left, setLeft] = useState(null);
   const [host, setHost] = useState(false);
 
   const [friendGaveUp, setFriendGaveUp] = useState(false);
@@ -37,7 +30,6 @@ export const Online3DContextProvider = ({ children }) => {
     setFriendReady(false);
     setGameOver(false);
     setWin(false);
-    setLeft(null);
     setHost(false);
     setFriendData(null);
     setPuzzle([]);
@@ -85,27 +77,6 @@ export const Online3DContextProvider = ({ children }) => {
     socket.emit("userGiveUp", { room: room, user: user });
   };
 
-  /*
-  //handles friend lefting
-  useEffect(() => {
-    if (friend) {
-      if (left) {
-        setLeft(null);
-      } else {
-        const getFriend = async () => {
-          const data = await loadFriend(friend);
-          const json = await data.json();
-          setFriendData(json);
-        };
-        getFriend();
-        if (host) {
-          newGame();
-        }
-      }
-    }
-  }, [host, friend]);
-  */
-
   return (
     <Online3DContext.Provider
       value={{
@@ -125,7 +96,6 @@ export const Online3DContextProvider = ({ children }) => {
         setUserReady,
         puzzle,
         friendGaveUp,
-        setLeft,
         setHost,
         setPuzzle,
         setFriendReady,
