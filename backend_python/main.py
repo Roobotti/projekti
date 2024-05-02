@@ -58,6 +58,10 @@ async def handle_join(sid, args):
             "host": current_rooms[room]["host"],
             "blocks": current_rooms[room]["blocks"],
             "solutions": current_rooms[room]["solutions"],
+            "hostRedy": current_rooms[room]["hostRedy"],
+            "playerRedy": current_rooms[room]["playerRedy"],
+            "hostGaveUp": current_rooms[room]["hostGaveUp"],
+            "playerGaveUp": current_rooms[room]["hplayerGaveUpost"],
         },
         room=sid,
     )
@@ -70,10 +74,8 @@ async def handle_leave(sid, args):
 
     if user == current_rooms[room]["host"]:
         current_rooms[room]["hostRedy"] = False
-        current_rooms[room]["hostGaveUp"] = False
     else:
         current_rooms[room]["playerRedy"] = False
-        current_rooms[room]["playerGaveUp"] = False
 
     await app.sio.emit("userLeft", {"user": user}, room=room, skip_sid=sid)
     app.sio.leave_room(sid, room)
@@ -104,6 +106,7 @@ async def handle_data(sid, args):
     blocks = args["blocks"]
     current_rooms[room]["solutions"] = solutions
     current_rooms[room]["blocks"] = blocks
+    current_rooms[room]
     await app.sio.emit(
         "game_data", {"solutions": solutions, "blocks": blocks}, room=room
     )
