@@ -61,7 +61,7 @@ async def handle_join(sid, args):
             "hostRedy": current_rooms[room]["hostRedy"],
             "playerRedy": current_rooms[room]["playerRedy"],
             "hostGaveUp": current_rooms[room]["hostGaveUp"],
-            "playerGaveUp": current_rooms[room]["hplayerGaveUpost"],
+            "playerGaveUp": current_rooms[room]["playerGaveUp"],
         },
         room=sid,
     )
