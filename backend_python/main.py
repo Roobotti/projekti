@@ -73,9 +73,14 @@ async def handle_leave(sid, args):
     user = args["user"]
 
     if user == current_rooms[room]["host"]:
-        current_rooms[room]["hostRedy"] = False
+        current_rooms[room]["hostRedy"] = current_rooms[room]["player"]
+        current_rooms[room]["player"] = False
     else:
         current_rooms[room]["playerRedy"] = False
+
+    if not current_rooms[room]["playerRedy"] and not current_rooms[room]["hostRedy"]:
+        current_rooms[room]["playerGaveUp"] = False
+        current_rooms[room]["hostGaveUp"] = False
 
     await app.sio.emit("userLeft", {"user": user}, room=room, skip_sid=sid)
     app.sio.leave_room(sid, room)
