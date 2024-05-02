@@ -18,11 +18,10 @@ const socketContext2D = () => {
   const { user, friend, setRoom, setSentInvite } = useContext(UserContext);
   const {
     initialize,
-    userReady,
-    setLeft,
     setHost,
     setPuzzle,
     setFriendReady,
+    setUserReady,
     setIsLoading,
     setGameOver,
     setProveTimer,
@@ -34,15 +33,31 @@ const socketContext2D = () => {
 
   useEffect(() => {
     const handleUserLeft = () => {
-      socket.emit("invite", { user: user, friend: friend, mode: "3D" });
-      setSentInvite(friend);
       setHost(true);
+      socket.emit("host", { user: user, friend: friend });
+      socket.emit("invite", { user: user, friend: friend, mode: "2D" });
+      setSentInvite(friend);
     };
 
-    const onRoom = ({ room, host, blocks, solutions }) => {
+    const onRoom = ({
+      room,
+      host,
+      blocks,
+      solutions,
+      hostRedy,
+      playerRedy,
+    }) => {
       setRoom(room);
       setHost(host === user);
       setPuzzle({ blocks, solutions });
+
+      if (host === user) {
+        setFriendReady(playerRedy);
+        setUserReady(hostRedy);
+      } else {
+        setFriendReady(hostRedy);
+        setUserReady(playerRedy);
+      }
     };
 
     const onReady = () => {
@@ -68,7 +83,6 @@ const socketContext2D = () => {
     };
 
     if (location.pathname === "/MultiPlayer" && friend) {
-      initialize();
       socket.emit("join", { user: user, friend: friend });
       socket.on("room", onRoom);
       socket.on("redy", onReady);
@@ -94,29 +108,51 @@ const socketContext2D = () => {
 const socketContext3D = () => {
   const { user, friend, setRoom, setSentInvite } = useContext(UserContext);
   const {
-    initialize,
     setHost,
     setPuzzle,
     setFriendReady,
+    setUserReady,
     setIsLoading,
     setGameOver,
     setFriendGaveUp,
+    setUserGaveUp,
     newGame,
   } = useContext(Online3DContext);
 
   const location = useLocation();
 
   useEffect(() => {
-    const handleUserLeft = ({ user }) => {
-      socket.emit("invite", { user: this.user, friend: friend, mode: "3D" });
-      setSentInvite(friend);
+    const handleUserLeft = () => {
       setHost(true);
+      socket.emit("host", { user: user, friend: friend });
+      socket.emit("invite", { user: user, friend: friend, mode: "3D" });
+      setSentInvite(friend);
     };
 
-    const onRoom = ({ room, host, blocks, solutions }) => {
+    const onRoom = ({
+      room,
+      host,
+      blocks,
+      solutions,
+      hostRedy,
+      playerRedy,
+      hostGaveUp,
+      playerGaveUp,
+    }) => {
       setRoom(room);
       setHost(host === user);
       setPuzzle({ blocks, solutions });
+      if (host === user) {
+        setFriendGaveUp(playerGaveUp);
+        setFriendReady(playerRedy);
+        setUserGaveUp(hostGaveUp);
+        setUserReady(hostRedy);
+      } else {
+        setFriendGaveUp(hostGaveUp);
+        setFriendReady(hostRedy);
+        setUserGaveUp(playerGaveUp);
+        setUserReady(playerRedy);
+      }
     };
 
     const onReady = () => {
@@ -141,7 +177,6 @@ const socketContext3D = () => {
     };
 
     if (location.pathname === "/MultiPlayer3D" && friend) {
-      initialize();
       socket.emit("join", { user: user, friend: friend });
       socket.on("room", onRoom);
       socket.on("redy", onReady);
@@ -153,7 +188,6 @@ const socketContext3D = () => {
     }
 
     return () => {
-      setFriendReady(false);
       socket.off("room", onRoom);
       socket.off("redy", onReady);
       socket.off("game_data", onGameData);

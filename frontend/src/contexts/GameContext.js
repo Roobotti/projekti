@@ -136,25 +136,6 @@ export const GameContextProvider = ({ children }) => {
     setClicks(clicks + 1);
   };
 
-  //handles friend lefting
-  useEffect(() => {
-    if (friend) {
-      if (left) {
-        setLeft(null);
-      } else {
-        const getFriend = async () => {
-          const data = await loadFriend(friend);
-          const json = await data.json();
-          setFriendData(json);
-        };
-        getFriend();
-        if (host) {
-          newGame();
-        }
-      }
-    }
-  }, [host, friend]);
-
   //count down
   useEffect(() => {
     if (friendReady && countdown > 0) {

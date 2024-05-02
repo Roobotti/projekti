@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   inactive: {
     alignSelf:'stretch',
     backgroundColor: 'transparent',
-    marginHorizontal:40
+    marginHorizontal:30
 
   },
   
@@ -482,19 +482,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     paddingLeft: 20,
-    marginHorizontal:40
+    marginHorizontal:30
   },
 
   menu: {
     flex:1,
     alignItems:'center',
+    justifyContent:'center',
     fontFamily:"FreckleFace",
     backgroundColor: 'rgba(217, 121, 80, 0.3)',
     borderWidth: 5,
     borderColor: "rgba(0, 0, 0, 0.8)",
     borderRadius: 10,
     padding:4,
-    marginHorizontal:40
+    marginHorizontal:30
   },
 
   avatar: {

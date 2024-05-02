@@ -44,6 +44,8 @@ const MultiPlayer3D = () => {
     setScore(false)
     setClicks(0)
   },[])
+
+  useEffect( () => {console.log("test- -", userReady)}, [userReady])
   
   useEffect( () => {
     if (puzzle?.blocks) {
@@ -66,23 +68,25 @@ const MultiPlayer3D = () => {
 
 
   const WhoReady = () => {
+    console.log("ready friend: ", !friendReady ? "not ready" : "ready")
+    console.log("ready user: ", !userReady ? "not ready" : "ready")
+    console.log("friend: ", friend)
+
     return(
       <View>
         <View style={styles.readyContainer}>
-          {!userReady
-            ? (
-              <TouchableOpacity  onPress={sendRedy} style={styles.ready}>
-                <Text style={styles.text}>Redy?</Text>
-              </TouchableOpacity>
-              )
-             
-            : (!friendReady ? (<View>
+          {!userReady ? (
+            <TouchableOpacity  onPress={sendRedy} style={styles.ready}>
+              <Text style={styles.text}>Redy?</Text>
+            </TouchableOpacity>
+          ) : (
+            !friendReady ? (
+              <View>
                 <LottieLoad
                 />
                 <Text style={styles.text} >Waiting for {friend}</Text>
-              
               </View>) : null
-            )}
+        )}
         </View>
       </View>
     )
@@ -227,7 +231,7 @@ const MultiPlayer3D = () => {
       <View style={{flex:1}}>
 
         <Animatable.View style= {{flex:1}}>
-          { (friendReady && puzzle?.blocks) ? GameState : null}
+          { (friendReady && userReady && puzzle?.blocks) ? GameState : null}
           
           {isLoading 
             ? ( <Loading /> )

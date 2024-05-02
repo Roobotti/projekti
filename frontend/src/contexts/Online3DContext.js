@@ -85,6 +85,7 @@ export const Online3DContextProvider = ({ children }) => {
     socket.emit("userGiveUp", { room: room, user: user });
   };
 
+  /*
   //handles friend lefting
   useEffect(() => {
     if (friend) {
@@ -103,6 +104,7 @@ export const Online3DContextProvider = ({ children }) => {
       }
     }
   }, [host, friend]);
+  */
 
   return (
     <Online3DContext.Provider
@@ -130,6 +132,7 @@ export const Online3DContextProvider = ({ children }) => {
         setIsLoading,
         setGameOver,
         setFriendGaveUp,
+        setUserGaveUp,
       }}
     >
       {children}
