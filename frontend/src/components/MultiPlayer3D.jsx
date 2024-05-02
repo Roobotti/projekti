@@ -69,19 +69,19 @@ const MultiPlayer3D = () => {
     return(
       <View>
         <View style={styles.readyContainer}>
-          {(!userReady && puzzle.blocks) 
+          {!userReady
             ? (
               <TouchableOpacity  onPress={sendRedy} style={styles.ready}>
                 <Text style={styles.text}>Redy?</Text>
               </TouchableOpacity>
               )
              
-            : (!friendReady && (<View>
+            : (!friendReady ? (<View>
                 <LottieLoad
                 />
                 <Text style={styles.text} >Waiting for {friend}</Text>
               
-              </View>) 
+              </View>) : null
             )}
         </View>
       </View>
@@ -119,8 +119,8 @@ const MultiPlayer3D = () => {
       <View style={{height:60}} >
           <View style={styles.navigationBar}>
             <Menu/>
-            {(friendReady && !gameOver) && <GiveUp/>}
-            {gameOver && <NewGame/>}
+            {(friendReady && !gameOver) ? <GiveUp/> : null}
+            {gameOver ? <NewGame/> : null}
           </View>
       </View>
 
@@ -150,20 +150,21 @@ const MultiPlayer3D = () => {
 
     return (
       <View style={styles.gameContainer} >
-
         <Animatable.View animation={zoomInUpBig} onAnimationEnd={() => setOpacity(1)} style={{flex: 1, display:'flex', justifyContent:'center', zIndex:2}}>
-          {puzzle?.solutions.length && <Matrix3D matrix={puzzle.solutions[0]}/>} 
+          {puzzle?.solutions.length ? <Matrix3D matrix={puzzle.solutions[0]}/> : null} 
         </Animatable.View>
 
         <View style={{}}>
-          {puzzle?.blocks && 
+          {puzzle?.blocks 
+            ? (
               <View>
                 <TopLayer />
                 <Animatable.View animation={'fadeInUpBig'} delay={300} style={styles.blocksContainer}>
                   <Blocks3D blocks={puzzle.blocks}/>
                 </Animatable.View>
               </View>
-            
+            )
+            : null
           }
         </View>
 
@@ -174,10 +175,15 @@ const MultiPlayer3D = () => {
   const GameState = useMemo(() => {
     return(
       <View style={{flex:1}}>
-        {!score && 
-        <Animatable.View ref={gameRef} delay={100} style={{flex:1}} >
-          <Game />
-        </Animatable.View>}
+        {!score 
+          ? (
+            <Animatable.View ref={gameRef} delay={100} style={{flex:1}} >
+              <Game />
+            </Animatable.View>
+          )
+          : null
+        }
+
       </View>
     )
     }, [isLoading, score, puzzle]);
@@ -202,7 +208,7 @@ const MultiPlayer3D = () => {
           )
           : (
             <View>
-              {friendData && <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} />}  
+              {friendData ? <Image source={{ uri: `data:image/jpeg;base64,${friendData.avatar}` }} style={styles.avatar} /> : null}  
                 <Text style={styles.text} > {friend} won </Text>
             </View>
             )
@@ -221,7 +227,7 @@ const MultiPlayer3D = () => {
       <View style={{flex:1}}>
 
         <Animatable.View style= {{flex:1}}>
-          { friendReady && puzzle?.blocks && GameState}
+          { (friendReady && puzzle?.blocks) ? GameState : null}
           
           {isLoading 
             ? ( <Loading /> )
@@ -239,8 +245,8 @@ const MultiPlayer3D = () => {
   const GameAndModal = useMemo(() => {
       return (
         <View style={{flex:1}}>
-          {giveUpModal && <MyModal Info={`New game will start${friendGaveUp ? '!' : ` if ${friend} gives up too`} `} ContinueText="Give up" CancelText="Keep going" ContinueTask={() => giveUp()} SetHide={setGiveUpModal}/>}
-          {menu && <MyModal To='/Lobby' SetHide={setMenu}/>}
+          {giveUpModal ? <MyModal Info={`New game will start${friendGaveUp ? '!' : ` if ${friend} gives up too`} `} ContinueText="Give up" CancelText="Keep going" ContinueTask={() => giveUp()} SetHide={setGiveUpModal}/> : null}
+          {menu ? <MyModal To='/Lobby' SetHide={setMenu}/> : null}
           
           {gameOver
             ? GameOverView 

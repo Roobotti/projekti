@@ -109,8 +109,9 @@ export const GameContextProvider = ({ children }) => {
    * submits the prove and updates winner
    */
   const submitProve = () => {
-    console.log("Solution: ", puzzle.solutions[0]);
-    const result = puzzle.solutions.some((r) => r === colored);
+    const result = puzzle.solutions.some(
+      (row) => row.toString() === colored.toString()
+    );
     socket.emit("contest_result", { room: room, result: result });
     setProveTimer(0);
     setContestTimer(0);
