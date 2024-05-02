@@ -1,19 +1,17 @@
 
 
-import React, { useEffect, useContext, useState, useMemo } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 
 import { Dimensions, Modal } from 'react-native';
 
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   RefreshControl,
   View,
   TouchableOpacity,
   TextInput,
-  Image,
-  Button,
+  Image
 } from 'react-native';
 
 //import for the animation of Collapse and Expand
@@ -45,7 +43,6 @@ export const LobbyCollap = () => {
   const [newFriend, setNewFriend] = useState("");
   const [profile, setProfile] = useState(null)
   const [refreshing, setRefreshing] = useState(false);
-    // Ddefault active selector
   const [activeSections, setActiveSections] = useState([]);
 
   const [loading, setLoading] = useState(false)
@@ -183,8 +180,6 @@ export const LobbyCollap = () => {
     socket.emit("invite", {"user":user, "friend":friend, "mode":mode});
     setSentInvite(friend)
     setFriend(friend)
-    console.log("mode:", mode)
-    console.log("friend:", friend)
   };
 
   const HostModal = ()  => {
@@ -237,7 +232,6 @@ export const LobbyCollap = () => {
 
   const handleJoin = (friend, mode) => {
     setFriend(friend)
-    console.log("mode is: ", mode)
     navigate((mode === "3D") ? "/MultiPlayer3D" : "/MultiPlayer", { replace: true })
   };
 
@@ -360,6 +354,17 @@ export const LobbyCollap = () => {
     )
   }
 
+  const Nofriends = () => {
+    return(
+      <View style={{flex:1, justifyContent:'center'}}>
+        <View style={{padding:10, marginTop:20, borderWidth:5, borderRadius:10,  alignSelf:'center', justifyContent:'center', alignItems:'center', backgroundColor:'rgba(255,0,0,0.2)'}}>
+          <Text style={styles.text}>You need to add friends</Text>
+          <Text style={styles.text}>to play online!</Text>
+        </View>
+      </View>
+    )
+  }
+
   return (
       <View style={styles.container}>
         <HostModal />
@@ -374,13 +379,12 @@ export const LobbyCollap = () => {
               cursorColor={'black'}
             />
         </View>
-
+        
         <ScrollView ove refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
           
           {loading && <LoadingSmall/>}
           {message && <Text style={styles.message}> {message} </Text>}
-
-          
+          {( !!friends.length || !!invites.length || !!sentRequests.length) ? null : <Nofriends/>}
           <Accordion
             sections={CONTENT}
             activeSections={activeSections}

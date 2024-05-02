@@ -1,12 +1,6 @@
 import { useLocation } from "react-router-native";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect } from "react";
 import { GameContext } from "./GameContext";
 import { UserContext } from "./UserContext";
 import { socket } from "../services/socket";
@@ -17,7 +11,6 @@ export const SocketContext = createContext();
 const socketContext2D = () => {
   const { user, friend, setRoom, setSentInvite } = useContext(UserContext);
   const {
-    initialize,
     setHost,
     setPuzzle,
     setFriendReady,

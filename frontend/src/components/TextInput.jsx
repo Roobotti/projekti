@@ -3,7 +3,7 @@ import theme from '../theme';
 
 const styles = StyleSheet.create({
   errorInput: {
-    borderColor: theme.colors.errorRed,
+    borderColor: 'black',
     
   },
 });

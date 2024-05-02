@@ -15,35 +15,36 @@ import { useContext, useEffect, useState } from 'react';
 import { Loading } from './Loading';
 
 const validationSchema = yup.object().shape({
-  username: yup.string().required('Username is required'),
-  password: yup.string().required('Password is required'),
+  username: yup.string().required('Username is required').min(3).max(12).trim("Cannot end or start with space").strict(true),
+  password: yup.string().required('Password is required').min(3),
+  confirmPassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
 });
-
 const initialValues = {
   username: '',
   password: '',
 };
 
-const SignForm = ({onSubmit, mode}) => {
+const SignForm = ({onSubmit, mode, signUP}) => {
     return (
       <View style={styles.form}>
         <FormikTextInput name="username" placeholder="Username"  style={styles.holder}/>
-        <FormikTextInput name="password" placeholder="Password" secureTextEntry borderColor='rgba(255,160,0,0.5)' style={styles.holder}/>
-        <Pressable onPress={onSubmit}  style={{...styles.holder, alignItems: 'center', backgroundColor: 'rgba(33, 235, 184, 0.4)', borderColor: 'rgba(33, 235, 184, 0.4)'}}>
+        <FormikTextInput name="password" placeholder="Password" secureTextEntry style={styles.holder}/>
+        {signUP ? <FormikTextInput name="confirmPassword" placeholder="Confirm password" secureTextEntry style={styles.holder}/> : null}
+        <Pressable onPress={onSubmit}  style={{...styles.holder, alignItems: 'center', backgroundColor: 'rgba(33, 235, 184, 0.4)'}}>
           <Text>{mode}</Text>
         </Pressable>
       </View>
     )
   };
 
-const SignContainer = ({onSubmit, mode}) => {  
+const SignContainer = ({onSubmit, mode, signUP=false}) => {  
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={ values => onSubmit(values)}
       validationSchema={validationSchema}
       >
-      {({ handleSubmit }) => <SignForm onSubmit={handleSubmit} mode={mode}/>}
+      {({ handleSubmit }) => <SignForm onSubmit={handleSubmit} mode={mode} signUP={signUP}/>}
     </Formik>
   )}
 
@@ -51,7 +52,7 @@ const SignContainer = ({onSubmit, mode}) => {
 export const SignIn = () => {
   const navigate = useNavigate();
   const authStorage = useAuthStorage();
-  const {login, user} = useContext(UserContext);
+  const {login} = useContext(UserContext);
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
 
@@ -81,7 +82,7 @@ export const SignIn = () => {
   return (
     <View style={styles.container}>
       {message && <Text style={styles.message}> {message} </Text>}
-        <SignContainer onSubmit={onSubmit} mode="sign in" />
+        <SignContainer onSubmit={onSubmit} mode="Sign in" />
       {loading && <Loading/>}
     </View>
   )
@@ -90,7 +91,7 @@ export const SignIn = () => {
 export const SignUp = () => {
   const navigate = useNavigate();
   const authStorage = useAuthStorage();
-  const {login, user} = useContext(UserContext);
+  const {login} = useContext(UserContext);
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
 
@@ -118,7 +119,7 @@ export const SignUp = () => {
   return (
     <View style={styles.container}>
       {message && <Text style={styles.message}> {message} </Text>}
-      <SignContainer onSubmit={onSubmit} mode="sign up" />
+      <SignContainer onSubmit={onSubmit} mode="Sign up" signUP={true}/>
       {loading && <Loading/>}
     </View>
   )
@@ -149,19 +150,21 @@ const styles = StyleSheet.create({
       padding: 20,
     },
     holder: {
+      backgroundColor: 'rgba(255,160,0,0.2)',
       padding: 20,
       borderRadius: 10,
       marginBottom: 20,
-      borderWidth: 1,
-      borderColor: 'rgba(255,160,0,0.5)',
-      backgroundColor: 'rgba(255,160,0,0.2)',
+      borderWidth: 3,
+      borderColor: 'black',
+      
     },
     message: {
       padding: 10,
       borderRadius: 10,
-      borderWidth: 1,
+      borderWidth: 4,
       borderStyle: 'solid',
-      borderColor: '#f9c2ff',
+      borderColor: 'black',
+      backgroundColor: 'rgba(255,0,0,0.2)',
       textAlign: 'center'
     }
 });
