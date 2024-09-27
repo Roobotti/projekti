@@ -6,7 +6,6 @@ import SinglePlayerMenu from './SinglePlayerMenu';
 import SinglePlayer2D from './SinglePlayer2D';
 import SinglePlayer3D from './SinglePlayer3D';
 import Menu from './Menu';
-import Build3dTest from '../devComponents/Build3dTest';
 import BoardWrite from "./BoardWrite"
 import { LobbyCollap } from './Lobby';
 import { Profile } from './Profile';
@@ -40,7 +39,6 @@ const Main = () => {
           <StatusBar />
           <Routes>
             <Route path="/" element={<Menu />} exact />
-            <Route path="/3DbuildTest" element={<Build3dTest />} exact />
             <Route path="/SinglePlayerMenu" element={<SinglePlayerMenu />} exact />
             <Route path="/SinglePlayer2D" element={<SinglePlayer2D />} exact />
             <Route path="/SinglePlayer3D" element={<SinglePlayer3D />}   exact />

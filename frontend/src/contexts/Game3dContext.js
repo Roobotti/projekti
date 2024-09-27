@@ -86,7 +86,6 @@ export const Game3dContextProvider = ({ children }) => {
       i = blocks.indexOf(block);
       if (blockParts[i].length === block_size[block]) {
         if (blockIsValid(padBlock(blockParts[i]), block)) {
-          console.log("was walid");
           newValids = newValids.includes(block)
             ? newValids
             : [...newValids, block];
@@ -97,7 +96,6 @@ export const Game3dContextProvider = ({ children }) => {
         newValids = [...newValids.filter((a) => a !== block)];
       }
     });
-    console.log(newValids);
     setValidBlocks(newValids);
   };
 

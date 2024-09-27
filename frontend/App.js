@@ -20,8 +20,6 @@ const authStorage = new AuthStorage();
 const queryClient = new QueryClient();
 
 const App = () => {
-  console.log("app", Constants.expoConfig);
-
   return (
     <NativeRouter>
       <HistoryContextProvider>

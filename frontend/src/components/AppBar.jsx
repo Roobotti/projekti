@@ -41,7 +41,6 @@ export const AppBar = () => {
       <View horizontal style={styles.container}>
         <View style={{...styles.tab, gap: 100}}>
           <Tab to="/" text="Menu"/>
-          <Tab to="/DevMenu" text="DevMenu"/>
         </View>
       </View>
 

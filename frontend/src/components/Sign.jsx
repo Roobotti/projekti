@@ -68,7 +68,6 @@ export const SignIn = () => {
       await authStorage.setAccessToken(json["access_token"])
       await login(json["access_token"])
       navigate("/", { replace: true });
-      console.log('Token saved to AsyncStorage');
       setLoading(false)
     
 

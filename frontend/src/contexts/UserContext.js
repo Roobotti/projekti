@@ -32,11 +32,9 @@ export const UserContextProvider = ({ children }) => {
   //socket handling
   useEffect(() => {
     socket.on(`${user}/post`, async (data) => {
-      console.log("sender", data.user, "user", user);
       const friend = await loadFriendData(data.user);
       switch (data.type) {
         case "invite":
-          console.log("data: ", data);
           if (!invites.map((f) => f.username).includes(data.user)) {
             setInvites((prevInvites) => [
               ...prevInvites,
@@ -48,7 +46,6 @@ export const UserContextProvider = ({ children }) => {
           setInvites((prevInvites) =>
             prevInvites.filter((i) => i.username !== data.user)
           );
-          console.log("Invite_removed");
           break;
         case "accept":
           if (!friends.map((f) => f.username).includes(data.user)) {
@@ -57,13 +54,11 @@ export const UserContextProvider = ({ children }) => {
           setRequests((prevRequests) =>
             prevRequests.filter((f) => f.username !== data.user)
           );
-          console.log("accept");
           break;
         case "request":
           if (!requests.map((r) => r.username).includes(friend.username)) {
             setRequests((prevRequests) => [...prevRequests, friend]);
           }
-          console.log("request");
           break;
       }
     });

@@ -42,8 +42,6 @@ const MultiPlayer3D = () => {
     setScore(false)
     setClicks(0)
   },[])
-
-  useEffect( () => {console.log("test- -", userReady)}, [userReady])
   
   useEffect( () => {
     if (puzzle?.blocks) {
@@ -66,10 +64,6 @@ const MultiPlayer3D = () => {
 
 
   const WhoReady = () => {
-    console.log("ready friend: ", !friendReady ? "not ready" : "ready")
-    console.log("ready user: ", !userReady ? "not ready" : "ready")
-    console.log("friend: ", friend)
-
     return(
       <View>
         <View style={styles.readyContainer}>
