@@ -19,9 +19,11 @@ export default {
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
+    bundleIdentifier: "com.roobotti.ubongoapp",
   },
   android: {
     softwareKeyboardLayoutMode: "pan",
+    package: "com.roobotti.ubongoapp",
     adaptiveIcon: {
       foregroundImage: "./assets/adaptive-icon.png",
       backgroundColor: "#000000",
@@ -34,5 +36,8 @@ export default {
     env: process.env.ENV,
     uri: process.env.APOLLO_URI,
     ws: process.env.WS_URL,
+    eas: {
+      projectId: "a1e55254-e543-4037-bca0-d8b8fce25611",
+    },
   },
 };
