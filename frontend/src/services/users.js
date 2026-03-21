@@ -19,22 +19,23 @@ const baseUrl = `${Constants.expoConfig.extra.uri}/api`;
  * @returns {Promise<Token>} Promise object of the users token
  */
 export const signIn = async ({ username, password }) => {
-  try {
-    const formData = new FormData();
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("password", password);
 
-    formData.append("username", username);
-    formData.append("password", password);
-    const response = await fetch(`${baseUrl}/token`, {
-      method: "POST",
-      body: formData,
-    });
-    return response;
-  } catch (error) {
-    console.error("Sign-in error:", error);
-    if (error.response) {
-      console.error("Response data:", error.response.data);
-    }
+  const response = await fetch(`${baseUrl}/token`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    // Let the caller decide how to display the error.
+    const err = new Error(`Failed to sign in (${response.status})`);
+    err.status = response.status;
+    throw err;
   }
+
+  return response;
 };
 
 /**
@@ -46,20 +47,22 @@ export const signIn = async ({ username, password }) => {
  * @returns {Promise<Token>} Promise object of the response
  */
 export const signUp = async ({ username, password }) => {
-  try {
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("password", password);
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("password", password);
 
-    const response = await fetch(`${baseUrl}/signup`, {
-      method: "POST",
-      body: formData,
-    });
+  const response = await fetch(`${baseUrl}/signup`, {
+    method: "POST",
+    body: formData,
+  });
 
-    return response;
-  } catch (error) {
-    console.error("Error signing up:", error);
+  if (!response.ok) {
+    const err = new Error(`Failed to sign up (${response.status})`);
+    err.status = response.status;
+    throw err;
   }
+
+  return response;
 };
 
 /**

@@ -65,15 +65,26 @@ export const SignIn = () => {
       setLoading(true)
       const result = await signIn(values);
       const json = await result.json()
-      await authStorage.setAccessToken(json["access_token"])
-      await login(json["access_token"])
+      const accessToken = json?.['access_token']
+      if (!accessToken) {
+        throw new Error('No access token returned')
+      }
+      await authStorage.setAccessToken(accessToken)
+      await login(accessToken)
       navigate("/", { replace: true });
       setLoading(false)
     
 
     } catch (error) { 
       console.log(error) 
-      setMessage("Wrong credentials")
+      const msg = String(error?.message || '')
+      setMessage(
+        msg.includes('Network') ||
+        msg.includes('Failed to fetch') ||
+        msg.includes('Network request failed')
+          ? 'Cannot reach server'
+          : 'Wrong credentials'
+      )
       setLoading(false)
     }
   };
@@ -104,13 +115,24 @@ export const SignUp = () => {
       await signUp(values);
       const result = await signIn(values);
       const json = await result.json()
-      await authStorage.setAccessToken(json["access_token"])
-      await login(json["access_token"])
+      const accessToken = json?.['access_token']
+      if (!accessToken) {
+        throw new Error('No access token returned')
+      }
+      await authStorage.setAccessToken(accessToken)
+      await login(accessToken)
       navigate("/", { replace: true });
       setLoading(false)
     } catch (error) { 
       console.log(error)
-      setMessage("Username is alredy taken")
+      const msg = String(error?.message || '')
+      setMessage(
+        msg.includes('Network') ||
+        msg.includes('Failed to fetch') ||
+        msg.includes('Network request failed')
+          ? 'Cannot reach server'
+          : 'Username is alredy taken'
+      )
       setLoading(false)
      }
   };
