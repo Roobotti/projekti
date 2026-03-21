@@ -1,5 +1,8 @@
 import "dotenv/config";
 
+const DEFAULT_APOLLO_URI = "https://fs-projekti-ubongo.onrender.com";
+const DEFAULT_WS_URL = "wss://fs-projekti-ubongo.onrender.com";
+
 export default {
   name: "ubongo-app",
   slug: "ubongo-app",
@@ -34,8 +37,8 @@ export default {
   },
   extra: {
     env: process.env.ENV,
-    uri: process.env.APOLLO_URI,
-    ws: process.env.WS_URL,
+    uri: process.env.APOLLO_URI || DEFAULT_APOLLO_URI,
+    ws: process.env.WS_URL || DEFAULT_WS_URL,
     eas: {
       projectId: "a1e55254-e543-4037-bca0-d8b8fce25611",
     },
