@@ -264,7 +264,7 @@ export const LobbyCollap = () => {
       return null
     }
     if (sentRequests.map((f) => f.username).includes(newFriend)) {
-      setMessage(`You have alredy sent request to: "${newFriend}"`)
+      setMessage(`You have already sent request to: "${newFriend}"`)
       setLoading(false)
       return null
     }
