@@ -110,7 +110,7 @@ export const SignUp = () => {
       setLoading(false)
     } catch (error) { 
       console.log(error)
-      setMessage("Username is alredy taken")
+      setMessage("Username is already taken")
       setLoading(false)
      }
   };
