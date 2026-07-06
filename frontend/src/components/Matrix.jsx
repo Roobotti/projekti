@@ -93,6 +93,8 @@ export const PuzzleProve = ({matrix, color='black', setColored}) => {
 };
 
 export const Hint = ({matrix}) => {
+  if (!matrix?.length) return null
+
   const arrayLength = matrix.length
 
   return (
