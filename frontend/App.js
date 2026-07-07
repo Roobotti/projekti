@@ -1,8 +1,8 @@
 import React from "react";
+import { View, Text, ScrollView } from "react-native";
 import { NativeRouter } from "react-router-native";
 
 import { QueryClient, QueryClientProvider } from "react-query";
-import Constants from "expo-constants";
 
 import Main from "./src/components/Main";
 import AuthStorageContext from "./src/contexts/AuthStorageContext";
@@ -19,29 +19,58 @@ import { SocketContextProvider } from "./src/contexts/SocketContext";
 const authStorage = new AuthStorage();
 const queryClient = new QueryClient();
 
+class ErrorBoundary extends React.Component {
+  state = { error: null };
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <ScrollView
+          style={{ flex: 1, backgroundColor: "#111", padding: 24, paddingTop: 60 }}
+        >
+          <Text style={{ color: "#f55", fontSize: 18, marginBottom: 12 }}>
+            App crashed on startup
+          </Text>
+          <Text style={{ color: "#fff", fontFamily: "monospace" }}>
+            {String(this.state.error?.message || this.state.error)}
+          </Text>
+        </ScrollView>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const App = () => {
   return (
-    <NativeRouter>
-      <HistoryContextProvider>
-        <QueryClientProvider client={queryClient}>
-          <AuthStorageContext.Provider value={authStorage}>
-            <AssetsContextProvider>
-              <UserContextProvider>
-                <GameContextProvider>
-                  <Game3dContextProvider>
-                    <Online3DContextProvider>
-                      <SocketContextProvider>
-                        <Main />
-                      </SocketContextProvider>
-                    </Online3DContextProvider>
-                  </Game3dContextProvider>
-                </GameContextProvider>
-              </UserContextProvider>
-            </AssetsContextProvider>
-          </AuthStorageContext.Provider>
-        </QueryClientProvider>
-      </HistoryContextProvider>
-    </NativeRouter>
+    <ErrorBoundary>
+      <NativeRouter>
+        <HistoryContextProvider>
+          <QueryClientProvider client={queryClient}>
+            <AuthStorageContext.Provider value={authStorage}>
+              <AssetsContextProvider>
+                <UserContextProvider>
+                  <GameContextProvider>
+                    <Game3dContextProvider>
+                      <Online3DContextProvider>
+                        <SocketContextProvider>
+                          <Main />
+                        </SocketContextProvider>
+                      </Online3DContextProvider>
+                    </Game3dContextProvider>
+                  </GameContextProvider>
+                </UserContextProvider>
+              </AssetsContextProvider>
+            </AuthStorageContext.Provider>
+          </QueryClientProvider>
+        </HistoryContextProvider>
+      </NativeRouter>
+    </ErrorBoundary>
   );
 };
 

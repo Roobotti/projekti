@@ -1,7 +1,7 @@
-import Constants from "expo-constants";
 import { useAuthStorage } from "../hooks/useStorageContext";
+import { API_URI } from "../config";
 
-const baseUrl = `${Constants.expoConfig.extra.uri}/api`;
+const baseUrl = `${API_URI}/api`;
 
 /**
  * @typedef {{username: string, friends: array<Friend>, requests: array<Friend>, sentRequests: array<Friend>, wins: array<string>, loses: array<string>, lobby: string, avatar: string, disabled: bool | None = None}} UserData
