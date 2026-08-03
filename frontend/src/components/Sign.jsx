@@ -125,14 +125,7 @@ export const SignUp = () => {
       setLoading(false)
     } catch (error) { 
       console.log(error)
-      const msg = String(error?.message || '')
-      setMessage(
-        msg.includes('Network') ||
-        msg.includes('Failed to fetch') ||
-        msg.includes('Network request failed')
-          ? 'Cannot reach server'
-          : 'Username is alredy taken'
-      )
+      setMessage("Username is already taken")
       setLoading(false)
      }
   };
