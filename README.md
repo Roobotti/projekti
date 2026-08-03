@@ -10,10 +10,16 @@ The project combines a React Native / Expo client with a FastAPI backend, MongoD
 
 Beyond the software, the project involved hand-drawn background art, iterative visual design, and extensive playtesting with friends to refine gameplay and fix issues based on user feedback. 
 
+The application is designed for Android devices.
+
+Please read the [quide.md](./quide.md) before playing.
+
 **Live backend:** [https://fs-projekti-ubongo.onrender.com](https://fs-projekti-ubongo.onrender.com)  
 **Mobile builds:** EAS Build (preview APK with production API URLs baked in)
 
 > **Disclaimer:** This project is an unofficial fan-made educational project. All rights to the original UBONGO 3D game belong to its respective creators and publishers.
+
+
 
 # AI Usage Disclosure
 
@@ -25,6 +31,8 @@ AI assistance was used only for:
 The application's code and overall implementation were developed solely without AI code generation. As a result, the repository may be less polished or organized than projects built with extensive AI assistance, which I find expected for a student's first large-scale software project :)
 
 ---
+
+
 
 ## Table of Contents
 
@@ -40,6 +48,8 @@ The application's code and overall implementation were developed solely without 
 10. [Known Limitations](#known-limitations)
 
 ---
+
+
 
 ## Architecture
 
@@ -83,7 +93,11 @@ flowchart TB
 
 ---
 
+
+
 ## Tech Stack and Learning Outcomes
+
+
 
 ### Frontend (`frontend/`)
 
@@ -102,6 +116,8 @@ flowchart TB
 | react-native-animatable, Lottie, expo-haptics | UI polish and feedback       | `Score.jsx`, `Animations.jsx`             |
 
 
+
+
 ### Backend (`backend_python/`)
 
 
@@ -113,6 +129,8 @@ flowchart TB
 | python-jose + passlib   | JWT auth + bcrypt passwords | `services.py`, `config.py`             |
 | NumPy                   | 3D puzzle solver            | `solver.py`, `components.py`           |
 | Pydantic                | Request/response models     | `services.py`                          |
+
+
 
 
 ### Deployment
@@ -134,6 +152,8 @@ Environment variables (frontend via `app.config.js`, backend via `.env`):
 - `DB_NAME` — MongoDB database name
 
 ---
+
+
 
 ## CRUD and Data Operations
 
@@ -194,6 +214,8 @@ Puzzles are **precomputed offline** by the solver and served read-only during ga
 | **Update** | `PUT /api/users/me/avatar` updates self + all references in friends/requests/sentRequests |
 
 
+
+
 ### Frontend Service Layer
 
 - `frontend/src/services/users.js` — all user/friend REST calls
@@ -201,6 +223,8 @@ Puzzles are **precomputed offline** by the solver and served read-only during ga
 - `frontend/src/services/board.js` — stub CRUD for boards (no backend routes implemented; unused)
 
 ---
+
+
 
 ## Unique Features Beyond Boilerplate
 
@@ -254,6 +278,8 @@ Implemented in `GameContext.js` with socket events `ubongo`, `contest`, `contest
 - Leave/rejoin logic preserves room state so players can exit and return (`SocketContext.js`)
 - Documented edge case: closing the entire app may allow rejoining the same room in a different mode
 
+
+
 ### 6. Social Lobby with Real-Time Notifications
 
 `Lobby.jsx` uses a collapsible accordion UI for:
@@ -286,6 +312,8 @@ Animated progress bar and level-up bounce effects in `Score.jsx`.
 - Protected routes via FastAPI `Depends(get_current_active_user)`
 - Token stored in AsyncStorage, attached as `Authorization: Bearer` header
 
+
+
 ### 9. Asset Preloading Context
 
 `AssetsContext.js` preloads at startup:
@@ -305,6 +333,8 @@ Prevents stutter during gameplay from on-demand image loading.
 - Green/red fullscreen effects on win/lose
 
 ---
+
+
 
 ## Real-Time Socket Protocol
 
@@ -332,6 +362,8 @@ All events use Socket.IO at path `/ws/socket.io` on the same host as the REST AP
 Room ID format: `{userA}-{userB}` with usernames sorted alphabetically.
 
 ---
+
+
 
 ## Database Schema
 
@@ -378,6 +410,8 @@ Pydantic models: `User`, `Friend`, `UserInDB` in `services.py`.
 }
 ```
 
+
+
 ### Collection: `own_boards` / `own_solutions`
 
 Used internally by the `upLoadBlocks` seeding pipeline; not exposed via public REST endpoints.
@@ -400,7 +434,11 @@ Socket room state in `main.py`:
 
 ---
 
+
+
 ## Running the Project
+
+
 
 ### Prerequisites
 
@@ -409,6 +447,8 @@ Socket room state in `main.py`:
 - Expo account (for EAS builds)
 - MongoDB Atlas cluster (for backend)
 - Android device or emulator (for mobile testing)
+
+
 
 ### Backend (local)
 
@@ -461,6 +501,8 @@ Runs the solver against boards in `own_boards` and populates `puzzle_data`. This
 
 ---
 
+
+
 ## Project Structure
 
 ```
@@ -490,6 +532,8 @@ Ubongo3dMobile/
         └── lotties/         # Lottie animation assets
 ```
 
+
+
 ### Frontend Routes
 
 
@@ -510,6 +554,8 @@ Ubongo3dMobile/
 
 ---
 
+
+
 ## Known Limitations
 
 - **No automated tests** — Jest is configured in `package.json` but no test files exist; backend has no test suite.
@@ -518,6 +564,8 @@ Ubongo3dMobile/
 - **In-memory room state** — Socket rooms are lost on server restart; not persisted to MongoDB.
 
 ---
+
+
 
 ## Non-Software Work
 

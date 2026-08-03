@@ -41,6 +41,8 @@
 | 22.08.2023 | 6      | sain deployattua backendin Renderiin, websocketit eivät kuitenkaan toimineet connection failed (403 Forbidden), en löytänyt netistä mitään tietoa omaan koodiini, niin meni monta tuntia saada ne toimimaan.                                                                                                                                                                                                                                                                                        |
 
 
+
+
 ## 2024 — jatko (3D-peli ja moninpeli)
 
 
@@ -58,12 +60,14 @@
 | 02.05.2024 | 8      | muokkasin socket logiikkaa niin että pelistä lähteminen ja peliin uudelleen liittyminen toimii, jos koko sovelluksen sulkee niin silloin voi liittyä samaan peliin eri modessa, ei aiheuta erroreita ja peliä pystyy pelaamaan niin jätän korjaamatta vaikka ei nyt mikään siistein ominaisuus olekaan. |
 
 
+
+
 ## 2026 — viimeistely ja julkaisu
 
 
-| Päivä      | Tunnit | Kuvaus                                                                                                                                                                                                                                                                                                                                                                                      |
-| ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 17.03.2026 | 3      | kun olin palauttamassa tehtävää niin minulla tuli ongelmia sovelluksen deployamisen kanssa, sekä minulla alkoi opinnot, nyt kun olen oppinut koodaamaan paljon enemmän, sekä käytössä on tehokkaita tekoäly työkaluja niin ajattelin että haluan viimeistellä pelin esittely kelpoiseksi, se olikin mielestäni jo ihan hyvä niin yritän vain saada toimimaan lanin ulkopuolella. Koska tunt |
+| Päivä      | Tunnit | Kuvaus                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 17.03.2026 | 3+     | kun olin palauttamassa tehtävää niin minulla tuli ongelmia sovelluksen deployamisen kanssa, sekä minulla alkoi opinnot, nyt kun olen oppinut koodaamaan paljon enemmän, sekä käytössä on tehokkaita tekoäly työkaluja niin ajattelin että haluan viimeistellä pelin esittely kelpoiseksi, se olikin mielestäni jo ihan hyvä niin yritän vain saada toimimaan lanin ulkopuolella. Koska tunnit olivat jo niinsanotusti käytetty en enään kirjannut kaikkia, arvioisin että käytin vielä yhteensä noin 20 tuntia. |
 
 
 ---
