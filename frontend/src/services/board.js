@@ -1,6 +1,7 @@
 import axios from "axios";
-import Constants from "expo-constants";
-const baseUrl = `${Constants.expoConfig.extra.uri}/api/board`;
+import { API_URI } from "../config";
+
+const baseUrl = `${API_URI}/api/board`;
 
 export const getSelected = async (board) => {
   const response = await fetch(`${baseUrl}s/${board}`);

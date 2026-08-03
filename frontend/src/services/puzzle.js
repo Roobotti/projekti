@@ -1,5 +1,6 @@
-import Constants from "expo-constants";
-const baseUrl = `${Constants.expoConfig.extra.uri}/api/puzzle`;
+import { API_URI } from "../config";
+
+const baseUrl = `${API_URI}/api/puzzle`;
 
 /**
  * Gets random board with set of blocks and all right solutions

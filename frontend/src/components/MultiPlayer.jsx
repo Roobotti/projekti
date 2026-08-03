@@ -163,7 +163,7 @@ const MultiPlayer = () => {
               pointerEvents={hintTimer?"none":"auto"} 
               onTouchStart={handleTouchStart}
             >
-              {puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}
+              {puzzle?.solutions?.[0] && <Hint matrix={puzzle.solutions[0]}/>}
             </View>
           </View>
         )}

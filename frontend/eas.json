@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 18.4.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "developmentClient": false,
+      "env": {
+        "ENV": "production",
+        "APOLLO_URI": "https://fs-projekti-ubongo.onrender.com",
+        "WS_URL": "wss://fs-projekti-ubongo.onrender.com"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

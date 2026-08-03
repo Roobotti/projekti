@@ -18,7 +18,8 @@ import { Game3dContext } from '../contexts/Game3dContext';
 import * as Animatable from 'react-native-animatable';
 import { zoomInUpBig } from './Animations';
 import SpNavi from './SinglePlayerNavigationBar';
-
+import { Loading } from './Loading';
+import { useLoadingNoticeAfterDelay } from '../hooks/useLoadingNoticeAfterDelay';
 
 
 const SinglePlayer3D = () => {
@@ -27,6 +28,7 @@ const SinglePlayer3D = () => {
   const [ score, setScore ] = useState(false)
 
   const [isLoading, setIsLoading] = useState(false);
+  const showLoadingNotice = useLoadingNoticeAfterDelay(isLoading, 400);
   const [initial, setInitial] = useState(true)
   
   const { allValid, visibleTop, setVisibleTop, setBlocks, streak3D, setStreak, setOnline} = useContext(Game3dContext)
@@ -66,6 +68,7 @@ const SinglePlayer3D = () => {
 
     } catch (error) {
       console.error('Error fetching data:', error);
+      setIsLoading(false);
     }
   };
 
@@ -131,10 +134,16 @@ const SinglePlayer3D = () => {
     return (
       <View style={{flex:1}}>
         <SpNavi getData={getData} score={score} streak3D={streak3D}/>
-        {GameState}
+        {isLoading && showLoadingNotice ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Loading />
+          </View>
+        ) : (
+          GameState
+        )}
       </View>
     )
-  }, [isLoading, score])
+  }, [isLoading, score, showLoadingNotice])
 
   return GameAndModal
     

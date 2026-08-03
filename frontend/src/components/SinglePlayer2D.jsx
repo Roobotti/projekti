@@ -12,6 +12,7 @@ import { debounce } from 'lodash';
 
 import * as Animatable from 'react-native-animatable';
 import SpNavi from './SinglePlayerNavigationBar';
+import { useLoadingNoticeAfterDelay } from '../hooks/useLoadingNoticeAfterDelay';
 
 
 const SinglePlayer2D = () => {
@@ -19,6 +20,7 @@ const SinglePlayer2D = () => {
   const [ puzzle, setPuzzle ] = useState({})
 
   const [isLoading, setIsLoading] = useState(false);
+  const showLoadingNotice = useLoadingNoticeAfterDelay(isLoading, 400);
   const [hintText, setHintText] = useState('Hint availabe') 
   const [hintTimer, setHintTimer] = useState(0)
 
@@ -49,6 +51,7 @@ const SinglePlayer2D = () => {
 
     } catch (error) {
       console.error('Error fetching data:', error);
+      setIsLoading(false);
     }
   };
 
@@ -61,36 +64,41 @@ const SinglePlayer2D = () => {
   return (
     <View style={{flex: 1}}>
       <SpNavi getData={getData}/>
-  
-      <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
-        <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={handleTouchStart}>{puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}</View>
-      </View>
 
-      <View style={{position:'absolute', bottom:5}}>
-        {isLoading 
-          ? ( <Loading /> )
-          : ( puzzle?.blocks && <BlockRenderer blocks={puzzle.blocks}/> )
-        }
-      </View>
+      {isLoading && showLoadingNotice ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Loading />
+        </View>
+      ) : (
+        <>
+          <View style={{flex: 1, display:'flex', justifyContent:'center', marginBottom:100}}>
+            <View pointerEvents={hintTimer?"none":"auto"} onTouchStart={handleTouchStart}>{puzzle?.solutions && <Hint matrix={puzzle.solutions[0]}/>}</View>
+          </View>
 
-      {puzzle && <Animatable.View 
-        animation={'fadeIn'}
-        duration={3000}
-        style={{
-          position:'absolute',
-          top: 90,
-          right: 10,
-          transform: [{rotate: '30deg'}],
-          alignSelf: 'center',
-          alignSelf:'stretch', 
-          padding:10, 
-          backgroundColor:'rgba(121, 217, 80, 0.3)',
-          borderRadius: 6,
-        }}
-        >
-        <Text style={{alignSelf: 'center'}}>{hintText}</Text>
-      </Animatable.View>
-      }
+          <View style={{position:'absolute', bottom:5}}>
+            {puzzle?.blocks && <BlockRenderer blocks={puzzle.blocks}/>}
+          </View>
+
+          {puzzle?.solutions && <Animatable.View 
+            animation={'fadeIn'}
+            duration={3000}
+            style={{
+              position:'absolute',
+              top: 90,
+              right: 10,
+              transform: [{rotate: '30deg'}],
+              alignSelf: 'center',
+              alignSelf:'stretch', 
+              padding:10, 
+              backgroundColor:'rgba(121, 217, 80, 0.3)',
+              borderRadius: 6,
+            }}
+            >
+            <Text style={{alignSelf: 'center'}}>{hintText}</Text>
+          </Animatable.View>
+          }
+        </>
+      )}
 
     </View>
   );
