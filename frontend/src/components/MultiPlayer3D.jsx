@@ -69,7 +69,7 @@ const MultiPlayer3D = () => {
         <View style={styles.readyContainer}>
           {!userReady ? (
             <TouchableOpacity  onPress={sendRedy} style={styles.ready}>
-              <Text style={styles.text}>Redy?</Text>
+              <Text style={styles.text}->Ready?</Text>
             </TouchableOpacity>
           ) : (
             !friendReady ? (

@@ -46,7 +46,7 @@ const MultiPlayer = () => {
         { (!userReady && puzzle.blocks) 
           ? (
             <TouchableOpacity  onPress={sendRedy} style={{alignSelf:'stretch', padding:10,  backgroundColor:'rgba(235, 164, 33, 0.4)'}}>
-              <Text style={{alignSelf: 'center'}}>Redy</Text>
+              <Text style={{alignSelf: 'center'}}>Ready/Text>
             </TouchableOpacity>
             )
           : ( !friendReady && (<View>
